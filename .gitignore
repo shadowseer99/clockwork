@@ -3,8 +3,8 @@
 /*/
 
 # Inverse ignore some stuff
-!/Assets/
-!/ProjectSettings/
+!/TIOE/Assets/
+!/TIOE/ProjectSettings/
 !.gitignore
 
 # OS Stuff
