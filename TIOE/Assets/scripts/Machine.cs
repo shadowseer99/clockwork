@@ -26,6 +26,7 @@ public class Machine : MonoBehaviour {
 	void Update () {
 		if(activated&&tempDevDur>0)
 		{
+            //machine execution
 			float rate = distToMove/deviceDuration;
 			float frameDist = Time.deltaTime*rate;
 			topgear.transform.Rotate(rotrate*Vector3.back);
