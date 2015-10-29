@@ -35,6 +35,7 @@ namespace UnityStandardAssets._2D
 		public void Move(float xrate,float yrate, bool crouch, bool jump)
         {
 			// If the player should jump...
+			/*
 			if (grounded && jump&&transform.parent==null)
 			{
 				// Add a vertical force to the player.
@@ -42,12 +43,15 @@ namespace UnityStandardAssets._2D
 				rigidBody.AddForce(new Vector3(0f, jumpSpeed,0));
 
 			}
-            //float moveHorizontal = Input.GetAxis ("Horizontal");
-            //float moveVertical = Input.GetAxis ("Vertical");
-            //transform.Rotate (xrate * Vector3.forward);
+			*/
+            
 			if (transform.parent == null) 
 			{
 				rigidBody.AddForce(Vector3.right * xrate * maxSpeed);
+			}else 
+			{
+				transform.Rotate(Vector3.back * Time.deltaTime*xrate*200);
+				transform.RotateAround(transform.parent.position, Vector3.back, 100 * Time.deltaTime*xrate);
 			}
 
 			int i = -1;
