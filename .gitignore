@@ -1,10 +1,9 @@
-# Ignore everything
+# Ignore everything, reverse ignore some things
 /*
-/*/
-
-# Inverse ignore some stuff
-!/TIOE/Assets/
+!/TIOE/
+/TIOE/*
 !/TIOE/ProjectSettings/
+!/TIOE/Assets/
 !.gitignore
 
 # OS Stuff
