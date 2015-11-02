@@ -3,18 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class EnviroGear : MonoBehaviour {
+	public float curAngularVelocity=0;
 	public float maxAngularVelocity=90f;
-	public float mass=1f;
 	public float angularAcceleration=10f;
-
+	public float mass=1f;
+	public bool isMovable=false;
+	public bool hasForce { get { return angularAcceleration!=0; } }
+	public bool isGolden=false;
+	
+	private float goldenRotation=0;
 	private List<EnviroGear> neighbors=new List<EnviroGear>();
 	private Transform gearTrans;
 	float radius;
 	private Rigidbody rigidBody;
 	
-	private float curAngularVelocity;
-	private float momentOfIntertia { get { return 0.5f*mass*transform.localScale.y*transform.localScale.z; } }
-	private float angularMomentum {
+	public float momentOfIntertia;
+	public float angularMomentum {
 		get { return momentOfIntertia*curAngularVelocity; }
 		set { curAngularVelocity = value/momentOfIntertia; }
 	}
@@ -24,15 +28,28 @@ public class EnviroGear : MonoBehaviour {
 		// initialize vars
 		radius = gameObject.GetComponent<Collider>().bounds.extents.x;
 		rigidBody = GetComponent<Rigidbody>();
+		momentOfIntertia = 0.5f*mass*transform.localScale.y*transform.localScale.z;
+		
+		// handle static gears and isGolden
+		if (!isMovable)
+			gameObject.layer = LayerMask.NameToLayer("Static Gear");
+		if (isGolden)
+			GetComponent<Renderer>().material.color = new Color(.886f, 0.925f, 0f);
 	}
 	
 	void FixedUpdate ()
 	{
-		// rotate angularSpeed degrees every second
+		// handle goldenGear
+		if (isGolden)
+		{
+			goldenRotation += Time.fixedDeltaTime*curAngularVelocity;
+			if (Mathf.Abs(goldenRotation) > 360)
+				GameObject.FindObjectOfType<MenuManager>().LoadLevel();
+		}
+
+		// rotate and apply torques
 		transform.Rotate(Time.deltaTime*curAngularVelocity*Vector3.left);
-		
-		// add the angularAcceleration with an appropriate drag force
-		curAngularVelocity += Time.fixedDeltaTime * (angularAcceleration - angularAcceleration*curAngularVelocity/maxAngularVelocity);
+		curAngularVelocity += Time.fixedDeltaTime * (angularAcceleration - angularAcceleration*Mathf.Abs(curAngularVelocity)/maxAngularVelocity);
 
 		// average out angular speed of neighbors
 		for (int i=0; i<neighbors.Count; ++i)
@@ -41,8 +58,6 @@ public class EnviroGear : MonoBehaviour {
 			// sum angularMomentum, distribute according to moment of inertia
 			float totalAngularMomentum = angularMomentum - neighbors[i].angularMomentum;
 			float totalMomentOfInertia = momentOfIntertia + neighbors[i].momentOfIntertia;
-			print("averaging out: totalAngularMomentum: "+totalAngularMomentum+"; totalMomentOfInertia: "+totalMomentOfInertia);
-			print(totalAngularMomentum*momentOfIntertia/totalMomentOfInertia);
 			angularMomentum = totalAngularMomentum*momentOfIntertia/totalMomentOfInertia;
 			neighbors[i].angularMomentum = -totalAngularMomentum*neighbors[i].momentOfIntertia/totalMomentOfInertia;
 		}
@@ -59,7 +74,7 @@ public class EnviroGear : MonoBehaviour {
 		return result*curAngularVelocity*Mathf.PI/180;
 	}
 
-	void OnCollisionEnter(Collision coll)
+	void OnTriggerEnter(Collider coll)
 	{
 		// find a gear, return if null
 		EnviroGear gear = coll.gameObject.GetComponent<EnviroGear>();
@@ -71,12 +86,12 @@ public class EnviroGear : MonoBehaviour {
 			neighbors.Add(gear);
 	}
 
-	void OnCollisionStay(Collision coll)
+	void OnTriggerStay(Collider coll)
 	{
 		rigidBody.velocity = Vector3.zero;
 	}
 
-	void OnCollisionExit(Collision coll)
+	void OnTriggerExit(Collider coll)
 	{
 		// find a gear, return if null
 		EnviroGear gear = coll.gameObject.GetComponent<EnviroGear>();
