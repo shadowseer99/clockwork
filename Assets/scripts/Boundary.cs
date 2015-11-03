@@ -7,12 +7,12 @@ public class Boundary : MonoBehaviour {
 	public float topPadding=50;
 	public float leftPAdding=20;
 	public float rightPAdding=20;
+	private bool end=false;
 
 	void Start()
 	{
 		// search for the highest and lowest colliders in the level
 		Collider[] colliders = GameObject.FindObjectsOfType<Collider>();
-		print("colliders.Length: "+colliders.Length);
 		float top=float.NegativeInfinity;
 		float bottom=float.PositiveInfinity;
 		float left=float.PositiveInfinity;
@@ -60,6 +60,14 @@ public class Boundary : MonoBehaviour {
 	void OnTriggerEnter(Collider coll)
 	{
 		if (coll.GetComponent<GearGuyCtrl1>())
-			Application.LoadLevel("End");
+			end = true;
+			
+	}
+
+	void Update()
+	{
+		if (end)
+			GameObject.FindObjectOfType<MenuManager>().DisplayMenu2(4);
+			//GameObject.FindObjectOfType<MenuManager>().LoadLevel();
 	}
 }

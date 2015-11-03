@@ -6,7 +6,7 @@ public class MenuManager : MonoBehaviour {
 	public GameObject canvas;
 	private GameObject[] menus;
 	public string[] levels;
-	private int curLevel=-1;
+	private static int curLevel=-1;
 
 	// Use this for initialization
 	void Start ()
@@ -24,10 +24,18 @@ public class MenuManager : MonoBehaviour {
 	{
 		for (int i=0; i<menus.Length; ++i)
 			menus[i].SetActive(false);
-		MonoBehaviour[] components = transform.gameObject.GetComponents<MonoBehaviour>();
-		for (int i=0; i<components.Length; ++i)
-			components[i].enabled = false;
+		Behaviour[] behaviors = GetComponents<Behaviour>();
+		for (int i=0; i<behaviors.Length; ++i)
+			behaviors[i].enabled = false;
 		this.enabled = true;
+	}
+
+	public void DisplayMenu2(int menu)
+	{
+		if (curLevel>=0)
+			Application.UnloadLevel(levels[curLevel]);
+		curLevel = -1;
+		DisplayMenu(menu);
 	}
 
 	public void DisplayMenu(int menu)
@@ -35,34 +43,29 @@ public class MenuManager : MonoBehaviour {
 		// set only the appropriate menu active
 		HideMenus();
 		menus[menu].SetActive(true);
-		MonoBehaviour[] components = transform.gameObject.GetComponents<MonoBehaviour>();
-		for (int i=0; i<components.Length; ++i)
-			components[i].enabled = true;
+		Behaviour[] behaviors = GetComponents<Behaviour>();
+		for (int i=0; i<behaviors.Length; ++i)
+			behaviors[i].enabled = true;
+		this.enabled = true;
 	}
 
 	public void LoadLevel(int level=-1)
 	{
 		// remove any unnecessary levels/menus
-		UnloadLevel();
 		HideMenus();
+		if (curLevel>=0)
+			Application.UnloadLevel(levels[curLevel]);
 		
-		// load new level
+		// load new level OR load victory menu
 		if (level==-1)
 			level = curLevel+1;
-		if (curLevel<levels.Length)
+		if (level<levels.Length)
 		{
 			Application.LoadLevelAdditive(levels[level]);
 			curLevel = level;
 		} else
 		{
-			Application.LoadLevel("Demo");
+			DisplayMenu2(5);
 		}
-	}
-
-	public void UnloadLevel()
-	{
-		if (curLevel>=0)
-			Application.UnloadLevel(levels[curLevel]);
-		curLevel = -1;
 	}
 }

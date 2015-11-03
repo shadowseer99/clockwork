@@ -28,7 +28,7 @@ public class EnviroGear : MonoBehaviour {
 		// initialize vars
 		radius = gameObject.GetComponent<Collider>().bounds.extents.x;
 		rigidBody = GetComponent<Rigidbody>();
-		momentOfIntertia = 0.5f*mass*transform.localScale.y*transform.localScale.z;
+		momentOfIntertia = 0.5f*mass*transform.localScale.y*transform.localScale.z*81;
 		
 		// handle static gears and isGolden
 		if (!isMovable)
@@ -44,12 +44,15 @@ public class EnviroGear : MonoBehaviour {
 		{
 			goldenRotation += Time.fixedDeltaTime*curAngularVelocity;
 			if (Mathf.Abs(goldenRotation) > 360)
+			{
 				GameObject.FindObjectOfType<MenuManager>().LoadLevel();
+				return;
+			}
 		}
 
 		// rotate and apply torques
 		transform.Rotate(Time.deltaTime*curAngularVelocity*Vector3.left);
-		curAngularVelocity += Time.fixedDeltaTime * (angularAcceleration - angularAcceleration*Mathf.Abs(curAngularVelocity)/maxAngularVelocity);
+		curAngularVelocity += Time.fixedDeltaTime * (angularAcceleration - Mathf.Abs(angularAcceleration)*curAngularVelocity/maxAngularVelocity);
 
 		// average out angular speed of neighbors
 		for (int i=0; i<neighbors.Count; ++i)

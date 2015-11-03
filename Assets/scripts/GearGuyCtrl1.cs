@@ -45,17 +45,18 @@ public class GearGuyCtrl1 : MonoBehaviour
 
 		}
 		*/
-            
+
 		if (transform.parent == null) 
 		{
 			rigidBody.AddForce(Vector3.right * xrate * maxSpeed);
 		}else 
 		{
-			// rotate this, move this around the center, apply the force to the parent
+			// rotate this, move this around the center
 			transform.Rotate(Vector3.back * Time.deltaTime*xrate*200);
 			transform.RotateAround(transform.parent.position, Vector3.back, 100 * Time.deltaTime*xrate);
+			// apply forces of acceleration and gravity
 			transform.parent.GetComponent<EnviroGear>().angularMomentum +=
-				2*(xrate-lastXRate)*mass*radius;
+				200*(xrate-lastXRate)*mass*radius - 9.81f*0.1f*Vector3.Dot(Vector3.right, (transform.position-transform.parent.position));
 			lastXRate = xrate;
 		}
 
@@ -73,15 +74,12 @@ public class GearGuyCtrl1 : MonoBehaviour
     }
 	public void engage(bool eng)
 	{
-
 		engaged = eng;
 		//stickyAura.SetActive (eng);
-
 
 		if (eng) {
 			transform.tag = "StickyAura";
 			stickyAura.transform.localScale = new Vector3(.761f,.761f,.761f);
-
 		}
 		else
         {
@@ -101,14 +99,18 @@ public class GearGuyCtrl1 : MonoBehaviour
     }
 	void OnTriggerEnter(Collider coll)
 	{
-		if (stickyAura.activeSelf && coll.gameObject.tag == "gear") {
+		if (engaged && coll.gameObject.tag == "gear") {
+			// handle parent
+			if (transform.parent==coll.transform)
+				return;
+
 			rigidBody.velocity = Vector3.zero;
             rigidBody.angularVelocity = Vector3.zero;
             transform.parent = coll.gameObject.transform;
 			radius = transform.localPosition.magnitude;
 			//alter angular momentum...
 			//transform.parent.GetComponent<EnviroGear>().angularMomentum -= 20;
-			//transform.parent.GetComponent<EnviroGear>().momentOfIntertia += mass*radius*radius;
+			transform.parent.GetComponent<EnviroGear>().momentOfIntertia += mass*radius*radius;
 			rigidBody.useGravity = false;
 		}
 	}
@@ -120,11 +122,11 @@ public class GearGuyCtrl1 : MonoBehaviour
         if (coll.gameObject.tag == "gear"&&transform.parent==coll.transform)
         {
 			Vector3 diff = Vector3.zero;//transform.position-coll.transform.position;
-			Vector3 gearSpeed = 2*coll.GetComponent<EnviroGear>().GetVelAtPoint(transform.position);
-			Vector3 speed = Vector3.Cross((transform.position-transform.parent.position), Vector3.back).normalized*lastXRate*200*Mathf.PI/180;
+			Vector3 gearSpeed = coll.GetComponent<EnviroGear>().GetVelAtPoint(transform.position);
+			Vector3 speed = Vector3.Cross((transform.position-transform.parent.position), Vector3.back).normalized*lastXRate*radius*50*Mathf.PI/180;
 			rigidBody.velocity += diff + gearSpeed - speed;
-			
-			//transform.parent.GetComponent<EnviroGear>().momentOfIntertia -= mass*radius*radius;
+
+			transform.parent.GetComponent<EnviroGear>().momentOfIntertia -= mass*radius*radius;
 			transform.SetParent(null);
 			rigidBody.useGravity = true;
         }
