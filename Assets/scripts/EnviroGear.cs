@@ -33,8 +33,10 @@ public class EnviroGear : MonoBehaviour {
 		// handle static gears and isGolden
 		if (!isMovable)
 			gameObject.layer = LayerMask.NameToLayer("Static Gear");
-		if (isGolden)
+		/*if (isGolden)
+		{
 			GetComponent<Renderer>().material.color = new Color(.886f, 0.925f, 0f);
+		}*/
 	}
 	
 	void FixedUpdate ()

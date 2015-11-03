@@ -14,8 +14,11 @@ public class MenuManager : MonoBehaviour {
 		// find menus
 		menus = new GameObject[canvas.transform.childCount];
 		for (int i=0; i<canvas.transform.childCount; ++i)
+		{
 			menus[i] = canvas.transform.GetChild(i).gameObject;
-
+			menus[i].GetComponent<RectTransform>().localScale = Vector3.one*(Screen.height/327f);
+		}
+		
 		// display first menu
 		DisplayMenu(0);
 	}
@@ -54,7 +57,11 @@ public class MenuManager : MonoBehaviour {
 		// remove any unnecessary levels/menus
 		HideMenus();
 		if (curLevel>=0)
+		{
 			Application.UnloadLevel(levels[curLevel]);
+			// additional clean that unity FAILS to unload
+			try { Destroy(GameObject.FindObjectOfType<GearGuyCtrl1>().gameObject); } catch { }
+		}
 		
 		// load new level OR load victory menu
 		if (level==-1)
