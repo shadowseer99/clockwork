@@ -23,7 +23,7 @@ public class EnviroGear : MonoBehaviour {
 		set { curAngularVelocity = value/momentOfIntertia; }
 	}
 	
-	void Start ()
+	void Start()
 	{
 		// initialize vars
 		radius = gameObject.GetComponent<Collider>().bounds.extents.x;
@@ -39,7 +39,7 @@ public class EnviroGear : MonoBehaviour {
 		}*/
 	}
 	
-	void FixedUpdate ()
+	public virtual void FixedUpdate()
 	{
 		// handle goldenGear
 		if (isGolden)
