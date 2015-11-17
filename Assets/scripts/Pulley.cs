@@ -42,27 +42,38 @@ public class Pulley : EnviroGear {
 		// sum weights and inertia, estimate angular velocity
 		float totalPull=0;
 		float inertia=momentOfIntertia;
-		if (leftObj.isTaut)
+		if (!leftObj.isResting)
 		{
 			totalPull += leftObj.mass*-Physics.gravity.y;
 			inertia += leftObj.mass;
 		}
-		if (rightObj.isTaut)
+		if (!rightObj.isResting)
+		{
+			totalPull -= rightObj.mass*-Physics.gravity.y;
+			inertia += rightObj.mass;
+		}
+		float estAngularAcceleration = Time.fixedDeltaTime*(180/Mathf.PI)*radius*totalPull/inertia;
+		//print("inertia: "+inertia+"; totalPull: "+totalPull+"; angularAcceleration: "+angularAcceleration);
+
+		// apply relevant forces from resting taut objects
+		if (leftObj.isResting && leftObj.isTaut && curAngularVelocity+estAngularAcceleration<0)
+		{
+			totalPull += leftObj.mass*-Physics.gravity.y;
+			inertia += leftObj.mass;
+		}
+		if (rightObj.isResting && rightObj.isTaut && curAngularVelocity+estAngularAcceleration>0)
 		{
 			totalPull -= rightObj.mass*-Physics.gravity.y;
 			inertia += rightObj.mass;
 		}
 		float angularAcceleration = Time.fixedDeltaTime*(180/Mathf.PI)*radius*totalPull/inertia;
-		//print("inertia: "+inertia+"; totalPull: "+totalPull+"; angularAcceleration: "+angularAcceleration);
-
-		// don't accelerate towards resting objects
-		if (leftObj.isResting)
-			angularAcceleration = Mathf.Min(0, angularAcceleration);
-		if (rightObj.isResting)
-			angularAcceleration = Mathf.Max(0, angularAcceleration);
 
 		// calculate new angular velocity and apply
 		curAngularVelocity += angularAcceleration;
+		if (leftObj.isResting && leftObj.isTaut && curAngularVelocity+estAngularAcceleration<0)
+			curAngularVelocity = Mathf.Min(0, curAngularVelocity);
+		if (rightObj.isResting && rightObj.isTaut && curAngularVelocity+estAngularAcceleration>0)
+			curAngularVelocity = Mathf.Max(0, curAngularVelocity);
 		float diff = Time.fixedDeltaTime*(Mathf.PI/180)*radius*curAngularVelocity;
 
 		// move objects, handle hitting the pulley
@@ -88,18 +99,20 @@ public class Pulley : EnviroGear {
 
 		// apply to left rope
 		bool wasResting = leftObj.isResting;
+		bool wasTaut = leftObj.isTaut;
 		lines.SetPosition(numLines-1, leftObj.SetRopeLength(leftRope, leftPos));
 		if (wasResting && !leftObj.isResting) {
 			print("picked up leftObj");
-			curAngularVelocity *= inertia/(inertia+leftObj.mass);
+			curAngularVelocity *= inertia/(inertia+leftObj.mass)/8*0;
 		}
 
 		// apply to right rope
 		wasResting = rightObj.isResting;
+		wasTaut = rightObj.isTaut;
 		lines.SetPosition(0, rightObj.SetRopeLength(rightRope, rightPos));
 		if (wasResting && !rightObj.isResting) {
 			print("picked up rightObj");
-			curAngularVelocity *= inertia/(inertia+rightObj.mass);
+			curAngularVelocity *= inertia/(inertia+rightObj.mass)/8*0;
 		}
 	}
 }

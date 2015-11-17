@@ -14,6 +14,12 @@ public class ElevatorPlatform : MovingPlatform {
 		mass = startMass;
 		foreach(Rigidbody r in restingObjs)
 			mass+=r.mass;
+		if (gameObject.name=="Left Elevator" || true) {
+			string str = startMass.ToString();
+			foreach (Rigidbody r in restingObjs)
+				str += "+"+r.mass;
+			print("mass: "+str+" = "+mass);
+		}
 	}
 
 	public override Vector3 SetRopeLength(float length, Vector3 connection)
@@ -22,10 +28,12 @@ public class ElevatorPlatform : MovingPlatform {
 		Vector3 error = targetPos-body.position;
 		Vector3 diff = targetPos-lastPos;
 		float lDiff = length-lastLength;
-		isResting = error.magnitude/diff.magnitude>0.1f && !firstTime;
-		isTaut = 1.05f*(body.position-connection).magnitude>lastLength || firstTime;
+		isResting = error.magnitude/diff.magnitude>0.1f && targetPos.y<body.position.y && !firstTime;
+		isTaut = 1.001f*(body.position-connection).magnitude>lastLength || firstTime;
 		lastLength = length;
 		firstTime = false;
+		//if (gameObject.name=="Left Elevator")
+			//print("isTuat: "+isTaut+"; isResting: "+isResting);
 
 		// move to the appropriate position
 		targetPos = connection + Vector3.down * length;

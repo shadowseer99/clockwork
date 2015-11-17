@@ -3,19 +3,19 @@ using UnityEngine;
 using System.Collections.Generic;
 public class GearGuyCtrl1 : MonoBehaviour
 {
-    [SerializeField] private float maxSpeed = 4f;                    // The fastest the player can travel in the x axis.
-    [SerializeField] private bool m_AirControl = false;                 // Whether or not a player can steer while jumping;
-    [SerializeField] private float jumpSpeed = 400f;                  // Amount of force added when the player jumps.
+    [SerializeField] private float maxSpeed = 4f;
+	[SerializeField] private float acceleration=16f;
+    [SerializeField] private bool m_AirControl = false;
 	[SerializeField] private GameObject stickyAura;
-    [SerializeField] private float launchSpeed = 2f;
 	public float mass=0.5f;
 
     private bool grounded; // Whether or not the player is grounded.
 	private bool engaged;
 	private float groundDist;
     private Rigidbody rigidBody;
+	private SphereCollider collider;
     private bool facingRight = true;  // For determining which way the player is currently facing.
-	private float lastXRate=0;
+	private float rotVel=0;
 	private float radius;
 
 	public Stack<GameObject> gearChildren = new Stack<GameObject>();
@@ -24,6 +24,7 @@ public class GearGuyCtrl1 : MonoBehaviour
 		groundDist = gameObject.GetComponent<Collider>().bounds.extents.y;
         // Setting up references.
         rigidBody = GetComponent<Rigidbody>();
+		collider = GetComponent<SphereCollider>();
 		stickyAura.transform.localScale = Vector3.zero;
     }
 
@@ -48,16 +49,33 @@ public class GearGuyCtrl1 : MonoBehaviour
 
 		if (transform.parent == null) 
 		{
-			rigidBody.AddForce(Vector3.right * xrate * maxSpeed);
+			float mult = (grounded?1:0.1f);
+			rigidBody.velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
+			rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
+			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*collider.radius*360/Mathf.PI);
+			//print(rigidBody.velocity);
 		}else 
 		{
 			// rotate this, move this around the center
-			transform.Rotate(Vector3.back * Time.deltaTime*xrate*200);
-			transform.RotateAround(transform.parent.position, Vector3.back, 100 * Time.deltaTime*xrate);
-			// apply forces of acceleration and gravity
-			transform.parent.GetComponent<EnviroGear>().angularMomentum +=
-				200*(xrate-lastXRate)*mass*radius - 9.81f*0.1f*Vector3.Dot(Vector3.right, (transform.position-transform.parent.position));
-			lastXRate = xrate;
+			float lastRotVel = rotVel;
+			rotVel += Time.fixedDeltaTime*xrate*acceleration/(transform.position-transform.parent.position).magnitude;
+			rotVel -= Time.fixedDeltaTime*(acceleration*rotVel/maxSpeed);
+			//print(rotVel);
+			Vector3 pos = transform.position;
+			transform.Rotate(Vector3.back * Time.fixedDeltaTime*rotVel*180/Mathf.PI);
+			Vector3 temp=transform.position;
+			transform.RotateAround(transform.parent.position, Vector3.back, Time.fixedDeltaTime*(rotVel)*180/Mathf.PI);
+			//print("moved "+(transform.position-pos).magnitude/Time.fixedDeltaTime);
+			//print("speed: "+(transform.position-temp).magnitude/Time.fixedDeltaTime+", expected speed: "+rotVel+"ratio: "+(transform.position-temp).magnitude/Time.fixedDeltaTime/rotVel+", radius: "+radius);
+			// apply forces of acceleration and gravity to the parent
+			EnviroGear gear = transform.parent.GetComponent<EnviroGear>();
+			Rigidbody rigidBody2 = gear.GetComponent<Rigidbody>();
+			gear.angularMomentum += mass*(lastRotVel-rotVel) - 9.81f*0.1f*Vector3.Dot(Vector3.right, transform.position-transform.parent.position);
+			if (gear.isMovable)
+				rigidBody2.velocity += Vector3.down*9.81f*mass;
+				//rigidBody2.velocity += Vector3.left*(9.81f*0.1f*Vector3.Dot(Vector3.left, transform.position-transform.parent.position));
+			//gear.angularMomentum += 200*(xrate-rotVel)*mass*radius - 9.81f*0.1f*Vector3.Dot(Vector3.right, (transform.position-transform.parent.position));
+			//rigidBody2.velocity += Vector3.right*0;
 		}
 
 		int i = -1;
@@ -123,7 +141,7 @@ public class GearGuyCtrl1 : MonoBehaviour
         {
 			Vector3 diff = Vector3.zero;//transform.position-coll.transform.position;
 			Vector3 gearSpeed = coll.GetComponent<EnviroGear>().GetVelAtPoint(transform.position);
-			Vector3 speed = Vector3.Cross((transform.position-transform.parent.position), Vector3.back).normalized*lastXRate*radius*50*Mathf.PI/180;
+			Vector3 speed = Vector3.Cross((transform.position-transform.parent.position), Vector3.back).normalized*rotVel*radius*50*Mathf.PI/180;
 			rigidBody.velocity += diff + gearSpeed - speed;
 
 			transform.parent.GetComponent<EnviroGear>().momentOfIntertia -= mass*radius*radius;
@@ -131,4 +149,29 @@ public class GearGuyCtrl1 : MonoBehaviour
 			rigidBody.useGravity = true;
         }
     }
+
+	void OnCollisionEnter(Collision coll)
+	{
+		if (coll.gameObject.transform==transform.parent)
+			return;
+
+		Rigidbody other = coll.gameObject.GetComponent<Rigidbody>();
+		EnviroGear gear = coll.gameObject.GetComponent<EnviroGear>();
+		if (gear!=null && gear.isMovable)
+		{
+			// average out velocities
+			//print("this.vel: "+rigidBody.velocity+"; other.vel: "+other.velocity+"; impulse: "+coll.impulse);
+			Vector3 totalVel = other.mass*other.velocity+rigidBody.mass*rigidBody.velocity-rigidBody.mass*coll.impulse;
+			float totalMass = other.mass+rigidBody.mass;
+			Vector3 finalVel = totalVel/totalMass;
+			//print("finalVel: "+finalVel);
+			other.velocity = 2*finalVel;
+			rigidBody.velocity = 2*finalVel;
+		}
+	}
+
+	void OnCollisionStay(Collision coll)
+	{
+		OnCollisionEnter(coll);
+	}
 }

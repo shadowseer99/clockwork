@@ -8,6 +8,7 @@ public class EnviroGear : MonoBehaviour {
 	public float angularAcceleration=10f;
 	public float mass=1f;
 	public bool isMovable=false;
+	public float momentOfIntertia;
 	public bool hasForce { get { return angularAcceleration!=0; } }
 	public bool isGolden=false;
 	
@@ -16,8 +17,8 @@ public class EnviroGear : MonoBehaviour {
 	private Transform gearTrans;
 	protected float radius;
 	private Rigidbody rigidBody;
+	private SphereCollider col;
 	
-	public float momentOfIntertia;
 	public float angularMomentum {
 		get { return momentOfIntertia*curAngularVelocity; }
 		set { curAngularVelocity = value/momentOfIntertia; }
@@ -27,17 +28,17 @@ public class EnviroGear : MonoBehaviour {
 	{
 		// initialize vars
 		Vector3 local = transform.localScale;
-		radius = GetComponent<SphereCollider>().radius * Mathf.Max(local.x, Mathf.Max(local.y, local.z));
+		col = GetComponent<SphereCollider>();
+		radius = col.radius * Mathf.Max(local.x, Mathf.Max(local.y, local.z));
 		rigidBody = GetComponent<Rigidbody>();
 		momentOfIntertia = 0.5f*mass*transform.localScale.y*transform.localScale.z*81;
+		//momentOfIntertia = 0.5f*mass*radius*radius;
 		
-		// handle static gears and isGolden
-		if (!isMovable)
-			gameObject.layer = LayerMask.NameToLayer("Static Gear");
-		/*if (isGolden)
-		{
-			GetComponent<Renderer>().material.color = new Color(.886f, 0.925f, 0f);
-		}*/
+		// handle static gears
+		rigidBody.isKinematic = !isMovable;
+		rigidBody.useGravity = isMovable;
+		gameObject.layer = LayerMask.NameToLayer(isMovable?"Default":"Static Gear");
+		rigidBody.constraints = (isMovable?RigidbodyConstraints.FreezeRotation|RigidbodyConstraints.FreezePositionZ:RigidbodyConstraints.FreezeAll);
 	}
 	
 	public virtual void FixedUpdate()
@@ -53,14 +54,16 @@ public class EnviroGear : MonoBehaviour {
 			}
 		}
 
-		// rotate and apply torques
-		transform.Rotate(Time.deltaTime*curAngularVelocity*Vector3.left);
-		curAngularVelocity += Time.fixedDeltaTime * (angularAcceleration - Mathf.Abs(angularAcceleration)*curAngularVelocity/maxAngularVelocity);
+		// rotate/move and apply torques
+		transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.left);
+		if (isMovable)
+			transform.position += Time.fixedDeltaTime*Vector3.left*curAngularVelocity*radius*(Mathf.PI/180);
+		curAngularVelocity += Time.fixedDeltaTime*(isMovable?0:angularAcceleration);
+		curAngularVelocity -= Time.fixedDeltaTime*Mathf.Abs(angularAcceleration)*curAngularVelocity/maxAngularVelocity;
 
 		// average out angular speed of neighbors
 		for (int i=0; i<neighbors.Count; ++i)
 		{
-			//print(angularMomentum+"-"+momentOfIntertia);
 			// sum angularMomentum, distribute according to moment of inertia
 			float totalAngularMomentum = angularMomentum - neighbors[i].angularMomentum;
 			float totalMomentOfInertia = momentOfIntertia + neighbors[i].momentOfIntertia;

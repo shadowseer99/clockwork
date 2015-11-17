@@ -28,8 +28,8 @@ public class GearGuyInputs1 : MonoBehaviour
     {
         // Read the inputs.
         bool crouch = Input.GetKey(KeyCode.LeftShift);
-        float x = CrossPlatformInputManager.GetAxis("Horizontal");
-		float y = CrossPlatformInputManager.GetAxis("Vertical");
+        float x = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+		float y = CrossPlatformInputManager.GetAxisRaw("Vertical");
 		//bool engaged = CrossPlatformInputManager.GetAxis ("Fire1");
         // Pass all parameters to the character control script.
         m_Character.Move(x,y, crouch, m_Jump);
