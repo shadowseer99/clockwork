@@ -30,9 +30,9 @@ public class Wench : EnviroGear {
 		Rachet ();
 		base.FixedUpdate();
 		Rachet ();
-		float totalPull = (isOnRightSide ? -obj.weight : obj.weight);
+		float totalPull = (isOnRightSide ? -obj.mass : obj.mass);
 
-		float inertia=angularMomentum+obj.weight;
+		float inertia=angularMomentum+obj.mass;
 		
 
 		float estimatedAngularVel = curAngularVelocity + Time.fixedDeltaTime*radius*(180/Mathf.PI)*totalPull/inertia;

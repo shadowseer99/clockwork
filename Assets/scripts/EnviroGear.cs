@@ -14,7 +14,7 @@ public class EnviroGear : MonoBehaviour {
 	private float goldenRotation=0;
 	private List<EnviroGear> neighbors=new List<EnviroGear>();
 	private Transform gearTrans;
-	float radius;
+	protected float radius;
 	private Rigidbody rigidBody;
 	
 	public float momentOfIntertia;
@@ -23,10 +23,11 @@ public class EnviroGear : MonoBehaviour {
 		set { curAngularVelocity = value/momentOfIntertia; }
 	}
 	
-	void Start()
+	public virtual void Start()
 	{
 		// initialize vars
-		radius = gameObject.GetComponent<Collider>().bounds.extents.x;
+		Vector3 local = transform.localScale;
+		radius = GetComponent<SphereCollider>().radius * Mathf.Max(local.x, Mathf.Max(local.y, local.z));
 		rigidBody = GetComponent<Rigidbody>();
 		momentOfIntertia = 0.5f*mass*transform.localScale.y*transform.localScale.z*81;
 		

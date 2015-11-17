@@ -5,73 +5,101 @@ public class Pulley : EnviroGear {
 
 	public MovingPlatform leftObj;
 	public MovingPlatform rightObj;
-	public float leftRope;
-	public float rightRope;
-	private float radius;
+	private Vector3 leftPos;
+	private Vector3 rightPos;
+	private float leftRope;
+	private float rightRope;
+	private LineRenderer lines;
+	private int numLines=22;
 
-	void Start ()
+	public override void Start ()
 	{
-		Vector3 local = transform.localScale;
-		radius = GetComponent<SphereCollider>().radius * Mathf.Max(local.x, Mathf.Max(local.y, local.z));
+		base.Start();
+		leftPos = transform.position+radius*Vector3.left;
+		rightPos = transform.position+radius*Vector3.right;
+		leftRope = (leftPos-leftObj.transform.position).magnitude;
+		rightRope = (rightPos-rightObj.transform.position).magnitude;
 
+		// initialize the line renderer
+		lines = gameObject.AddComponent<LineRenderer>();
+		Color c = new Color(214/255f, 216/255f, 93/255f);
+		lines.SetColors(c, c);
+		lines.material = (Material)Instantiate(GetComponent<Renderer>().material);
+		lines.material.color = c;
+		lines.SetWidth(0.1f, 0.1f);
+		lines.SetVertexCount(numLines);
+		for (int i=1; i<numLines-1; ++i)
+		{
+			float angle = (i-1f)/(numLines-3)*Mathf.PI;
+			lines.SetPosition(i, Mathf.Cos(angle)*radius*Vector3.right + Mathf.Sin(angle)*radius*Vector3.up+transform.position);
+		}
 	}
 
-
-
-	/*void FixedUpdate ()
-	{
-
-	}*/
-
-	public override void FixedUpdate ()
+	public override void FixedUpdate()
 	{
 		base.FixedUpdate();
 
+		// sum weights and inertia, estimate angular velocity
 		float totalPull=0;
-		float inertia=angularMomentum;
-
-		// sum weights and inertia
-		if (leftObj!=null)
+		float inertia=momentOfIntertia;
+		if (leftObj.isTaut)
 		{
-			totalPull += leftObj.weight;
-			inertia += leftObj.weight;
+			totalPull += leftObj.mass*-Physics.gravity.y;
+			inertia += leftObj.mass;
 		}
-		if (rightObj!=null)
+		if (rightObj.isTaut)
 		{
-			totalPull -= rightObj.weight;
-			inertia += leftObj.weight;
+			totalPull -= rightObj.mass*-Physics.gravity.y;
+			inertia += rightObj.mass;
 		}
+		float angularAcceleration = Time.fixedDeltaTime*(180/Mathf.PI)*radius*totalPull/inertia;
+		//print("inertia: "+inertia+"; totalPull: "+totalPull+"; angularAcceleration: "+angularAcceleration);
 
-		float estimatedAngularVel = curAngularVelocity + Time.fixedDeltaTime*radius*(180/Mathf.PI)*totalPull/inertia;
-		if (estimatedAngularVel>0)
-		{
-			if (leftObj!=null && leftObj.isResting)
-			{
-				totalPull -= leftObj.weight;
-				inertia -= leftObj.weight;
-			}
+		// don't accelerate towards resting objects
+		if (leftObj.isResting)
+			angularAcceleration = Mathf.Min(0, angularAcceleration);
+		if (rightObj.isResting)
+			angularAcceleration = Mathf.Max(0, angularAcceleration);
 
-		} else
+		// calculate new angular velocity and apply
+		curAngularVelocity += angularAcceleration;
+		float diff = Time.fixedDeltaTime*(Mathf.PI/180)*radius*curAngularVelocity;
+
+		// move objects, handle hitting the pulley
+		if (leftRope+diff<=0)
 		{
-			if (rightObj!=null && rightObj.isResting)
-			{
-				totalPull += rightObj.weight;
-				inertia -= leftObj.weight;
-			}
+			curAngularVelocity = -0.8f*(curAngularVelocity-angularAcceleration);
+			rightRope += leftRope;
+			leftRope = 0;
+		}
+		else if (rightRope-diff<=0)
+		{
+			curAngularVelocity = -0.8f*(curAngularVelocity-angularAcceleration);
+			leftRope += rightRope;
+			rightRope = 0;
+		}
+		else
+		{
+			leftRope += diff;
+			rightRope -= diff;
 		}
 		
-		
-		// sum of forces = ma
-		// I*a = sum of torques
-		// a = (sum of torques)/I
-		// w += (sum of torques)/I
-		curAngularVelocity += Time.fixedDeltaTime*radius*(180/Mathf.PI)*totalPull/inertia;
 
 
-		float diff = curAngularVelocity*radius*(180/Mathf.PI);
-		leftRope += diff;
-		rightRope -= diff;
-		//leftObj.SetRopeLength(leftRope);
-		//rightObj.SetRopeLength(rightRope);
+		// apply to left rope
+		bool wasResting = leftObj.isResting;
+		lines.SetPosition(numLines-1, leftObj.SetRopeLength(leftRope, leftPos));
+		if (wasResting && !leftObj.isResting) {
+			print("picked up leftObj");
+			curAngularVelocity *= inertia/(inertia+leftObj.mass);
+		}
+
+		// apply to right rope
+		wasResting = rightObj.isResting;
+		lines.SetPosition(0, rightObj.SetRopeLength(rightRope, rightPos));
+		if (wasResting && !rightObj.isResting) {
+			print("picked up rightObj");
+			curAngularVelocity *= inertia/(inertia+rightObj.mass);
+		}
 	}
 }

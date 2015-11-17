@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 public abstract class MovingPlatform : MonoBehaviour {
 
-	public float startWeight;
-	public float weight;
+	public float startMass;
+	[HideInInspector] public float mass;
 	protected List<Rigidbody> restingObjs=new List<Rigidbody>();
 	public bool isResting=false;
+	public bool isTaut=false;
 	public Vector3 connectionPoint;
 	protected Rigidbody body;
 
@@ -41,5 +42,5 @@ public abstract class MovingPlatform : MonoBehaviour {
 		}
 	}
 
-	public abstract void SetRopeLength(float length,Vector3 connection);
+	public abstract Vector3 SetRopeLength(float length,Vector3 connection);
 }
