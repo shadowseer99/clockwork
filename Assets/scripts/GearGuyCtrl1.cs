@@ -51,7 +51,7 @@ public class GearGuyCtrl1 : MonoBehaviour
 		{
 			float mult = (grounded?1:0.1f);
 			rigidBody.velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
-			rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
+			//rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
 			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*collider.radius*360/Mathf.PI);
 			//print(rigidBody.velocity);
 		}else 
