@@ -7,6 +7,7 @@ public class MenuManager : MonoBehaviour {
 	private GameObject[] menus;
 	public string[] levels;
 	private static int curLevel=-1;
+	public Texture2D cursor;
 
 	// Use this for initialization
 	void Start ()
@@ -31,6 +32,7 @@ public class MenuManager : MonoBehaviour {
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = false;
 		this.enabled = true;
+		Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 	}
 
 	public void DisplayMenu2(int menu)
@@ -50,6 +52,7 @@ public class MenuManager : MonoBehaviour {
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = true;
 		this.enabled = true;
+		Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
 	}
 
 	public void LoadLevel(int level=-1)

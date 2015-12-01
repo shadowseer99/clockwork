@@ -54,8 +54,14 @@ public class EnviroGear : MonoBehaviour {
 			}
 		}
 
+		if (name=="envirogear (4)") {
+			print("right: "+transform.right);
+			print("forward: "+transform.forward);
+			print("up: "+transform.up);
+		}
+		//transform.Rotate(
 		// rotate/move and apply torques
-		transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.left);
+		transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.forward, Space.World);
 		if (isMovable)
 			transform.position += Time.fixedDeltaTime*Vector3.left*curAngularVelocity*radius*(Mathf.PI/180);
 		curAngularVelocity += Time.fixedDeltaTime*(isMovable?0:angularAcceleration);
