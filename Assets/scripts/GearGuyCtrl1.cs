@@ -82,7 +82,7 @@ public class GearGuyCtrl1 : MonoBehaviour
 					mult = 0.1f;
 			rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
 			rigidBody.velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
-			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*collider.radius*360/Mathf.PI);
+			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*radius*4);
 		}else 
 		{
 			// rotate this, move this around the center
