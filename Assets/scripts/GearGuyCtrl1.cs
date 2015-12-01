@@ -10,6 +10,7 @@ public class GearGuyCtrl1 : MonoBehaviour
 	[SerializeField] private GameObject stickyAura;
 	public float mass=0.5f;
 
+	private Water inwater;
 	private Collision[] collidingWith;
 	private int numCollidingWith=0;
 	private Collision[] groundedTo;
@@ -21,6 +22,7 @@ public class GearGuyCtrl1 : MonoBehaviour
     private bool facingRight = true;  // For determining which way the player is currently facing.
 	private float rotVel=0;
 	private float radius;
+	private float localRadius;
 
 	public Stack<GameObject> gearChildren = new Stack<GameObject>();
     private void Awake()
@@ -39,6 +41,8 @@ public class GearGuyCtrl1 : MonoBehaviour
 			maxSpeed *= transform.localScale.x;
 			acceleration *= transform.localScale.x;
 		}
+		localRadius = collider.radius*Mathf.Max(Mathf.Max(transform.localScale.x, transform.localScale.y), transform.localScale.z);
+		inwater = Water.nullWater;
     }
 
 	public void FixedUpdate()
@@ -82,7 +86,11 @@ public class GearGuyCtrl1 : MonoBehaviour
 					mult = 0.1f;
 			rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
 			rigidBody.velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
-			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*radius*4);
+			rigidBody.velocity += Time.fixedDeltaTime*(1-inwater.densityRatio)*Physics.gravity;
+			float f = Time.fixedDeltaTime*(inwater.thicknessRatio-1);
+			rigidBody.velocity = f*inwater.flow + (1-f)*rigidBody.velocity;
+			rigidBody.velocity += Time.fixedDeltaTime*inwater.flow*inwater.thicknessRatio;
+			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*180/Mathf.PI/localRadius);
 		}else 
 		{
 			// rotate this, move this around the center
@@ -158,8 +166,11 @@ public class GearGuyCtrl1 : MonoBehaviour
 			//alter angular momentum...
 			//transform.parent.GetComponent<EnviroGear>().angularMomentum -= 20;
 			transform.parent.GetComponent<EnviroGear>().momentOfIntertia += mass*radius*radius;
-			rigidBody.useGravity = false;
 		}
+
+		Water tempWater = coll.gameObject.GetComponent<Water>();
+		if (inwater==Water.nullWater && tempWater!=null)
+			inwater = tempWater;
 	}
 
     //deparent from gears
@@ -175,8 +186,10 @@ public class GearGuyCtrl1 : MonoBehaviour
 
 			transform.parent.GetComponent<EnviroGear>().momentOfIntertia -= mass*radius*radius;
 			transform.SetParent(null);
-			rigidBody.useGravity = true;
         }
+
+		if (inwater!=Water.nullWater && inwater==coll.gameObject.GetComponent<Water>())
+			inwater = Water.nullWater;
     }
 
 	void OnCollisionEnter(Collision coll)

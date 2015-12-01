@@ -11,7 +11,7 @@ public class EnviroGear : MonoBehaviour {
 	public float momentOfIntertia;
 	public bool hasForce { get { return angularAcceleration!=0; } }
 	public bool isGolden=false;
-	
+
 	private float goldenRotation=0;
 	private List<EnviroGear> neighbors=new List<EnviroGear>();
 	private Transform gearTrans;
@@ -83,7 +83,7 @@ public class EnviroGear : MonoBehaviour {
 		return result*curAngularVelocity*Mathf.PI/180;
 	}
 
-	void OnTriggerEnter(Collider coll)
+	public virtual void OnTriggerEnter(Collider coll)
 	{
 		// find a gear, return if null
 		EnviroGear gear = coll.gameObject.GetComponent<EnviroGear>();
@@ -95,12 +95,12 @@ public class EnviroGear : MonoBehaviour {
 			neighbors.Add(gear);
 	}
 
-	void OnTriggerStay(Collider coll)
+	public virtual void OnTriggerStay(Collider coll)
 	{
 		rigidBody.velocity = Vector3.zero;
 	}
 
-	void OnTriggerExit(Collider coll)
+	public virtual void OnTriggerExit(Collider coll)
 	{
 		// find a gear, return if null
 		EnviroGear gear = coll.gameObject.GetComponent<EnviroGear>();
