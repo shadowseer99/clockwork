@@ -14,12 +14,12 @@ public class ElevatorPlatform : MovingPlatform {
 		mass = startMass;
 		foreach(Rigidbody r in restingObjs)
 			mass+=r.mass;
-		if (gameObject.name=="Left Elevator" || true) {
+		/*if (gameObject.name=="Left Elevator" || true) {
 			string str = startMass.ToString();
 			foreach (Rigidbody r in restingObjs)
 				str += "+"+r.mass;
 			print("mass: "+str+" = "+mass);
-		}
+		}*/
 	}
 
 	public override Vector3 SetRopeLength(float length, Vector3 connection)

@@ -12,17 +12,18 @@ public class Button : MonoBehaviour {
 	public bool repeat=true;
 	public Transform target;
 	public Transform endPos;
+	public GameObject toggleObject;
 	public UnityEngine.UI.Button.ButtonClickedEvent customAction;
 	public UnityEngine.UI.Button.ButtonClickedEvent undoCustomAction;
 	public bool everyFrame=false;
 	public bool onResume=false;
 
-	[SerializeField] private int state=0;
-	[SerializeField] private float axis=0;
+	private int state=0;
+	private float axis=0;
 	private Transform startPos;
 	private float totalDur;
-	[SerializeField] private bool canGoForwards=true;
-	[SerializeField] private bool canGoBackwards=true;
+	private bool canGoForwards=true;
+	private bool canGoBackwards=true;
 
 	// handle transforms
 	public void Start() {
@@ -110,6 +111,8 @@ public class Button : MonoBehaviour {
 			if (canGoBackwards && axis>0 && revert) {
 				undoCustomAction.Invoke();
 				state = -1;
+				if (toggleObject)
+					toggleObject.SetActive(!toggleObject.activeSelf);
 			}
 			// stop going forwards if still going forwards
 			if (state==1)
@@ -123,6 +126,8 @@ public class Button : MonoBehaviour {
 			if (canGoForwards && axis<duration) {
 				customAction.Invoke();
 				state = 1;
+				if (toggleObject)
+					toggleObject.SetActive(!toggleObject.activeSelf);
 			}
 			// stop going backwards if still going backwards
 			if (state==-1)

@@ -97,7 +97,9 @@ public class EnviroGear : MonoBehaviour {
 
 	public virtual void OnTriggerStay(Collider coll)
 	{
-		rigidBody.velocity = Vector3.zero;
+		// NEEDS FIXING
+		if (coll.GetComponent<Water>()==null)
+			rigidBody.velocity = Vector3.zero;
 	}
 
 	public virtual void OnTriggerExit(Collider coll)

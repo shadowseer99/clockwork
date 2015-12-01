@@ -16,7 +16,7 @@ public class WaterWheel : EnviroGear {
 	{
 		base.FixedUpdate();
 		
-		print("using water: "+inwater.name);
+		//print("using water: "+inwater.name);
 		Vector3 contact = inwater.GetContactPoint(transform);
 		Vector3 diff = contact-transform.position;
 		Vector3 cross = Vector3.Cross(diff, inwater.flow);
