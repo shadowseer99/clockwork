@@ -4,12 +4,16 @@ using System.Collections.Generic;
 public class GearGuyCtrl1 : MonoBehaviour
 {
     [SerializeField] private float maxSpeed = 4f;
+	[SerializeField] private bool adjustForSize=false;
 	[SerializeField] private float acceleration=16f;
     [SerializeField] private bool m_AirControl = false;
 	[SerializeField] private GameObject stickyAura;
 	public float mass=0.5f;
 
-    private bool grounded; // Whether or not the player is grounded.
+	private Collision[] collidingWith;
+	private int numCollidingWith=0;
+	private Collision[] groundedTo;
+	private int numGroundedTo=0;
 	private bool engaged;
 	private float groundDist;
     private Rigidbody rigidBody;
@@ -21,16 +25,31 @@ public class GearGuyCtrl1 : MonoBehaviour
 	public Stack<GameObject> gearChildren = new Stack<GameObject>();
     private void Awake()
     {
-		groundDist = gameObject.GetComponent<Collider>().bounds.extents.y;
         // Setting up references.
         rigidBody = GetComponent<Rigidbody>();
 		collider = GetComponent<SphereCollider>();
 		stickyAura.transform.localScale = Vector3.zero;
+
+		// adjust vars
+		groundDist = gameObject.GetComponent<Collider>().bounds.extents.y;
+		int arrSize = Math.Min(GameObject.FindObjectsOfType<Collider>().Length, 100);
+		collidingWith = new Collision[arrSize];
+		groundedTo = new Collision[arrSize];
+		if (adjustForSize) {
+			maxSpeed *= transform.localScale.x;
+			acceleration *= transform.localScale.x;
+		}
     }
 
 	public void FixedUpdate()
 	{
-		grounded = Physics.Raycast(transform.position,Vector3.down,groundDist+.1f);
+		/*RaycastHit rayhit;
+		//if (Physics.Raycast(transform.position, Vector3.down, out rayhit, groundDist+.1f))
+		if (Physics.SphereCast(transform.position, radius*0.45f, Vector3.down, out rayhit, radius))
+			groundedObj = rayhit.collider.gameObject;
+		else
+			groundedObj = null;*/
+
 	}
 
 
@@ -47,13 +66,27 @@ public class GearGuyCtrl1 : MonoBehaviour
 		}
 		*/
 
+		// handle grounded
+		numGroundedTo = 0;
+		for (int i=0; i<numCollidingWith; ++i) {
+			if (collidingWith[i].impulse.y>0) {
+				groundedTo[numGroundedTo++] = collidingWith[i];
+				print("grounded to "+collidingWith[i].gameObject.GetComponent<Collider>().material.bounciness);
+			}
+		}
+		numCollidingWith = 0;
+			
+
 		if (transform.parent == null) 
 		{
-			float mult = (grounded?1:0.1f);
+			float mult = (numGroundedTo>0?1:0.1f);
+			for (int i=0; i<numGroundedTo; ++i)
+				if (groundedTo[i].gameObject.GetComponent<Collider>().material.bounciness>0.01f)
+					mult = 0.1f;
+			print("mult1: "+mult);
+			rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
 			rigidBody.velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
-			//rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
 			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*collider.radius*360/Mathf.PI);
-			//print(rigidBody.velocity);
 		}else 
 		{
 			// rotate this, move this around the center
@@ -78,10 +111,10 @@ public class GearGuyCtrl1 : MonoBehaviour
 			//rigidBody2.velocity += Vector3.right*0;
 		}
 
-		int i = -1;
+		int ii = -1;
         foreach (GameObject go in gearChildren) {
-			go.transform.Rotate(rigidBody.angularVelocity*i);
-			i*=-1;
+			go.transform.Rotate(rigidBody.angularVelocity*ii);
+			ii*=-1;
 		}
         /*
 		if (!engaged)
@@ -152,6 +185,7 @@ public class GearGuyCtrl1 : MonoBehaviour
 
 	void OnCollisionEnter(Collision coll)
 	{
+		collidingWith[numCollidingWith++] = coll;
 		if (coll.gameObject.transform==transform.parent)
 			return;
 
