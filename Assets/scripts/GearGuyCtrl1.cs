@@ -68,12 +68,9 @@ public class GearGuyCtrl1 : MonoBehaviour
 
 		// handle grounded
 		numGroundedTo = 0;
-		for (int i=0; i<numCollidingWith; ++i) {
-			if (collidingWith[i].impulse.y>0) {
+		for (int i=0; i<numCollidingWith; ++i)
+			if (collidingWith[i].impulse.y>0)
 				groundedTo[numGroundedTo++] = collidingWith[i];
-				print("grounded to "+collidingWith[i].gameObject.GetComponent<Collider>().material.bounciness);
-			}
-		}
 		numCollidingWith = 0;
 			
 
@@ -83,7 +80,6 @@ public class GearGuyCtrl1 : MonoBehaviour
 			for (int i=0; i<numGroundedTo; ++i)
 				if (groundedTo[i].gameObject.GetComponent<Collider>().material.bounciness>0.01f)
 					mult = 0.1f;
-			print("mult1: "+mult);
 			rigidBody.velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*rigidBody.velocity.x/maxSpeed)*mult;
 			rigidBody.velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
 			transform.Rotate(Vector3.back, Time.fixedDeltaTime*rigidBody.velocity.x*collider.radius*360/Mathf.PI);
