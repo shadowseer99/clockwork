@@ -7,9 +7,9 @@ public abstract class MovingPlatform : MonoBehaviour {
 	public float startMass;
 	[HideInInspector] public float mass;
 	protected List<Rigidbody> restingObjs=new List<Rigidbody>();
-	public bool isResting=false;
-	public bool isTaut=false;
-	public Vector3 connectionPoint;
+	[HideInInspector] public bool isResting=false;
+	[HideInInspector] public bool isTaut=false;
+	[HideInInspector] public Vector3 connectionPoint;
 	protected Rigidbody body;
 
 	// Use this for initialization
