@@ -5,7 +5,7 @@ public class Water : MonoBehaviour {
 
 	public Vector3 flow=Vector3.zero;
 	public float densityRatio=0;
-	public float thicknessRatio=1;
+	public float thicknessRatio=0;
 	public Vector3[] contactPoints=new Vector3[0];
 
 	private static Water _nullWater;
@@ -13,8 +13,13 @@ public class Water : MonoBehaviour {
 	{
 		get
 		{
-			if (_nullWater==null)
-				_nullWater = new GameObject("Null Water").AddComponent<Water>();
+			if (_nullWater==null) {
+				GameObject obj = GameObject.Find("Null Water");
+				if (obj)
+					_nullWater = obj.GetComponent<Water>();
+				if (_nullWater==null)
+					_nullWater = new GameObject("Null Water").AddComponent<Water>();
+			}
 			return _nullWater;
 		}
 	}
