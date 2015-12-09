@@ -51,7 +51,6 @@ public class Pulley : EnviroGear {
 		float inertia=momentOfIntertia;
 		totalPull -= resistance*Vector3.Dot(leftStartPos-leftObj.transform.position, Vector3.up);
 		totalPull += resistance*Vector3.Dot(rightStartPos-rightObj.transform.position, Vector3.up);
-		print("totalPull: "+totalPull);
 		if (!leftObj.isResting)
 		{
 			totalPull += leftObj.mass*-Physics.gravity.y;
