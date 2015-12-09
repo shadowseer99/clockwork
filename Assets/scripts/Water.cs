@@ -5,7 +5,7 @@ public class Water : MonoBehaviour {
 
 	public Vector3 flow=Vector3.zero;
 	public float densityRatio=0;
-	public float thicknessRatio=0;
+	public float thicknessRatio=1;
 	public Vector3[] contactPoints=new Vector3[0];
 
 	private static Water _nullWater;

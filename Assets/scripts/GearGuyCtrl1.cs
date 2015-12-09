@@ -177,6 +177,13 @@ public class GearGuyCtrl1 : MonoBehaviour
 		}
 
 		Water tempWater = coll.gameObject.GetComponent<Water>();
+		if (tempWater!=null)
+			inwater = tempWater;
+	}
+
+	void OnTriggerStay(Collider coll)
+	{
+		Water tempWater = coll.gameObject.GetComponent<Water>();
 		if (inwater==Water.nullWater && tempWater!=null)
 			inwater = tempWater;
 	}
