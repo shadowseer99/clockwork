@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.ComponentModel;
 public class GearGuyCtrl1 : MonoBehaviour
 {
     [SerializeField] private float maxSpeed = 4f;
@@ -72,6 +73,13 @@ public class GearGuyCtrl1 : MonoBehaviour
 
 		// handle grounded
 		numGroundedTo = 0;
+		/*for (int i=0; i<numCollidingWith; ++i) {
+			string str="";
+			PhysicMaterial mat = collidingWith[i].collider.material;
+			foreach (PropertyDescriptor desc in TypeDescriptor.GetProperties(mat))
+				str += desc.Name+"="+desc.GetValue(mat);
+			print("colliding with: "+str);
+		}*/
 		for (int i=0; i<numCollidingWith; ++i)
 			if (collidingWith[i].impulse.y>0)
 				groundedTo[numGroundedTo++] = collidingWith[i];
@@ -168,6 +176,13 @@ public class GearGuyCtrl1 : MonoBehaviour
 			transform.parent.GetComponent<EnviroGear>().momentOfIntertia += mass*radius*radius;
 		}
 
+		Water tempWater = coll.gameObject.GetComponent<Water>();
+		if (tempWater!=null)
+			inwater = tempWater;
+	}
+
+	void OnTriggerStay(Collider coll)
+	{
 		Water tempWater = coll.gameObject.GetComponent<Water>();
 		if (inwater==Water.nullWater && tempWater!=null)
 			inwater = tempWater;

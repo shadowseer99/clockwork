@@ -13,8 +13,13 @@ public class Water : MonoBehaviour {
 	{
 		get
 		{
-			if (_nullWater==null)
-				_nullWater = new GameObject("Null Water").AddComponent<Water>();
+			if (_nullWater==null) {
+				GameObject obj = GameObject.Find("Null Water");
+				if (obj)
+					_nullWater = obj.GetComponent<Water>();
+				if (_nullWater==null)
+					_nullWater = new GameObject("Null Water").AddComponent<Water>();
+			}
 			return _nullWater;
 		}
 	}
