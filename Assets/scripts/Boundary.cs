@@ -12,6 +12,9 @@ public class Boundary : MonoBehaviour {
 	void Start()
 	{
 		// search for the highest and lowest colliders in the level
+		transform.position = Vector3.zero;
+		transform.rotation = Quaternion.identity;
+		transform.localScale = Vector3.one;
 		Collider[] colliders = GameObject.FindObjectsOfType<Collider>();
 		float top=float.NegativeInfinity;
 		float bottom=float.PositiveInfinity;
