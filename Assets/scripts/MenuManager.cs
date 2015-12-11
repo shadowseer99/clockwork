@@ -5,7 +5,7 @@ public class MenuManager : MonoBehaviour {
 
 	public GameObject canvas;
 	private GameObject[] menus;
-	public string[] levels;
+	//public string[] levels;
 	private static int curLevel=-1;
 	public Texture2D cursor;
 
@@ -38,7 +38,7 @@ public class MenuManager : MonoBehaviour {
 	public void DisplayMenu2(int menu)
 	{
 		if (curLevel>=0)
-			Application.UnloadLevel(levels[curLevel]);
+			Application.UnloadLevel(Application.loadedLevel);
 		curLevel = -1;
 		DisplayMenu(menu);
 	}
@@ -59,14 +59,17 @@ public class MenuManager : MonoBehaviour {
 	{
 		LoadLevel(curLevel);
 	}
-
+    public void exit()
+    {
+        Application.Quit();
+    }
 	public void LoadLevel(int level=-1)
 	{
 		// remove any unnecessary levels/menus
 		HideMenus();
 		if (curLevel>=0)
 		{
-			Application.UnloadLevel(levels[curLevel]);
+			Application.UnloadLevel(Application.loadedLevel);
 			// additional clean that unity FAILS to unload
 			try { Destroy(GameObject.FindObjectOfType<GearGuyCtrl1>().gameObject); } catch { }
 		}
@@ -74,13 +77,10 @@ public class MenuManager : MonoBehaviour {
 		// load new level OR load victory menu
 		if (level==-1)
 			level = curLevel+1;
-		if (level<levels.Length)
-		{
-			Application.LoadLevelAdditive(levels[level]);
-			curLevel = level;
-		} else
-		{
-			DisplayMenu2(5);
-		}
+		
+		
+		Application.LoadLevelAdditive(level);
+		curLevel = level;
+		
 	}
 }
