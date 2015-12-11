@@ -92,7 +92,7 @@ public class MenuManager : MonoBehaviour {
 		print("level: "+level+"; levelCount: "+Application.levelCount);
 		if (level<Application.levelCount)
 		{
-			Application.LoadLevelAdditive(level);
+			Application.LoadLevel(level);
 			curLevel = level;
 		} else
 		{

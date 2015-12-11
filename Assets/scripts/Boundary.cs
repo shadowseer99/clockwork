@@ -70,6 +70,6 @@ public class Boundary : MonoBehaviour {
 	void Update()
 	{
 		if (end)
-			MenuManager.GetManager().Restart();
-	}
+            Application.LoadLevel(Application.loadedLevel);
+    }
 }

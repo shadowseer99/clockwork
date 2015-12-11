@@ -26,6 +26,6 @@ public class DeathZone : MonoBehaviour {
 	void Update()
 	{
 		if (time<0)
-			MenuManager.GetManager().Restart();
-	}
+            Application.LoadLevel(Application.loadedLevel);
+    }
 }
