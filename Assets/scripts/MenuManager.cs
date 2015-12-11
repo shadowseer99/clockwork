@@ -1,11 +1,14 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 using System.Collections;
 
 public class MenuManager : MonoBehaviour {
 
 	public GameObject canvas;
 	private GameObject[] menus;
-	public string[] levels;
+	//public string[] levels;
 	private static int curLevel=-1;
 	public Texture2D cursor;
 
@@ -24,6 +27,8 @@ public class MenuManager : MonoBehaviour {
 		DisplayMenu(0);
 	}
 
+	//void Update() { print("curlevel: "+curLevel); }
+
 	public void HideMenus()
 	{
 		for (int i=0; i<menus.Length; ++i)
@@ -32,13 +37,13 @@ public class MenuManager : MonoBehaviour {
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = false;
 		this.enabled = true;
-		Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
+		//Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
 	}
 
 	public void DisplayMenu2(int menu)
 	{
 		if (curLevel>=0)
-			Application.UnloadLevel(levels[curLevel]);
+			Application.UnloadLevel(curLevel);
 		curLevel = -1;
 		DisplayMenu(menu);
 	}
@@ -55,13 +60,27 @@ public class MenuManager : MonoBehaviour {
 		Cursor.SetCursor(cursor, Vector2.one*16, CursorMode.ForceSoftware);
 	}
 
+	public void Restart()
+	{
+		if (curLevel>=0)
+			LoadLevel(curLevel);
+		
+#if UNITY_EDITOR
+		if (curLevel<0)
+			EditorApplication.LoadLevelInPlayMode(EditorApplication.currentScene);
+#endif
+	}
+    public void exit()
+    {
+        Application.Quit();
+    }
 	public void LoadLevel(int level=-1)
 	{
 		// remove any unnecessary levels/menus
 		HideMenus();
 		if (curLevel>=0)
 		{
-			Application.UnloadLevel(levels[curLevel]);
+			Application.UnloadLevel(curLevel);
 			// additional clean that unity FAILS to unload
 			try { Destroy(GameObject.FindObjectOfType<GearGuyCtrl1>().gameObject); } catch { }
 		}
@@ -69,13 +88,26 @@ public class MenuManager : MonoBehaviour {
 		// load new level OR load victory menu
 		if (level==-1)
 			level = curLevel+1;
-		if (level<levels.Length)
+
+		print("level: "+level+"; levelCount: "+Application.levelCount);
+		if (level<Application.levelCount)
 		{
-			Application.LoadLevelAdditive(levels[level]);
+			Application.LoadLevelAdditive(level);
 			curLevel = level;
 		} else
 		{
 			DisplayMenu2(5);
 		}
+	}
+	
+	/// <summary>Returns the MenuManager or loads "Main Menu" to return the MenuManager</summary>
+	public static MenuManager GetManager()
+	{
+		// try finding the manager, load "Main Menu" if necessary
+		MenuManager manager = GameObject.FindObjectOfType<MenuManager>();
+		if (manager!=null)
+			return manager;
+		Application.LoadLevelAdditive(0);
+		return GameObject.FindObjectOfType<MenuManager>();
 	}
 }

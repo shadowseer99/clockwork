@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Transparent))]
 public class Water : MonoBehaviour {
 
 	public Vector3 flow=Vector3.zero;
