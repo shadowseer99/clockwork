@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 using System.Collections;
 using System;
-using UnityEditor;
 
 [RequireComponent(typeof(Transparent))]
 public class Button : MonoBehaviour {

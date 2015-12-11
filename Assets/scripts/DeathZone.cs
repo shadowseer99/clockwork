@@ -26,6 +26,6 @@ public class DeathZone : MonoBehaviour {
 	void Update()
 	{
 		if (time<0)
-			GameObject.FindObjectOfType<MenuManager>().Restart();
+			MenuManager.GetManager().Restart();
 	}
 }

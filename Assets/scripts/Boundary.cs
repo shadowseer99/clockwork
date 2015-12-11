@@ -70,6 +70,6 @@ public class Boundary : MonoBehaviour {
 	void Update()
 	{
 		if (end)
-			GameObject.FindObjectOfType<MenuManager>().Restart();
+			MenuManager.GetManager().Restart();
 	}
 }
