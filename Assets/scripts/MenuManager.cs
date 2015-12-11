@@ -55,6 +55,11 @@ public class MenuManager : MonoBehaviour {
 		Cursor.SetCursor(cursor, Vector2.one*16, CursorMode.ForceSoftware);
 	}
 
+	public void Restart()
+	{
+		LoadLevel(curLevel);
+	}
+
 	public void LoadLevel(int level=-1)
 	{
 		// remove any unnecessary levels/menus
