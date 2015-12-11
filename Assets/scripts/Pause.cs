@@ -10,10 +10,10 @@ public class Pause : MonoBehaviour {
     // Use this for initialization
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
-        bool reset = Input.GetKey(KeyCode.R);
-        bool menu = Input.GetKey(KeyCode.Escape);
+        bool reset = Input.GetKeyDown(KeyCode.R);
+        bool menu = Input.GetKeyDown(KeyCode.Escape);
         if (reset)
         {
             Reset();

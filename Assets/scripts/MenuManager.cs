@@ -37,7 +37,7 @@ public class MenuManager : MonoBehaviour {
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = false;
 		this.enabled = true;
-		//Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
+		Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
 	}
 
 	public void DisplayMenu2(int menu)
