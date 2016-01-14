@@ -129,6 +129,7 @@ public class GearGuyCtrl1 : MonoBehaviour
 			ii*=-1;
 		}
         /*
+		 * 
 		if (!engaged)
 			m_Rigidbody.AddForce (Vector3.right * xrate * m_MaxSpeed);
 		else
