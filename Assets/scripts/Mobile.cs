@@ -15,6 +15,8 @@ public class Mobile : MonoBehaviour {
     public void Start()
     {
 #if UNITY_IPHONE || UNITY_ANDROID
+
+#else
         gameObject.SetActive(false);
 #endif
     }
