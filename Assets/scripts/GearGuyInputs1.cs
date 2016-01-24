@@ -22,7 +22,11 @@ public class GearGuyInputs1 : MonoBehaviour
     {
 #if UNITY_IPHONE || UNITY_ANDROID
         bool crouch = Mobile.engage;
-        float x = Mobile.movement;
+        float x = 0;
+        if (Mobile.left)
+            x -= 1;
+        if (Mobile.right)
+            x += 1;
 #else
         // Read the inputs.
         bool crouch = CrossPlatformInputManager.GetAxisRaw("Jump")==1;

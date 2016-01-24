@@ -31,11 +31,20 @@ public class Pause : MonoBehaviour {
         {
             if(!activated)
             {
+#if UNITY_IPHONE || UNITY_ANDROID
+                
+                Mobile.menu=false;
+                Mobile.active = false;
+#endif
                 Time.timeScale = 0;
                 activated = true;
             }
             else
             {
+#if UNITY_IPHONE || UNITY_ANDROID
+            
+                Mobile.active = true;
+#endif
                 Time.timeScale = 1;
                 activated = false;
             }
