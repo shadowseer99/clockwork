@@ -99,9 +99,35 @@ public class MenuManager : MonoBehaviour {
 			DisplayMenu2(5);
 		}
 	}
-	
-	/// <summary>Returns the MenuManager or loads "Main Menu" to return the MenuManager</summary>
-	public static MenuManager GetManager()
+    public void LoadLevelVar(UnityEngine.UI.Text slevel)
+    {
+        // remove any unnecessary levels/menus
+        HideMenus();
+        if (curLevel >= 0)
+        {
+            Application.UnloadLevel(curLevel);
+            // additional clean that unity FAILS to unload
+            try { Destroy(GameObject.FindObjectOfType<GearGuyCtrl1>().gameObject); } catch { }
+        }
+        int level = 0;
+        // load new level OR load victory menu
+        if (slevel.text == null)
+            level = curLevel + 1;
+        else
+            int.TryParse(slevel.text, out level);
+        
+        if (level < Application.levelCount)
+        {
+            Application.LoadLevel(level);
+            curLevel = level;
+        }
+        else
+        {
+            DisplayMenu2(5);
+        }
+    }
+    /// <summary>Returns the MenuManager or loads "Main Menu" to return the MenuManager</summary>
+    public static MenuManager GetManager()
 	{
 		// try finding the manager, load "Main Menu" if necessary
 		MenuManager manager = GameObject.FindObjectOfType<MenuManager>();
