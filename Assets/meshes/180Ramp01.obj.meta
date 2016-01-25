@@ -1,17 +1,17 @@
 fileFormatVersion: 2
-guid: abf1fd0ee7d999941ad0cfffe6d4a8b5
-timeCreated: 1449853857
+guid: 2f34f13b7550b654387b70320959e396
+timeCreated: 1453687213
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: //RootNode
-    100002: default
+    100002: pTorus1
     400000: //RootNode
-    400002: default
-    2300000: default
-    3300000: default
-    4300000: default
+    400002: pTorus1
+    2300000: pTorus1
+    3300000: pTorus1
+    4300000: pTorus1
   materials:
     importMaterials: 1
     materialName: 0
