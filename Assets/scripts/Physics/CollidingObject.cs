@@ -16,7 +16,7 @@ public class CollidingObject:PhysicsObject {
 	public float curSpeed=0;
 	public float maxSpeed=4;
 	public float accel=4;
-	protected float accelMult=1;
+	[HideInInspector]public float accelMult=1;
 	public CollidingObject attachedTo;
 	protected bool attaching=false;
 

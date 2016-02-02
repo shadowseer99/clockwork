@@ -42,9 +42,6 @@ public class PhysicsObject:MonoBehaviour {
 	public Rigidbody2D rigidbody       { get; private set; }
 
 	// physics manager variables
-	private static PhysicsManager _manager;
-	public static PhysicsManager manager {
-		get { return _manager??new GameObject("Physics Manager").AddComponent<PhysicsManager>(); } }
 	[HideInInspector] public uint id;
 	[HideInInspector] public uint visited;
 	[HideInInspector] public uint setId;
