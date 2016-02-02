@@ -1,0 +1,200 @@
+﻿using UnityEngine;
+using System.Collections;
+using UnityStandardAssets.CrossPlatformInput;
+using System;
+using UnityEditor;
+
+public class PlayerGear:CollidingObject {
+	public float maxSpeed = 4f;
+	public bool adjustForSize=false;
+	public float acceleration=16f;
+	public float curSpeed=0;
+	public Gear attachedTo;
+
+	public override void Start() {
+		base.Start();
+		trig.enabled = false;
+	}
+
+	public override void PhysicsUpdate(int percolate=int.MaxValue) {
+		// handle engaged
+		bool engaged = Input.GetKey(KeyCode.LeftShift);
+		trig.enabled = engaged;
+		rotateAround = engaged;
+
+		/*
+		// acceleration
+		float xrate = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+		// direction of acceleration
+		Vector3 speedDir = (attachedTo==null
+			?Vector3.right
+			:attachedTo.GetVelAtPoint(transform.position).normalized);
+		// current speed in speedDir
+		Vector3 projVel = (attachedTo==null
+			?Vector3.Project(velocity, speedDir)
+			:attachedTo.GetVelAtPoint(transform.position).normalized);
+		// speed orthogonal to speedDir
+		Vector3 defaultSpeed = velocity-projVel;
+		// calculate new speed in speedDir
+		curSpeed = Vector3.Dot(projVel, speedDir);
+		curSpeed += Time.fixedDeltaTime*acceleration*(xrate-curSpeed/maxSpeed);
+		velocity = defaultSpeed + curSpeed*speedDir;
+		Vector3 friction = Vector3.zero;
+		curAngularVelocity = -curSpeed*360/Mathf.PI/radius+(attachedTo!=null?attachedTo.curAngularVelocity:0);
+		if (UnityEngine.Random.Range(0, 10)==9 && engaged) {
+			print("curSpeed: "+curSpeed);
+			print("speedDir: "+speedDir);
+			print("defaultSpeed: "+defaultSpeed);
+		}*/
+
+		if (attachedTo!=null) {
+			if (Vector3.Distance(transform.position, attachedTo.transform.position) > this.trigRadius+attachedTo.trigRadius) {
+				velocity = attachedTo.GetVelAtPoint(transform.position);
+				velocity = velocity.normalized*(velocity.magnitude+curSpeed);
+				attachedTo = null;
+			} else {
+				float xrate = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+				Vector3 speedDir = Vector3.right;
+				Vector3 projVel = Vector3.Project(velocity, speedDir);
+				Vector3 defaultSpeed = velocity-projVel;//
+				curSpeed = Vector3.Dot(projVel, speedDir);
+				curSpeed += Time.fixedDeltaTime*acceleration*(xrate-curSpeed/maxSpeed);
+				velocity = defaultSpeed + curSpeed*speedDir;
+				Vector3 friction = Vector3.zero;
+				curAngularVelocity = -curSpeed*360/Mathf.PI/radius+(attachedTo!=null?attachedTo.curAngularVelocity:0);
+			}
+		}
+		
+		if (attachedTo==null) {
+			/*float xrate = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+			Vector3 speedDir = Vector3.right;
+			Vector3 projVel = Vector3.Project(velocity, speedDir);
+			Vector3 defaultSpeed = velocity-projVel;
+			curSpeed = Vector3.Dot(projVel, speedDir);
+			curSpeed += Time.fixedDeltaTime*acceleration*(xrate-curSpeed/maxSpeed);
+			velocity = defaultSpeed + curSpeed*speedDir;
+			Vector3 friction = Vector3.zero;
+			curAngularVelocity = -curSpeed*360/Mathf.PI/radius+(attachedTo!=null?attachedTo.curAngularVelocity:0);*/
+		}
+
+		// move
+		centerOfRotation = (attachedTo!=null?attachedTo.transform.position:Vector3.zero);
+		if (attachedTo!=null) {
+			Vector3 grav = Physics.gravity;
+			Physics.gravity = Vector3.zero;
+			base.PhysicsUpdate(percolate-1);
+			Physics.gravity = grav;
+		} else {
+			base.PhysicsUpdate(percolate-1);
+		}
+
+		// move
+		if (attachedTo!=null) {
+			/*base.PhysicsUpdate(percolate-1);
+			float mult = (numGroundedTo>0?1:0.1f);
+			for (int i=0; i<numGroundedTo; ++i)
+				if (groundedTo[i].gameObject.GetComponent<Collider>().material.bounciness>0.01f)
+					mult = 0.1f;
+			velocity -= Time.fixedDeltaTime*Vector3.right*(acceleration*velocity.x/maxSpeed)*mult;
+			velocity += Time.fixedDeltaTime*Vector3.right*xrate*acceleration*mult;
+			transform.Rotate(Vector3.back, Time.fixedDeltaTime*velocity.x*180/Mathf.PI/radius);*/
+		} else {
+			/*// rotate this, move this around the center
+			float lastRotVel = rotVel;
+			rotVel += Time.fixedDeltaTime*xrate*acceleration/(transform.position-transform.parent.position).magnitude;
+			rotVel -= Time.fixedDeltaTime*(acceleration*rotVel/maxSpeed);
+			//print(rotVel);
+			Vector3 pos = transform.position;
+			transform.Rotate(Vector3.back * Time.fixedDeltaTime*rotVel*180/Mathf.PI);
+			Vector3 temp=transform.position;
+			transform.RotateAround(transform.parent.position, Vector3.back, Time.fixedDeltaTime*(rotVel)*180/Mathf.PI);
+			//print("moved "+(transform.position-pos).magnitude/Time.fixedDeltaTime);
+			//print("speed: "+(transform.position-temp).magnitude/Time.fixedDeltaTime+", expected speed: "+rotVel+"ratio: "+(transform.position-temp).magnitude/Time.fixedDeltaTime/rotVel+", radius: "+radius);
+			// apply forces of acceleration and gravity to the parent
+			EnviroGear gear = transform.parent.GetComponent<EnviroGear>();
+			Rigidbody rigidBody2 = gear.GetComponent<Rigidbody>();
+			gear.angularMomentum += mass*(lastRotVel-rotVel) - 9.81f*0.1f*Vector3.Dot(Vector3.right, transform.position-transform.parent.position);
+			if (gear.isMovable)
+				rigidBody2.velocity += Vector3.down*9.81f*mass;
+				//rigidBody2.velocity += Vector3.left*(9.81f*0.1f*Vector3.Dot(Vector3.left, transform.position-transform.parent.position));
+			//gear.angularMomentum += 200*(xrate-rotVel)*mass*radius - 9.81f*0.1f*Vector3.Dot(Vector3.right, (transform.position-transform.parent.position));
+			//rigidBody2.velocity += Vector3.right*0;*/
+		}
+	}
+	
+	private void Flip()
+	{
+		// Switch the way the player is labelled as facing.
+		facingRight = !facingRight;
+
+		// Multiply the player's x local scale by -1.
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
+	}
+
+	public override void OnTriggerEnter(Collider coll) {
+		base.OnTriggerEnter(coll);
+		//print("engaged: "+engaged+"; tag: "+coll.gameObject.tag+"; attachedTo: "+attachedTo);
+		if (coll.gameObject.tag=="gear" && (attachedTo==null || coll.gameObject!=attachedTo.gameObject) && engaged) {
+			attachedTo = coll.GetComponent<Gear>();
+			print("attaching");
+			// project velocity onto the parent gear
+			//Vector3 vel = attachedTo.veloi
+		}
+	}
+	
+	public override void OnTriggerExit(Collider coll) {
+		base.OnTriggerExit(coll);
+		if (coll.gameObject.tag=="gear" && attachedTo!=null && coll.gameObject==attachedTo.gameObject) {
+			attachedTo = null;
+			print("detatching; attachedTo: "+attachedTo);
+		}
+	}
+
+	public override void OnCollisionEnter(Collision coll)
+	{
+		base.OnCollisionEnter(coll);
+		if (coll.gameObject.transform==transform.parent)
+			return;
+
+		Gear other = coll.gameObject.GetComponent<Gear>();
+		if (other!=null && other.isMovable)
+		{
+			// average out velocities
+			//print("this.vel: "+velocity+"; other.vel: "+other.velocity+"; impulse: "+coll.impulse);
+			Vector3 totalVel = other.mass*other.velocity+rigidbody.mass*velocity-rigidbody.mass*coll.impulse;
+			float totalMass = other.mass+rigidbody.mass;
+			Vector3 finalVel = totalVel/totalMass;
+			//print("finalVel: "+finalVel);
+			other.velocity = 2*finalVel;
+			velocity = 2*finalVel;
+		}
+	}
+
+	void OnCollisionStay(Collision coll)
+	{
+		OnCollisionEnter(coll);
+	}
+}
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(PlayerGear))]
+public class PlayerGearEditor:Editor {
+	public enum MassType { mass, density, momentOfInertia }
+	public static MassType massType;
+	public override void OnInspectorGUI() {
+		PlayerGear obj = (PlayerGear)target;
+		EditorGUILayout.BeginHorizontal();
+		massType = (MassType)EditorGUILayout.EnumPopup(massType);
+		if (massType==MassType.mass)
+			obj.mass = EditorGUILayout.FloatField(obj.mass);
+		else if (massType==MassType.density)
+			obj.density = EditorGUILayout.FloatField(obj.density);
+		else if (massType==MassType.momentOfInertia)
+			obj.momentOfInertia = EditorGUILayout.FloatField(obj.momentOfInertia);
+		EditorGUILayout.EndHorizontal();
+		base.OnInspectorGUI();
+	}
+}
+#endif

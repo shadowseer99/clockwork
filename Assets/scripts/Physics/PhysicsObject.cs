@@ -6,22 +6,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-[RequireComponent(typeof(Collider), typeof(Rigidbody))]
+[RequireComponent(typeof(CircleCollider2D), typeof(Rigidbody2D))]
 [ExecuteInEditMode]
 public class PhysicsObject:MonoBehaviour {
 	// core variables
 	[HideInInspector]
-	public float mass=1;
+	public float mass {
+		get { return rigidbody.mass; }
+		set { rigidbody.mass = value; } }
 	public float density {
 		get { return mass/area; }
 		set { mass=value*area; } }
 	public float momentOfInertia {
-		get { return momentOfInertiaMult*mass*radius*radius; }
-		set { mass=value/momentOfInertiaMult/radius/radius; } }
+		get { return momentOfInertiaMult*mass*collRadius*collRadius; }
+		set { mass=value/momentOfInertiaMult/collRadius/collRadius; } }
 	public bool isMovable=true;
 	public Vector3 velocity {
 		get { return rigidbody.velocity; }
-		set { rigidbody.velocity = value; } }
+		set { rigidbody.velocity = (isMovable?value:Vector3.zero); } }
 	public Vector3 momentum {
 		get { return velocity*mass; }
 		set { velocity = value/mass; } }
@@ -31,15 +33,18 @@ public class PhysicsObject:MonoBehaviour {
 		get { return momentOfInertia*curAngularVelocity; }
 		set { curAngularVelocity = value/momentOfInertia; } }
 	// helper variables
-	protected float radius;
-	protected float area;
-	protected float momentOfInertiaMult;
-	protected Collider coll;
-	protected Rigidbody rigidbody;
+	public float collRadius          { get; private set; }
+	public float trigRadius          { get; private set; }
+	public float area                { get; private set; }
+	public float momentOfInertiaMult { get; private set; }
+	public CircleCollider2D coll       { get; private set; }
+	public CircleCollider2D trig       { get; private set; }
+	public Rigidbody2D rigidbody       { get; private set; }
 
-	// other variables
-	protected bool rotateAround=false;
-	protected Vector3 center;
+	// physics manager variables
+	private static PhysicsManager _manager;
+	public static PhysicsManager manager {
+		get { return _manager??new GameObject("Physics Manager").AddComponent<PhysicsManager>(); } }
 	[HideInInspector] public uint id;
 	[HideInInspector] public uint visited;
 	[HideInInspector] public uint setId;
@@ -60,11 +65,16 @@ public class PhysicsObject:MonoBehaviour {
 
 	public virtual void FixedUpdate() { PhysicsUpdate(); }
 
-	public virtual void PhysicsUpdate(int percolate=int.MaxValue) {
-		/*if (isMovable)
-			transform.position += Time.fixedDeltaTime*velocity;*/
+	public virtual void PhysicsUpdate() {
 		if (isRotatable)
 			transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.forward, Space.World);
+		if (!isMovable)
+			velocity = Vector3.zero;
+	}
+
+	public virtual void Move() {
+		/*RaycastHit2D rayHit = Physics2D.CircleCast(transform.position, trigRadius, velocity, velocity.magnitude*Time.fixedDeltaTime);
+		rayHit.*/
 	}
 
 	public void AddForceAtPoint(Vector3 point, Vector3 force) {
@@ -94,42 +104,44 @@ public class PhysicsObject:MonoBehaviour {
 		}
 	}
 
+	/// <summary>Returns the speed of an object rotating around this object at the given point.</summary>
+	public Vector3 GetVelAtPoint(Vector3 point) {
+		// use the cross product, multiply by angularSpeed in radians
+		Vector3 diff = point-transform.position;
+		Vector3 result = Vector3.Cross(Vector3.forward, diff);
+		// extra logic to prevent returning Vector3.zero
+		return result*(Mathf.Abs(curAngularVelocity)>0.001f?curAngularVelocity:(float)1e-3)*Mathf.PI/180;
+	}
+
 	/// <summary>Resets radius/area, based off of the collider values</summary>
 	private void HandleColliders() {
 		// adjust rigidbody
-		rigidbody = GetComponent<Rigidbody>();
+		rigidbody = GetComponent<Rigidbody2D>();
 		rigidbody.isKinematic = !isMovable;
-		rigidbody.useGravity = false;
+		rigidbody.gravityScale = 0;
 		gameObject.layer = LayerMask.NameToLayer(isMovable?"Default":"Static Gear");
-		rigidbody.constraints = (isMovable?RigidbodyConstraints.FreezeRotation|RigidbodyConstraints.FreezePositionZ:RigidbodyConstraints.FreezeAll);
+		rigidbody.constraints = (isMovable?RigidbodyConstraints2D.FreezeRotation:RigidbodyConstraints2D.FreezeAll);
 
 		// find coolider, set radius/area/momentOfInertiaMult
 		Transform t = transform;
-		radius = area = momentOfInertiaMult = -1;
-		Collider[] colls = GetComponents<Collider>();
+		collRadius = area = momentOfInertiaMult = -1;
+		CircleCollider2D[] colls = GetComponents<CircleCollider2D>();
 		for (int i=0; i<colls.Length; ++i) {
-			if (!colls[i].isTrigger) {
-				Type type = colls[i].GetType();
-				if (type==typeof(SphereCollider)) {
-					SphereCollider coll = (SphereCollider)colls[i];
-					radius = coll.radius*Mathf.Sqrt(
-						t.TransformVector(t.InverseTransformVector(Vector3.up).normalized).magnitude
-						*t.TransformVector(t.InverseTransformVector(Vector3.right).normalized).magnitude);
-					area = Mathf.PI*radius*radius;
-					momentOfInertiaMult = 0.5f;
-				} else if (type==typeof(BoxCollider)) {
-					throw new Exception("An Incompatible Collider has been attached to "+gameObject.name);
-					//BoxCollider coll = (BoxCollider)colls[i];
-					//radius = coll.size.magnitude*GetTransformMagnitude(transform)/Mathf.Sqrt(3);
-					//area = radius*radius;
-				} else {
-					throw new Exception("An Incompatible Collider has been attached to "+gameObject.name);
-				}
+			// find constants
+			float radius = colls[i].radius*Mathf.Sqrt(
+				t.TransformVector(t.InverseTransformVector(Vector3.up).normalized).magnitude
+				*t.TransformVector(t.InverseTransformVector(Vector3.right).normalized).magnitude);
+			area = Mathf.PI*collRadius*collRadius;
+			momentOfInertiaMult = 0.5f;
+			// store results as trigger OR collider
+			if (colls[i].isTrigger) {
+				this.trig = colls[i];
+				this.trigRadius = radius;
+			} else {
+				this.coll = colls[i];
+				this.collRadius = radius;
 			}
 		}
-		//print("radius: "+radius);
-		//print("area: "+area);
-		//print("momentOfInertiaMult: "+momentOfInertiaMult);
 	}
 }
 
