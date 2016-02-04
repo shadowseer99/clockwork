@@ -16,6 +16,10 @@ public class WallBuilderEditor : Editor
         {
             myScript.BuildObject();
         }
+        if (GUILayout.Button("Kill Children"))
+        {
+            myScript.KillChildren();
+        }
         SceneView.RepaintAll();
     }
 }
