@@ -39,13 +39,11 @@ public class PhysicsObject:MonoBehaviour {
 	public float momentOfInertiaMult { get; private set; }
 	public CircleCollider2D coll       { get; private set; }
 	public CircleCollider2D trig       { get; private set; }
-	public Rigidbody2D rigidbody       { get; private set; }
+	new public Rigidbody2D rigidbody   { get; private set; }
 
 	// physics manager variables
-	[HideInInspector] public uint id;
+	[HideInInspector] public PhysicsManager.GearSet gearSet;
 	[HideInInspector] public uint visited;
-	[HideInInspector] public uint setId;
-	[HideInInspector] public bool speed;
 
 	public virtual void Start() {
 		HandleColliders();
