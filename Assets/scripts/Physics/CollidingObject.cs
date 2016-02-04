@@ -1,6 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿#if UNITY_EDITOR
 using UnityEditor;
+#endif
+using UnityEngine;
+using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
 using System;
 using System.Collections.Generic;
@@ -12,24 +14,55 @@ public class CollidingObject:PhysicsObject {
 	[HideInInspector]public List<Water> inwaters=new List<Water>();
 	[HideInInspector]public List<Collision2D> collidingWith=new List<Collision2D>();
 	[HideInInspector]public List<Collision2D> groundedTo=new List<Collision2D>();
-	[HideInInspector]public List<CollidingObject> neighbors=new List<CollidingObject>();
+	public List<CollidingObject> neighbors=new List<CollidingObject>();
 	public float curSpeed=0;
 	public float maxSpeed=4;
 	public float accel=4;
-	[HideInInspector]public float accelMult=1;
+	public float accelMult=1;
 	public CollidingObject attachedTo;
 	protected bool attaching=false;
 
 	public override void PhysicsUpdate() {
 		// handle water
-		// use https://www.mathsisfun.com/geometry/circle-sector-segment.html for better water
-		/*velocity += Time.fixedDeltaTime*(1-inwater.densityRatio)*Physics.gravity;
-		float f = (1-1/(Time.fixedDeltaTime*inwater.thicknessRatio+1));
-		velocity = f*inwater.flow + (1-f)*velocity;*/
-		
-		// update physics
-		base.PhysicsUpdate();
+		float cumArea=0;
+		float cumDensity=0;
+		float cumThickness=0;
+		Vector3 cumVelocity=Vector3.zero;
+		for (int i=0; i<inwaters.Count; ++i) {
+			// find approximate contact point (can be improved, TODO)
+			BoxCollider2D coll = inwaters[i].GetComponent<BoxCollider2D>();
+			Vector3 dir = (coll.transform.position-transform.position).normalized;
+			float distance = -collRadius;
+			float diff = 2*collRadius;
+			for (int j=0; j<20; ++j) {
+				diff /= 2;
+				distance += diff;
+				if (coll.OverlapPoint(transform.position + distance*dir))
+					distance -= diff;
+			}
+			// calculate area, cumulate variables (using https://www.mathsisfun.com/geometry/circle-sector-segment.html)
+			if (distance<collRadius) {
+				float angle = Mathf.Acos(distance/collRadius);
+				float area = angle*collRadius*collRadius - distance*distance*Mathf.Tan(angle);
+				cumArea += area;
+				cumDensity += area*inwaters[i].densityRatio;
+				cumThickness += area*inwaters[i].thicknessRatio;
+				cumVelocity += area*inwaters[i].thicknessRatio*inwaters[i].flow;
+			}
+		}
+		// adjust results
+		float totalArea = Mathf.PI*collRadius*collRadius;
+		cumThickness /= Mathf.Max(totalArea, cumArea);
+		cumDensity /= Mathf.Max(totalArea, cumArea);
+		cumVelocity /= Mathf.Max(totalArea, cumArea);
+		if (cumThickness>0)
+			cumVelocity /= cumThickness;
+		// update velocity
+		velocity += Time.fixedDeltaTime*(1-cumDensity)*Physics.gravity;
+		float f = (1-1/(Time.fixedDeltaTime*cumThickness+1));
+		velocity = f*cumVelocity + (1-f)*velocity;
 
+		// handle acceleration
 		// if attached to another gear
 		if (attachedTo!=null) {
 			Vector3 diff = transform.position-attachedTo.transform.position;
@@ -41,9 +74,8 @@ public class CollidingObject:PhysicsObject {
 				Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude));
 			velocity = Vector3.zero;
 		}
-		
 		// if grounded and not attached
-		if (attachedTo==null && groundedTo.Count>0) {
+		if (attachedTo==null && (groundedTo.Count>0 || !isMovable)) {
 			// helper vectors
 			Vector3 speedDir = Vector3.right;
 			Vector3 projVel = Vector3.Project(velocity, speedDir);
@@ -54,6 +86,9 @@ public class CollidingObject:PhysicsObject {
 			velocity = defaultSpeed + curSpeed*speedDir;
 			curAngularVelocity = -curSpeed*180/Mathf.PI/collRadius+(attachedTo!=null?attachedTo.curAngularVelocity:0);
 		}
+		
+		// update physics
+		base.PhysicsUpdate();
 	}
 
 	public virtual void OnTriggerEnter2D(Collider2D coll) {
