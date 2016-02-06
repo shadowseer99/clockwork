@@ -1,18 +1,17 @@
 fileFormatVersion: 2
-guid: a15911c202b44904cb0fc7f8e3f67bd9
-timeCreated: 1454435445
+guid: abf1fd0ee7d999941ad0cfffe6d4a8b5
+timeCreated: 1449853857
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: //RootNode
-    100002: gear18_stone
+    100002: default
     400000: //RootNode
-    400002: gear18_stone
-    2300000: gear18_stone
-    3300000: gear18_stone
-    4300000: gear18_stone
-    9500000: //RootNode
+    400002: default
+    2300000: default
+    3300000: default
+    4300000: default
   materials:
     importMaterials: 1
     materialName: 0
@@ -71,7 +70,7 @@ ModelImporter:
     rootMotionBoneName: 
     hasTranslationDoF: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
