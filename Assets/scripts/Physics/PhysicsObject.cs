@@ -58,18 +58,15 @@ public class PhysicsObject:MonoBehaviour {
 #endif
 	}
 
-	public virtual void FixedUpdate() { PhysicsUpdate(); }
+	//public virtual void FixedUpdate() { PhysicsUpdate(); }
 
-	public virtual void PhysicsUpdate() {
+	public virtual void PhysicsUpdate() {}
+
+	public virtual void Move() {
 		if (isRotatable)
 			transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.forward, Space.World);
 		if (!isMovable)
 			velocity = Vector3.zero;
-	}
-
-	public virtual void Move() {
-		/*RaycastHit2D rayHit = Physics2D.CircleCast(transform.position, trigRadius, velocity, velocity.magnitude*Time.fixedDeltaTime);
-		rayHit.*/
 	}
 
 	public void AddForceAtPoint(Vector3 point, Vector3 force) {

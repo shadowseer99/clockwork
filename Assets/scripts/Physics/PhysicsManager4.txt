@@ -68,10 +68,6 @@ public class PhysicsManager : MonoBehaviour {
 				continue;
 			}
 		}
-		// update ColllidingObjects
-		for (int i=objs.Count-1; i>=0; --i)
-		//for (int i=0; i<objs.Count; ++i)
-			objs[i].PhysicsUpdate();
 
 		// rebuild gearSets
 		for (int i=0; i<gearSets.Count; ++i)
@@ -82,31 +78,31 @@ public class PhysicsManager : MonoBehaviour {
 				gearSets.Add(new GearSet(curIndex));
 			if (gearSets[curIndex].TryAddObj(colls[i], null))
 				++curIndex;
-//print("DONE MAKING GEARSET");
 		}
-		while (gearSets.Count>=curIndex+1)
-			gearSets.RemoveAt(gearSets.Count-1);
 
 		// update gearSets
 		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].AnalyzeRelations();
 		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].UpdateObjects();
-		// move PhysicsObjects
+
+		// update PhysicsObjects
 		for (int i=0; i<objs.Count; ++i)
-			objs[i].Move();
+			objs[i].PhysicsUpdate();
 	}
 
 	// helper functions
-	private static bool IsVisited(CollidingObject obj) { return obj!=null && obj.visited>visitedNum; }
+	private static bool IsVisited(CollidingObject obj) { return obj.visited>visitedNum; }
 	private static float Mult(CollidingObject obj) { return (float)(obj.visited*2.0-POSITIVE-NEGATIVE); }
 
 	/// <summary>Manages a collection of interacting gears</summary>
 	public class GearSet {
 		public List<CollidingObject> gears=new List<CollidingObject>();
-		public List<GearSetRelation> relations=new List<GearSetRelation>();
 		public float totalAngularMomentum=0;
 		public float totalMomentOfInertia=0;
+		public List<GearSetRelation> relations=new List<GearSetRelation>();
+		public float relationalAngularMomentum=0;
+		public float relationalMomentOfInertia=0;
 		public int index=-1;
 		public bool isMovable=false;
 
@@ -116,7 +112,6 @@ public class PhysicsManager : MonoBehaviour {
 		public void Reset(int index=-1) {
 			gears.Clear();
 			relations.Clear();
-			totalAngularMomentum = totalMomentOfInertia = 0;
 			isMovable = false;
 			if (index>=0)
 				this.index = index;
@@ -124,8 +119,7 @@ public class PhysicsManager : MonoBehaviour {
 		// adds obj to this GearSet if possible, returns true if possible
 		public bool TryAddObj(CollidingObject obj, CollidingObject oldObj) {
 			// add relations if both objects have gearSets
-			if (IsVisited(obj) && IsVisited(oldObj)) {
-//print("adding relationship between "+obj.gameObject.name+" and "+oldObj.gameObject.name);
+			if (obj!=null && oldObj!=null && obj.gearSet!=null && oldObj.gearSet!=null) {
 				if (obj.attachedTo==oldObj) oldObj.gearSet.relations.Add(new GearSetRelation(oldObj, obj, true));
 				if (oldObj.attachedTo==obj)    obj.gearSet.relations.Add(new GearSetRelation(obj, oldObj, true));
 				if (obj.isMovable) oldObj.gearSet.relations.Add(new GearSetRelation(oldObj, obj, false));
@@ -140,7 +134,7 @@ public class PhysicsManager : MonoBehaviour {
 				obj.gearSet = this;
 				gears.Add(obj);
 				totalAngularMomentum += Mult(obj)*obj.angularMomentum;
-				totalMomentOfInertia += obj.momentOfInertia;
+				totalMomentOfInertia += Mult(obj)*obj.momentOfInertia;
 				isMovable = obj.isMovable && obj.attachedTo==null;
 
 				// try adding neighbors
@@ -155,44 +149,27 @@ public class PhysicsManager : MonoBehaviour {
 			for (int i=0; i<relations.Count; ++i) {
 				CollidingObject obj = relations[i].obj;
 				CollidingObject other = relations[i].other;
-				float mult = Mult(obj)*Mult(other);
-//print("relation with "+obj.gameObject.name+" and "+other.gameObject.name+" (dir="+mult+", attached="+relations[i].isAttached+")");
+				float mult = -Mult(obj)*Mult(other);
 				Vector3 diff = other.transform.position-obj.transform.position;
 				if (relations[i].isAttached) {
-					// adds other's acceleration, gravity, and momentum
-					totalAngularMomentum += (mult*180/Mathf.PI)*(other.mass*other.collRadius*other.Accel()
-						+ Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward))
-						+ mult*diff.sqrMagnitude*other.mass*obj.curAngularVelocity;
-					totalMomentOfInertia += diff.sqrMagnitude*other.mass;
-//print("added totalAngularMomentum: "+((mult*180/Mathf.PI)*(other.mass*other.collRadius*other.Accel()
-	//- Physics.gravity.y*other.mass*Vector3.Dot(Vector3.right, diff))));
-//print("added totalMomentOfInertia: "+(diff.sqrMagnitude*other.mass));
+					// adds other's acceleration and gravity
+					relationalAngularMomentum += mult*other.mass*Time.fixedDeltaTime*other.accel*(other.accelMult-other.curSpeed/other.maxSpeed)
+						- mult*Physics.gravity.y*other.mass*Vector3.Dot(Vector3.right, diff);
+					relationalMomentOfInertia += diff.sqrMagnitude*other.mass;
 				} else {
-					// apply 1/3 of other's angular momentum, apply full momentOfInertia
-					totalAngularMomentum += (mult/3)* (other.angularMomentum + other.mass*other.velocity.magnitude
-						*Vector3.Dot(Vector3.Cross(other.velocity.normalized, diff.normalized), Vector3.forward));
-					totalMomentOfInertia += other.momentOfInertia;
+					// find difference between angularMomentums
+					float objAngularMomentum = totalAngularMomentum/totalMomentOfInertia;
+					float otherAngularMomentum = other.angularMomentum + other.mass*Vector3.Dot(Vector3.Cross(other.velocity, diff.normalized), Vector3.forward);
+					float diffAngularMomentum = objAngularMomentum-otherAngularMomentum;
+					// apply 1/3 of diffAngularMomentum, apply full momentOfInertia
+					relationalAngularMomentum += mult*diffAngularMomentum/3;
+					relationalMomentOfInertia += other.momentOfInertia;
 				}
 			}
 		}
 		public void UpdateObjects() {
-print(ToString()+"; TAM: "+totalAngularMomentum+"; TMI: "+totalMomentOfInertia);
-			// update gears
-			for (int i=0; i<gears.Count; ++i) {
-				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
-				gears[i].curSpeed = gears[i].AngularVelocityToCurSpeed();
-			}
-			// update relations
 			for (int i=0; i<relations.Count; ++i) {
-				if (!relations[i].isAttached) {
-					CollidingObject obj = relations[i].obj;
-					CollidingObject other = relations[i].other;
-					float mult = -Mult(obj)*Mult(other);
-					Vector3 diff = other.transform.position-obj.transform.position;
-					other.angularMomentum = mult*(totalAngularMomentum/totalMomentOfInertia)*(1/3);
-					other.velocity =        mult*(totalAngularMomentum/totalMomentOfInertia)*(2/3)
-						*Vector3.Cross(diff.normalized, Vector3.forward).normalized/other.mass/diff.magnitude;
-				}
+
 			}
 		}
 		// prints objects added to this
@@ -203,7 +180,7 @@ print(ToString()+"; TAM: "+totalAngularMomentum+"; TMI: "+totalMomentOfInertia);
 			return result;
 		}
 	}
-	public class GearSetRelation {
+	private class GearSetRelation {
 		public CollidingObject obj;
 		public CollidingObject other;
 		public bool isAttached;

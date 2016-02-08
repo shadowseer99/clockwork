@@ -59,7 +59,7 @@ public class CollidingObject:PhysicsObject {
 			cumVelocity /= cumThickness;
 		// update velocity
 		velocity += Time.fixedDeltaTime*(1-cumDensity)*Physics.gravity;
-		float f = (1-1/(Time.fixedDeltaTime*cumThickness+1));
+		float f = Time.fixedDeltaTime*cumThickness;//(1-1/(Time.fixedDeltaTime*cumThickness+1));
 		velocity = f*cumVelocity + (1-f)*velocity;
 
 		// handle acceleration
@@ -67,24 +67,32 @@ public class CollidingObject:PhysicsObject {
 		if (attachedTo!=null) {
 			Vector3 diff = transform.position-attachedTo.transform.position;
 			transform.position = attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius);
-			float xrate = CrossPlatformInputManager.GetAxisRaw("Horizontal");
-			curSpeed += Time.fixedDeltaTime*accel*(xrate-curSpeed/maxSpeed);
+			curSpeed += Accel();
 			curAngularVelocity = -curSpeed*180/(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius));
+//print("rotating "+transform.position+" around "+attachedTo.transform.position
+	//+" (attachedTo: "+attachedTo.curAngularVelocity+"; curSpeed: "+curSpeed+"; attachedTo: "+attachedTo.curAngularVelocity
+	//+"; result: "+Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude)+")");
 			transform.RotateAround(attachedTo.transform.position, Vector3.forward,
 				Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude));
 			velocity = Vector3.zero;
 		}
+		// if not moving
+		else if (!isMovable) {
+			curSpeed += Accel();
+//print("oldSpeed: "+curAngularVelocity+"; newSpeed: "+CurSpeedToAngularVelocity());
+			curAngularVelocity = CurSpeedToAngularVelocity();
+		}
 		// if grounded and not attached
-		if (attachedTo==null && (groundedTo.Count>0 || !isMovable)) {
+		else if (attachedTo==null && groundedTo.Count>0) {
 			// helper vectors
 			Vector3 speedDir = Vector3.right;
 			Vector3 projVel = Vector3.Project(velocity, speedDir);
 			Vector3 defaultSpeed = velocity-projVel;
 			// calculate curSpeed, in the direction of speedDir
 			curSpeed = Vector3.Dot(projVel, speedDir);
-			curSpeed += Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed);
+			curSpeed += Accel();
 			velocity = defaultSpeed + curSpeed*speedDir;
-			curAngularVelocity = -curSpeed*180/Mathf.PI/collRadius+(attachedTo!=null?attachedTo.curAngularVelocity:0);
+			curAngularVelocity = CurSpeedToAngularVelocity();
 		}
 		
 		// update physics
@@ -110,7 +118,6 @@ public class CollidingObject:PhysicsObject {
 			print("attaching to: "+attachedTo.name);
 		}
 	}
-
 	public virtual void OnTriggerExit2D(Collider2D coll) {
 		// add neighboring CollidingObjects
 		CollidingObject collObj = coll.GetComponent<CollidingObject>();
@@ -133,29 +140,19 @@ public class CollidingObject:PhysicsObject {
 		}
 	}
 
-	public virtual void OnCollisionEnter2D(Collision2D coll) {
+	//public virtual void OnCollisionEnter2D(Collision2D coll) {}
+	public virtual void OnCollisionStay2D(Collision2D coll) {
+		//OnCollisionEnter2D(coll);
 		// add to collidingWith, try adding to groundedTo
 		collidingWith.Add(coll);
 		if (transform.position.y-coll.contacts[0].point.y>0)
 			groundedTo.Add(coll);
-
-		Gear other = coll.gameObject.GetComponent<Gear>();
-		if (other!=null && other.isMovable && this.isMovable) {
-			throw new NotImplementedException("impulse isn't implemented");
-			// average out velocities
-			/*print("this.vel: "+velocity+"; other.vel: "+other.velocity+"; impulse: "+coll.contacts);
-			Vector3 totalVel = other.mass*other.velocity+rigidbody.mass*velocity-rigidbody.mass*coll.impulse;
-			float totalMass = other.mass+rigidbody.mass;
-			Vector3 finalVel = totalVel/totalMass;
-			//print("finalVel: "+finalVel);
-			other.velocity = 2*finalVel;
-			velocity = 2*finalVel;*/
-		}
 	}
 
-	void OnCollisionStay2D(Collision2D coll) {
-		OnCollisionEnter2D(coll);
-	}
+	// helper functions
+	public float Accel() { return Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed); }
+	public float CurSpeedToAngularVelocity() { return curSpeed*180/Mathf.PI/collRadius; }
+	public float AngularVelocityToCurSpeed() { return curAngularVelocity*collRadius*Mathf.PI/180; }
 }
 
 #if UNITY_EDITOR

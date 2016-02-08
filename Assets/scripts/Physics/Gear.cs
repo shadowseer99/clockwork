@@ -17,6 +17,8 @@ public class Gear:CollidingObject {
 				GameObject.FindObjectOfType<MenuManager>().LoadLevel();
 				return;
 			}
+			//Material mat;
+			//DynamicGI.SetEmissive(GetComponent<Renderer>(), 
 		}
 
 		// rotate/move and apply torques
