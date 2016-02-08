@@ -68,10 +68,7 @@ public class CollidingObject:PhysicsObject {
 			Vector3 diff = transform.position-attachedTo.transform.position;
 			transform.position = attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius);
 			curSpeed += Accel();
-			curAngularVelocity = -curSpeed*180/(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius));
-//print("rotating "+transform.position+" around "+attachedTo.transform.position
-	//+" (attachedTo: "+attachedTo.curAngularVelocity+"; curSpeed: "+curSpeed+"; attachedTo: "+attachedTo.curAngularVelocity
-	//+"; result: "+Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude)+")");
+			curAngularVelocity = CurSpeedToAngularVelocity();
 			transform.RotateAround(attachedTo.transform.position, Vector3.forward,
 				Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude));
 			velocity = Vector3.zero;
@@ -79,7 +76,6 @@ public class CollidingObject:PhysicsObject {
 		// if not moving
 		else if (!isMovable) {
 			curSpeed += Accel();
-//print("oldSpeed: "+curAngularVelocity+"; newSpeed: "+CurSpeedToAngularVelocity());
 			curAngularVelocity = CurSpeedToAngularVelocity();
 		}
 		// if grounded and not attached
@@ -151,27 +147,21 @@ public class CollidingObject:PhysicsObject {
 
 	// helper functions
 	public float Accel() { return Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed); }
-	public float CurSpeedToAngularVelocity() { return curSpeed*180/Mathf.PI/collRadius; }
-	public float AngularVelocityToCurSpeed() { return curAngularVelocity*collRadius*Mathf.PI/180; }
+	public float CurSpeedToAngularVelocity() {
+		if (attachedTo!=null)
+			return -curSpeed*180/(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius));
+		else
+			return curSpeed*180/Mathf.PI/collRadius;
+	}
+	public float AngularVelocityToCurSpeed() {
+		if (attachedTo!=null)
+			return -curAngularVelocity*(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius))/180;
+		else
+			return curAngularVelocity*collRadius*Mathf.PI/180;
+	}
 }
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(CollidingObject))]
-public class CollidingObjectEditor:Editor {
-	public enum MassType { mass, density, momentOfInertia }
-	public static MassType massType;
-	public override void OnInspectorGUI() {
-		CollidingObject obj = (CollidingObject)target;
-		EditorGUILayout.BeginHorizontal();
-		massType = (MassType)EditorGUILayout.EnumPopup(massType);
-		if (massType==MassType.mass)
-			obj.mass = EditorGUILayout.FloatField(obj.mass);
-		else if (massType==MassType.density)
-			obj.density = EditorGUILayout.FloatField(obj.density);
-		else if (massType==MassType.momentOfInertia)
-			obj.momentOfInertia = EditorGUILayout.FloatField(obj.momentOfInertia);
-		EditorGUILayout.EndHorizontal();
-		base.OnInspectorGUI();
-	}
-}
+public class CollidingObjectEditor:PhysicsObjectEditor {}
 #endif
