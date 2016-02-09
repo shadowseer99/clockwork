@@ -12,8 +12,8 @@ public class PhysicsObject:MonoBehaviour {
 	// core variables
 	[HideInInspector]
 	public float mass {
-		get { return rigidbody.mass; }
-		set { rigidbody.mass = value; } }
+		get { return (rigidbody==null?0:rigidbody.mass); }
+		set { if (rigidbody!=null) rigidbody.mass = value; } }
 	public float density {
 		get { return mass/area; }
 		set { mass=value*area; } }
@@ -22,8 +22,8 @@ public class PhysicsObject:MonoBehaviour {
 		set { mass=value/momentOfInertiaMult/collRadius/collRadius; } }
 	public bool isMovable=true;
 	public Vector3 velocity {
-		get { return rigidbody.velocity; }
-		set { rigidbody.velocity = (isMovable?value:Vector3.zero); } }
+		get { return (rigidbody==null?Vector2.zero:rigidbody.velocity); }
+		set { if (rigidbody!=null) rigidbody.velocity = (isMovable?value:Vector3.zero); } }
 	public Vector3 momentum {
 		get { return velocity*mass; }
 		set { velocity = value/mass; } }

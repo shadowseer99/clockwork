@@ -21,6 +21,7 @@ public class CollidingObject:PhysicsObject {
 	public float accelMult=1;
 	public CollidingObject attachedTo;
 	protected bool attaching=false;
+	public int numPegs=0;
 
 	public override void PhysicsUpdate() {
 		// handle water
