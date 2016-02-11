@@ -163,10 +163,10 @@ public class PhysicsManager : MonoBehaviour {
 						+ Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward))
 						+ mult*diff.sqrMagnitude*other.mass*obj.curAngularVelocity;
 					totalMomentOfInertia += diff.sqrMagnitude*other.mass;
-print("gravity: "+(Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward)));
+//print("gravity: "+(Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward)));
 //print("acceleration: "+(other.mass*other.collRadius*other.Accel()));
-print("momentum: "+(mult*diff.sqrMagnitude*other.mass*obj.curAngularVelocity));
-print("momentum constants: "+(mult*diff.sqrMagnitude*other.mass));
+//print("momentum: "+(mult*diff.sqrMagnitude*other.mass*obj.curAngularVelocity));
+//print("momentum constants: "+(mult*diff.sqrMagnitude*other.mass));
 				} else {
 					//print("adding "+other.name);
 					// apply 1/3 of other's angular momentum, apply full momentOfInertia
@@ -177,7 +177,7 @@ print("momentum constants: "+(mult*diff.sqrMagnitude*other.mass));
 			}
 		}
 		public void UpdateObjects() {
-print(ToString()+"; TAM: "+totalAngularMomentum+"; TMI: "+totalMomentOfInertia);
+//print(ToString()+"; TAM: "+totalAngularMomentum+"; TMI: "+totalMomentOfInertia);
 			// update gears
 			for (int i=0; i<gears.Count; ++i) {
 				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
@@ -185,14 +185,14 @@ print(ToString()+"; TAM: "+totalAngularMomentum+"; TMI: "+totalMomentOfInertia);
 			}
 			// update relations
 			for (int i=0; i<relations.Count; ++i) {
-				if (!relations[i].isAttached) {
+				/*if (!relations[i].isAttached) {
 					CollidingObject obj = relations[i].obj;
 					CollidingObject other = relations[i].other;
 					float mult = -Mult(obj)*Mult(other);
 //print("applying to "+other.name+" ("+mult*(totalAngularMomentum/totalMomentOfInertia)+")");
 					other.angularMomentum = mult*(totalAngularMomentum*other.momentOfInertia/totalMomentOfInertia)*(1f/3f);
 					other.velocity = obj.GetVelAtPoint(other.transform.position);
-				}
+				}*/
 			}
 		}
 		// prints objects added to this

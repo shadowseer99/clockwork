@@ -21,6 +21,7 @@ public class CollidingObject:PhysicsObject {
 	public float accelMult=1;
 	public CollidingObject attachedTo;
 	protected bool attaching=false;
+	public int numPegs=0;
 
 	public override void PhysicsUpdate() {
 		// handle water
@@ -151,13 +152,13 @@ public class CollidingObject:PhysicsObject {
 		if (attachedTo!=null)
 			return -curSpeed*180/(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius));
 		else
-			return curSpeed*180/Mathf.PI/collRadius;
+			return -curSpeed*180/Mathf.PI/collRadius;
 	}
 	public float AngularVelocityToCurSpeed() {
 		if (attachedTo!=null)
 			return -curAngularVelocity*(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius))/180;
 		else
-			return curAngularVelocity*collRadius*Mathf.PI/180;
+			return -curAngularVelocity*collRadius*Mathf.PI/180;
 	}
 }
 
