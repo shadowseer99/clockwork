@@ -17,21 +17,22 @@ public class PhysicsManager : MonoBehaviour {
 	private static PhysicsManager _physicsManager;
 	public static PhysicsManager physicsManager {
 		get {
-			// if null, create new PhysicsManager
+			// if null, find or create new PhysicsManager
 			if (_physicsManager==null) {
-				_physicsManager = new GameObject("Physics Manager").AddComponent<PhysicsManager>();
+				_physicsManager = GameObject.FindObjectOfType<PhysicsManager>()
+					?? new GameObject("Physics Manager").AddComponent<PhysicsManager>();
 			}
 			return _physicsManager;
 		}
 	}
 
 	public void Start() {
-		if (_physicsManager==null)
-			_physicsManager = this;
-		// populate
-		PhysicsObject[] objs = GameObject.FindObjectsOfType<PhysicsObject>();
-		for (int i=0; i<objs.Length; ++i)
-			physicsManager.AddObject(objs[i]);
+		// populate if empty
+		if (this.objs.Count==0) {
+			PhysicsObject[] objs = GameObject.FindObjectsOfType<PhysicsObject>();
+			for (int i=0; i<objs.Length; ++i)
+				physicsManager.AddObject(objs[i]);
+		}
 	}
 
 	/// <summary>Adds obj to the data structures, starts updating obj.

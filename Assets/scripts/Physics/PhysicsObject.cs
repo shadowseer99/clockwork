@@ -46,6 +46,7 @@ public class PhysicsObject:MonoBehaviour {
 	[HideInInspector] public uint visited;
 
 	public virtual void Start() {
+		PhysicsManager.physicsManager.Start();
 		HandleColliders();
 	}
 
