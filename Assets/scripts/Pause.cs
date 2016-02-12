@@ -5,12 +5,17 @@ using UnityStandardAssets.CrossPlatformInput;
 public class Pause : MonoBehaviour {
 
     [SerializeField] private GameObject screen;
+	[SerializeField] private GameObject levelend;
 
     private bool activated = false;
     
     // Use this for initialization
 
     // Update is called once per frame
+	void Start()
+	{
+		levelend.SetActive (false);
+	}
     void Update()
     {
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -51,6 +56,11 @@ public class Pause : MonoBehaviour {
         }
         screen.SetActive(activated);
     }
+	public void NextLevel()
+	{
+		Time.timeScale = 1;
+		Application.LoadLevel (Application.loadedLevel + 1);
+	}
     public void Resume()
     {
         Time.timeScale = 1;
@@ -70,4 +80,9 @@ public class Pause : MonoBehaviour {
     {
         Application.Quit();
     }
+	public void EndLevel()
+	{
+		Time.timeScale = 0;
+		levelend.SetActive (true);
+	}
 }

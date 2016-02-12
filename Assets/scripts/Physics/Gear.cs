@@ -14,7 +14,7 @@ public class Gear:CollidingObject {
 		if (isGolden) {
 			goldenRotation += Time.fixedDeltaTime*curAngularVelocity;
 			if (Mathf.Abs(goldenRotation) > 360) {
-				GameObject.FindObjectOfType<MenuManager>().LoadLevel();
+				GameObject.FindObjectOfType<Pause>().EndLevel();
 				return;
 			}
 			//Material mat;

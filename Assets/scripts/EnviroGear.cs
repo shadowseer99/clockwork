@@ -49,7 +49,8 @@ public class EnviroGear : MonoBehaviour {
 			goldenRotation += Time.fixedDeltaTime*curAngularVelocity;
 			if (Mathf.Abs(goldenRotation) > 360)
 			{
-                Application.LoadLevel(Application.loadedLevel+1);
+				GameObject.FindObjectOfType<Pause>().EndLevel();
+				//Application.LoadLevel(Application.loadedLevel+1);
                 return;
 			}
 		}
