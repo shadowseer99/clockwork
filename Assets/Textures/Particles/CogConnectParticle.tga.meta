@@ -1,0 +1,390 @@
+fileFormatVersion: 2
+guid: 42f135ffa11258642bb1a4a0c190ecbc
+timeCreated: 1455646355
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: CogConnectParticle_0
+    21300002: CogConnectParticle_1
+    21300004: CogConnectParticle_2
+    21300006: CogConnectParticle_3
+    21300008: CogConnectParticle_4
+    21300010: CogConnectParticle_5
+    21300012: CogConnectParticle_6
+    21300014: CogConnectParticle_7
+    21300016: CogConnectParticle_8
+    21300018: CogConnectParticle_9
+    21300020: CogConnectParticle_10
+    21300022: CogConnectParticle_11
+    21300024: CogConnectParticle_12
+    21300026: CogConnectParticle_13
+    21300028: CogConnectParticle_14
+    21300030: CogConnectParticle_15
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 128
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: CogConnectParticle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -5, y: 6}
+        - {x: -6, y: 4}
+        - {x: -6, y: -6}
+        - {x: 3, y: -6}
+        - {x: 6, y: -5}
+        - {x: 6, y: 3}
+        - {x: 3, y: 6}
+    - name: CogConnectParticle_1
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -7, y: 11}
+        - {x: -11, y: 7}
+        - {x: -11, y: -4}
+        - {x: -10, y: -10}
+        - {x: 7, y: -10}
+        - {x: 10, y: -7}
+        - {x: 10, y: 5}
+        - {x: 9, y: 11}
+    - name: CogConnectParticle_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -9, y: 11}
+        - {x: -11, y: 5}
+        - {x: -11, y: -8}
+        - {x: -8, y: -11}
+        - {x: 4, y: -11}
+        - {x: 11, y: -10}
+        - {x: 11, y: 9}
+        - {x: 8, y: 11}
+    - name: CogConnectParticle_3
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -7, y: 15}
+        - {x: -14, y: 11}
+        - {x: -15, y: 7}
+        - {x: -15, y: -7}
+        - {x: -8, y: -14}
+        - {x: 6, y: -14}
+        - {x: 10, y: -13}
+        - {x: 14, y: -9}
+        - {x: 14, y: 8}
+        - {x: 12, y: 15}
+    - name: CogConnectParticle_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -11, y: 23}
+        - {x: -23, y: 19}
+        - {x: -23, y: -17}
+        - {x: -13, y: -22}
+        - {x: 19, y: -22}
+        - {x: 22, y: -19}
+        - {x: 22, y: 20}
+        - {x: 17, y: 23}
+    - name: CogConnectParticle_5
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -12, y: 26}
+        - {x: -25, y: 16}
+        - {x: -26, y: 13}
+        - {x: -26, y: -15}
+        - {x: -15, y: -26}
+        - {x: 17, y: -26}
+        - {x: 26, y: -18}
+        - {x: 26, y: 11}
+        - {x: 19, y: 26}
+    - name: CogConnectParticle_6
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -27, y: 32}
+        - {x: -32, y: 14}
+        - {x: -32, y: -17}
+        - {x: -29, y: -20}
+        - {x: -15, y: -32}
+        - {x: 25, y: -32}
+        - {x: 32, y: -17}
+        - {x: 32, y: 23}
+        - {x: 20, y: 32}
+    - name: CogConnectParticle_7
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -30, y: 35}
+        - {x: -35, y: 16}
+        - {x: -35, y: -13}
+        - {x: -29, y: -33}
+        - {x: 33, y: -33}
+        - {x: 33, y: 25}
+        - {x: 27, y: 35}
+    - name: CogConnectParticle_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 23, y: 43}
+        - {x: -22, y: 43}
+        - {x: -28, y: 42}
+        - {x: -43, y: 26}
+        - {x: -43, y: -16}
+        - {x: -31, y: -43}
+        - {x: 24, y: -43}
+        - {x: 43, y: -24}
+        - {x: 43, y: 18}
+        - {x: 41, y: 26}
+    - name: CogConnectParticle_9
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -46, y: 46}
+        - {x: -46, y: -46}
+        - {x: 42, y: -46}
+        - {x: 46, y: -27}
+        - {x: 46, y: 39}
+        - {x: 24, y: 46}
+    - name: CogConnectParticle_10
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -25, y: 51}
+        - {x: -39, y: 39}
+        - {x: -51, y: 20}
+        - {x: -51, y: -30}
+        - {x: -29, y: -50}
+        - {x: 29, y: -50}
+        - {x: 50, y: -32}
+        - {x: 50, y: 26}
+        - {x: 43, y: 51}
+    - name: CogConnectParticle_11
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -30, y: 53}
+        - {x: -53, y: 28}
+        - {x: -53, y: -26}
+        - {x: -31, y: -53}
+        - {x: 36, y: -53}
+        - {x: 53, y: -47}
+        - {x: 53, y: 28}
+        - {x: 47, y: 53}
+    - name: CogConnectParticle_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -30, y: 53}
+        - {x: -53, y: 28}
+        - {x: -53, y: -26}
+        - {x: -31, y: -53}
+        - {x: 36, y: -53}
+        - {x: 53, y: -47}
+        - {x: 53, y: 28}
+        - {x: 47, y: 53}
+    - name: CogConnectParticle_13
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 26, y: 55}
+        - {x: -35, y: 55}
+        - {x: -55, y: 38}
+        - {x: -55, y: -32}
+        - {x: -42, y: -54}
+        - {x: 48, y: -54}
+        - {x: 54, y: -29}
+        - {x: 54, y: 37}
+        - {x: 40, y: 52}
+    - name: CogConnectParticle_14
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 28, y: 62}
+        - {x: -49, y: 62}
+        - {x: -62, y: 59}
+        - {x: -62, y: -57}
+        - {x: -61, y: -62}
+        - {x: 30, y: -62}
+        - {x: 62, y: -35}
+        - {x: 62, y: 32}
+        - {x: 41, y: 60}
+      - - {x: -37, y: 2}
+        - {x: 3, y: 37}
+        - {x: 38, y: -3}
+        - {x: -2, y: -38}
+    - name: CogConnectParticle_15
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -59, y: 64}
+        - {x: -64, y: 59}
+        - {x: -64, y: -43}
+        - {x: -51, y: -64}
+        - {x: 57, y: -64}
+        - {x: 64, y: -40}
+        - {x: 64, y: 49}
+        - {x: 53, y: 64}
+      - - {x: -40, y: 3}
+        - {x: 4, y: 40}
+        - {x: 41, y: -4}
+        - {x: -3, y: -41}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
