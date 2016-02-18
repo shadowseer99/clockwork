@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-[RequireComponent(typeof(Transparent))]
+//[RequireComponent(typeof(Transparent))]
 public class Button : MonoBehaviour {
 	public enum ButtonType { moveObject, toggleObject, customAction }
 	[HideInInspector] public ButtonType buttonType;
