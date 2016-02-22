@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 public class GearGuyCtrl1 : MonoBehaviour
 {
-    [SerializeField] private float maxSpeed = 4f;
-	[SerializeField] private bool adjustForSize=false;
-	[SerializeField] private float acceleration=16f;
-    [SerializeField] private bool m_AirControl = false;
-	[SerializeField] private GameObject stickyAura;
+    public float maxSpeed = 4f;
+	public bool adjustForSize=false;
+	public float acceleration=16f;
+    public bool m_AirControl = false;
+	public GameObject stickyAura;
 	public float mass=0.5f;
 
 	private Water inwater;
