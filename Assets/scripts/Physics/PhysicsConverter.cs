@@ -39,8 +39,8 @@ public class PhysicsConverter : MonoBehaviour {
 					Mathf.Abs(x.transform.TransformVector(coll.radius*Vector3.up).magnitude),
 					Mathf.Abs(x.transform.TransformVector(coll.radius*Vector3.forward).magnitude));
 				GameObject result = (coll.isTrigger
-					?gearSelector.GetGearByTrigSize(max/scaleFactor)
-					:gearSelector.GetGearByCollSize(max/scaleFactor)).gameObject;
+					?gearSelector.GetGearByTrigSize(max/scaleFactor, x.isGolden)
+					:gearSelector.GetGearByCollSize(max/scaleFactor, x.isGolden)).gameObject;
 				result.transform.localScale = result.transform.localScale*scaleFactor;
 				return result;
 			},
