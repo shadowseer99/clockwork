@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+
+public class Thickener:MonoBehaviour {
+	public Vector3 thickenVector=Vector3.forward;
+
+	public void Start() {
+		MeshFilter[] meshFilters = GetComponentsInChildren<MeshFilter>();
+		for (int i=0; i<meshFilters.Length; ++i) {
+			// initialize vars
+			Mesh m = meshFilters[i].mesh;
+			Transform t = meshFilters[i].transform;
+			Vector3[] verts = m.vertices;
+
+			// find average position
+			Vector3 avg = Vector3.zero;
+			for (int j=0; j<verts.Length; ++j)
+				avg += verts[j];
+			avg /= verts.Length;
+
+			// thicken vertices
+			//Vector3 thickenVec = t.TransformDirection(thickenVector);
+			//thickenVec = new Vector3(Mathf.Sign(thickenVector.x)*thickenv
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.InverseTransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformVector(thickenVector)));
+			print(100*(Vector3.one+t.InverseTransformVector(thickenVector)));
+			print(100*(t.TransformDirection(Vector3.one+thickenVector)));
+			print(100*(t.InverseTransformDirection(Vector3.one+thickenVector)));
+			print(100*(t.TransformVector(Vector3.one+thickenVector)));
+			print(100*(t.InverseTransformVector(Vector3.one+thickenVector)));
+			/*print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));
+			print(100*(Vector3.one+t.TransformDirection(thickenVector)));*/
+			/*for (int j=0; j<verts.Length; ++j)
+				verts[j] = Vector3.Scale(verts[j], Vector3.one+t.TransformDirection(thickenVector));*/
+
+			// move back to position
+			Vector3 newAvg = Vector3.zero;
+			for (int j=0; j<verts.Length; ++j)
+				newAvg += verts[j];
+			newAvg /= verts.Length;
+			for (int j=0; j<verts.Length; ++j)
+				verts[j] -= newAvg - avg;
+			m.vertices = verts;
+		}
+	}
+}

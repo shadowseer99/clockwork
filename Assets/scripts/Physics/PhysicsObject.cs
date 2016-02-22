@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+[DisallowMultipleComponent]
 [RequireComponent(typeof(CircleCollider2D), typeof(Rigidbody2D))]
 [ExecuteInEditMode]
 public class PhysicsObject:MonoBehaviour {
@@ -70,33 +71,6 @@ public class PhysicsObject:MonoBehaviour {
 			velocity = Vector3.zero;
 	}
 
-	public void AddForceAtPoint(Vector3 point, Vector3 force) {
-		print("AddForceAtPoint("+point+", "+force+")");
-		print("radius of gyration: "+Mathf.Sqrt(momentOfInertia/area));
-		force *= Time.fixedDeltaTime;
-		Vector3 diff = point-transform.position;
-		float newMomentOfInertia=diff.sqrMagnitude*mass;
-		float totalMomentOfInertia=(momentOfInertia+newMomentOfInertia);
-		print("newMoment: "+newMomentOfInertia+"; totalMoment: "+totalMomentOfInertia);
-		float cross = Vector3.Dot(Vector3.Cross(diff, force), Vector3.forward)*180/Mathf.PI;
-		float ratio = newMomentOfInertia/totalMomentOfInertia;
-		print("ratio: "+ratio+"; cross: "+cross+"; isMovable: "+isMovable+"; isRotatable: "+isRotatable);
-		if (isMovable) {
-			if (isRotatable) {
-				velocity += force*(1-ratio);
-			} else {
-				velocity += force;
-			}
-		}
-		if (isRotatable) {
-			if (isMovable) {
-				angularMomentum += cross*ratio;
-			} else {
-				angularMomentum += cross;
-			}
-		}
-	}
-
 	/// <summary>Returns the speed of an object rotating around this object at the given point.</summary>
 	public Vector3 GetVelAtPoint(Vector3 point) {
 		// use the cross product, multiply by angularSpeed in radians
@@ -141,6 +115,7 @@ public class PhysicsObject:MonoBehaviour {
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(PhysicsObject))]
+[CanEditMultipleObjects]
 public class PhysicsObjectEditor:Editor {
 	public enum MassType { mass, density, momentOfInertia }
 	public static MassType massType;
@@ -157,5 +132,12 @@ public class PhysicsObjectEditor:Editor {
 		EditorGUILayout.EndHorizontal();
 		base.OnInspectorGUI();
 	}
+
+	/*protected void TrySetPrefabMod() {
+		PropertyModification[] mods = PrefabUtility.GetPropertyModifications(target);
+		if (mods!=null) {
+
+		}
+	}*/
 }
 #endif

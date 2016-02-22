@@ -17,10 +17,12 @@ public class CollidingObject:PhysicsObject {
 	public List<CollidingObject> neighbors=new List<CollidingObject>();
 	public float curSpeed=0;
 	public float maxSpeed=4;
+	//public float additionalFriction=0;
 	public float accel=4;
+	//public float power=4;
 	public float accelMult=1;
-	public CollidingObject attachedTo;
-	protected bool attaching=false;
+	[HideInInspector]public CollidingObject attachedTo;
+	[HideInInspector]protected bool attaching=false;
 	public int numPegs=0;
 
 	public override void Start() {
@@ -77,6 +79,7 @@ public class CollidingObject:PhysicsObject {
 		if (attachedTo!=null) {
 			Vector3 diff = transform.position-attachedTo.transform.position;
 			transform.position = attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius);
+			print("curSpeed: "+curSpeed+" curspeed2: "+(curSpeed+Accel()));
 			curSpeed += Accel();
 			curAngularVelocity = CurSpeedToAngularVelocity();
 			transform.RotateAround(attachedTo.transform.position, Vector3.forward,
@@ -103,6 +106,8 @@ public class CollidingObject:PhysicsObject {
 		
 		// update physics
 		base.PhysicsUpdate();
+		collidingWith.Clear();
+		groundedTo.Clear();
 	}
 
 	public virtual void OnTriggerEnter2D(Collider2D coll) {
@@ -140,6 +145,7 @@ public class CollidingObject:PhysicsObject {
 			print("detatching; attachedTo: "+attachedTo.name);
 			isMovable = true;
 			velocity = attachedTo.GetVelAtPoint(transform.position);
+
 			velocity = velocity.normalized*(velocity.magnitude-curSpeed);
 			attachedTo = null;
 			print("vel: "+velocity.magnitude);
@@ -148,7 +154,6 @@ public class CollidingObject:PhysicsObject {
 
 	//public virtual void OnCollisionEnter2D(Collision2D coll) {}
 	public virtual void OnCollisionStay2D(Collision2D coll) {
-		//OnCollisionEnter2D(coll);
 		// add to collidingWith, try adding to groundedTo
 		collidingWith.Add(coll);
 		if (transform.position.y-coll.contacts[0].point.y>0)
@@ -156,7 +161,10 @@ public class CollidingObject:PhysicsObject {
 	}
 
 	// helper functions
-	public float Accel() { return Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed); }
+	public float Accel() {
+		return Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed);
+		//return Time.fixedDeltaTime*accel*accelMult;
+	}
 	public float CurSpeedToAngularVelocity() {
 		if (attachedTo!=null)
 			return -curSpeed*180/(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius));

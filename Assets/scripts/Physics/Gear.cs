@@ -68,21 +68,5 @@ public class Gear:CollidingObject {
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(Gear))]
-public class GearEditor:Editor {
-	public enum MassType { mass, density, momentOfInertia }
-	public static MassType massType;
-	public override void OnInspectorGUI() {
-		Gear obj = (Gear)target;
-		EditorGUILayout.BeginHorizontal();
-		massType = (MassType)EditorGUILayout.EnumPopup(massType);
-		if (massType==MassType.mass)
-			obj.mass = EditorGUILayout.FloatField(obj.mass);
-		else if (massType==MassType.density)
-			obj.density = EditorGUILayout.FloatField(obj.density);
-		else if (massType==MassType.momentOfInertia)
-			obj.momentOfInertia = EditorGUILayout.FloatField(obj.momentOfInertia);
-		EditorGUILayout.EndHorizontal();
-		base.OnInspectorGUI();
-	}
-}
+public class GearEditor:CollidingObjectEditor {}
 #endif
