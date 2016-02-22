@@ -1,0 +1,287 @@
+﻿#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+using System.Collections;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+[ExecuteInEditMode]
+public class PhysicsConverter : MonoBehaviour {
+	// input prefabs
+	public GearSelector gearSelector;
+	public float scaleFactor=8;
+	public GameObject playerGearPrefab;
+	public GameObject deathZonePrefab;
+	public GameObject boundaryPrefab;
+	public GameObject buttonPrefab;
+	public List<PrefabConverter> conversions;
+
+	// helper vars
+	private Dictionary<GameObject, GameObject> prefabs=new Dictionary<GameObject,GameObject>();
+	private Dictionary<GameObject, GameObject> replacements=new Dictionary<GameObject, GameObject>();
+	private Dictionary<GameObject, Type> options2=new Dictionary<GameObject, Type>();
+	private Dictionary<GameObject, PropertyModification[]> prefabOptions=new Dictionary<GameObject, PropertyModification[]>();
+	private GameObject destroyMe;
+	
+	public void Convert () {
+		destroyMe = new GameObject("GARBAGE (DESTROY ME)");
+
+		// convert generic objects
+		CopyObjects<EnviroGear, Gear>(
+			x=>{
+				SphereCollider coll = x.GetComponent<SphereCollider>();
+				GameObject result = (coll.isTrigger
+					?gearSelector.GetGearByTrigSize(coll.radius/scaleFactor)
+					:gearSelector.GetGearByCollSize(coll.radius/scaleFactor)).gameObject;
+				result.transform.localScale = result.transform.localScale*scaleFactor;
+				return result;
+			},
+			(oldGear, newGear)=>{
+				// newGear specific actions
+				newGear.isGolden = oldGear.isGolden;
+				newGear.Start();
+				newGear.mass = oldGear.mass;
+				newGear.isMovable = oldGear.isMovable;
+				newGear.curAngularVelocity = oldGear.angularAcceleration;
+				newGear.accel = -newGear.AngularVelocityToCurSpeed();
+				newGear.curAngularVelocity = oldGear.maxAngularVelocity;
+				newGear.maxSpeed = -newGear.AngularVelocityToCurSpeed();
+				newGear.curAngularVelocity = oldGear.curAngularVelocity;
+				newGear.curSpeed = -newGear.AngularVelocityToCurSpeed();
+				CopyTransform(oldGear.gameObject, newGear.gameObject, false);
+			});
+		CopyObjects<GearGuyCtrl1, PlayerGear>(
+			(x)=>PrefabUtility.InstantiatePrefab(playerGearPrefab) as GameObject,
+			(oldPlayer, newPlayer)=>{
+				newPlayer.Start();
+				newPlayer.mass = oldPlayer.mass;
+				newPlayer.isMovable = true;
+				newPlayer.accel = oldPlayer.acceleration;
+				newPlayer.maxSpeed = oldPlayer.maxSpeed;
+				CopyTransform(oldPlayer.gameObject, newPlayer.gameObject, false);
+			});
+		CopyObjects<DeathZone, DeathZone2D>(x=>PrefabUtility.InstantiatePrefab(deathZonePrefab) as GameObject);
+		CopyObjects<Boundary, Boundary2D>(x=>PrefabUtility.InstantiatePrefab(boundaryPrefab) as GameObject);
+		CopyObjects<Button, Button2D>(x=>PrefabUtility.InstantiatePrefab(buttonPrefab) as GameObject);
+
+		// prepare to convert prefabs, track replacements
+		for (int i=0; i<conversions.Count; ++i)
+			prefabs[conversions[i].oldPrefab] = conversions[i].newPrefab;
+		// loop over prefabs
+		GameObject[] objs = GameObject.FindObjectsOfType<GameObject>();
+		for (int i=0; i<objs.Length; ++i) {
+			// check if objs[i] is the prefab root of a prefab to replace
+			GameObject parent = PrefabUtility.GetPrefabParent(objs[i]) as GameObject;
+			if (PrefabUtility.FindPrefabRoot(objs[i])==objs[i] && parent!=null && prefabs.ContainsKey(parent)) {
+				// create replacement, store changes
+				GameObject replacement = PrefabUtility.InstantiatePrefab(prefabs[parent]) as GameObject;
+				prefabOptions[objs[i]] = PrefabUtility.GetPropertyModifications(objs[i]);
+				replacements[objs[i]] = replacement;
+				CopyTransform(objs[i], replacement);
+				CopyColliders(objs[i], replacement);
+				objs[i].transform.parent = destroyMe.transform;
+//print("replaced "+objs[i].name+" with "+replacement.name);
+			}
+		}
+
+		// change instances of replacements (loop over GameObjects, Components, FieldInfos, check if GameObject, Transform, Component)
+		foreach (Transform t in GameObject.FindObjectsOfType<Transform>()) {
+			if (t.transform.root==destroyMe.transform)
+				continue;
+			foreach (Component comp in t.GetComponents<Component>()) {
+				foreach (FieldInfo field in comp.GetType().GetFields()) {
+					// validate if the field should be changed
+					object val = field.GetValue(comp);
+					if (val is GameObject || val is Component) {
+						GameObject obj = val as GameObject ?? (val as Component).gameObject;
+						if (obj.transform.root==destroyMe.transform)
+							continue;
+
+					}
+				}
+			}
+		}
+		/*foreach (KeyValuePair<GameObject, Type> entry in options2) {
+			// search all fields for GameObjects and Transforms
+			Component[] comps = entry.Key.GetComponents(entry.Value);
+			FieldInfo[] fields = entry.Value.GetFields();
+			for (int i=0; i<comps.Length; ++i) {
+				for (int j=0; j<fields.Length; ++j) {
+					// if it's a GameObject that's being replaced, find the appropriate variable to change it to
+					object obj = fields[j].GetValue(comps[i]);
+					if (obj is GameObject || obj is Transform)
+						fields[j].SetValue(comps[i], FindReplacement(entry.Key, fields[j].GetValue(comps[i])));
+				}
+			}
+		}*/
+		/*foreach (KeyValuePair<GameObject, PropertyModification[]> entry in prefabOptions) {
+			// search for PropertyModifications with non-null targets
+			foreach (PropertyModification propMod in entry.Value) {
+				if (propMod.target!=null)
+					propMod.target = FindReplacement(entry.Key, propMod.target) as UnityEngine.Object;
+			}
+			PrefabUtility.SetPropertyModifications(entry.Key, entry.Value);
+		}*/
+
+		// delete old objects
+		destroyMe.SetActive(false);
+		foreach (GameObject oldObj in replacements.Keys)
+			oldObj.transform.parent = destroyMe.transform;
+		transform.parent = destroyMe.transform;
+		//DestroyImmediate(destroyMe);
+	}
+
+	public object FindReplacement(GameObject root, object o) {
+		// initialize vars
+		Transform t = o as Transform;
+		GameObject obj = (t!=null?t.gameObject:o as GameObject);
+
+		// handle early termination
+		if (obj==null || PrefabUtility.FindPrefabRoot(obj)==root)
+			return o;
+
+		// find the path to the object
+		GameObject cur = obj;
+		Stack<string> path = new Stack<string>();
+		while (cur!=null && cur.transform.parent!=null && cur!=PrefabUtility.FindPrefabRoot(cur)) {
+			path.Push(cur.name);
+			cur = cur.transform.parent.gameObject;
+		}
+
+		// return the equivalent object
+		if (!replacements.ContainsKey(cur))
+			return o;
+		if (cur && replacements.ContainsKey(cur)) {
+			Transform target = replacements[cur].transform;
+			while (path.Count>0 && target!=null)
+				target = target.transform.Find(path.Pop());
+			return (t==null?target.gameObject as UnityEngine.Object:target as UnityEngine.Object);
+		}
+		return null;
+	}
+
+	public void CopyObjects<OldType, NewType>(Func<OldType, GameObject> prefab, Action<OldType, NewType> customCopy=null) where OldType:Component where NewType:Component {
+		// loop over <OldType> GameObjects
+		OldType[] objs = GameObject.FindObjectsOfType<OldType>();
+		foreach (OldType oldObj in objs) {
+			// initialize, continue if necessary
+			if (oldObj.transform.parent==destroyMe.transform)
+				continue;
+			GameObject newObj = prefab(oldObj);
+			if (newObj==null)
+				continue;
+			newObj.name = oldObj.name;
+
+			// copy components
+			OldType[] oldComps = oldObj.GetComponents<OldType>();
+			for (int i=0; i<oldComps.Length; ++i) {
+				NewType newComp = newObj.GetComponent<NewType>();
+				if (newComp==null || i!=0)
+					newComp = newObj.AddComponent<NewType>();
+				if (customCopy==null) {
+					CopyTransform(oldComps[i].gameObject, newObj);
+					CopyColliders(oldComps[i].gameObject, newObj);
+					CopyComponent(oldComps[i], newComp, typeof(OldType), typeof(NewType));
+				} else {
+					customCopy(oldComps[i], newComp);
+				}
+			}
+
+			// store results
+			options2[newObj] = typeof(NewType);
+			replacements[oldObj.gameObject] = newObj;
+			oldObj.transform.parent = destroyMe.transform;
+		}
+	}
+	public void CopyTransform(GameObject oldObj, GameObject newObj, bool copyScale=true) {
+		// copy parent
+		newObj.transform.parent = oldObj.transform.parent;
+
+		// copy position, scale
+		newObj.transform.localPosition = oldObj.transform.localPosition;
+		if (copyScale)
+			newObj.transform.localScale = oldObj.transform.localScale;
+		
+		// copy children (when they belong to another prefab)
+		for (int i=oldObj.transform.childCount-1; i>=0; --i) {
+			if (PrefabUtility.FindPrefabRoot(oldObj.transform.GetChild(i).gameObject)!=oldObj) {
+				oldObj.transform.GetChild(i).parent = newObj.transform;
+			}
+		}
+	}
+	public void CopyColliders(GameObject oldObj, GameObject newObj) {
+		// initialize vars
+		Collider2D[] newColls = newObj.GetComponents<Collider2D>();
+		Collider[] oldColls = oldObj.GetComponents<Collider>();
+		Collider2D newTrig=null, newColl=null;
+		for (int i=0; i<newColls.Length; ++i) {
+			if (newColls[i].isTrigger)
+				newTrig = newColls[i];
+			else
+				newColl = newColls[i];
+		}
+		// loop over old colliders, changing values where necessary
+		foreach (Collider oldColl in oldColls) {
+			Collider2D curColl = (oldColl.isTrigger?newTrig:newColl);
+			if (curColl.GetType()==typeof(CircleCollider2D) && oldColl.GetType()==typeof(SphereCollider)) {
+				curColl.offset = (oldColl as SphereCollider).center;
+				(curColl as CircleCollider2D).radius = (oldColl as SphereCollider).radius;
+			} else if (curColl.GetType()==typeof(BoxCollider2D) && oldColl.GetType()==typeof(BoxCollider)) {
+				curColl.offset = (oldColl as BoxCollider).center;
+				(curColl as BoxCollider2D).size = (oldColl as BoxCollider).size;
+			} else {
+				throw new NotImplementedException("Unsupported Collider combination is used");
+			}
+		}
+	}
+	/// <summary>Copies FieldInfo from oldComp to newComp</summary>
+	public void CopyComponent(Component oldComp, Component newComp, Type oldType, Type newType) {
+		FieldInfo[] oldFields = oldType.GetFields();
+		FieldInfo[] newFields = newType.GetFields();
+		// loop over fields, handle for general objects and Enums
+		for (int i=0; i<newFields.Length; ++i) {
+			if (newFields[i].GetValue(newComp) is Enum)
+				newFields[i].SetValue(newComp, (int)oldFields[i].GetValue(oldComp));
+			else
+				newFields[i].SetValue(newComp, oldFields[i].GetValue(oldComp));
+			if (oldComp.gameObject.name=="Button_camera")
+				print("copied field "+oldFields[i].Name+" = "+oldFields[i].GetValue(oldComp)+"; newValue: "+newFields[i].GetValue(newComp));
+		}
+	}
+
+	[Serializable]
+	public class PrefabConverter {
+		public GameObject oldPrefab;
+		public GameObject newPrefab;
+	}
+	[CustomPropertyDrawer(typeof(PrefabConverter))]
+	public class Point3Drawer : PropertyDrawer {
+		public override void OnGUI(Rect pos, SerializedProperty property, GUIContent label) {
+			EditorGUI.BeginProperty(pos, label, property);
+			pos = EditorGUI.PrefixLabel(pos, GUIUtility.GetControlID(FocusType.Passive), label);
+			int indent = EditorGUI.indentLevel;
+			EditorGUI.indentLevel = 0;
+			float w=pos.width/2;
+			EditorGUI.PropertyField(new Rect(pos.x  , pos.y, w, pos.height), property.FindPropertyRelative("oldPrefab"), GUIContent.none);
+			EditorGUI.PropertyField(new Rect(pos.x+w, pos.y, w, pos.height), property.FindPropertyRelative("newPrefab"), GUIContent.none);
+		
+			EditorGUI.indentLevel = indent;
+			EditorGUI.EndProperty();
+		}
+	}
+}
+
+[CustomEditor(typeof(PhysicsConverter))]
+[CanEditMultipleObjects]
+public class PhysicsConverterEditor:Editor {
+	public override void OnInspectorGUI() {
+		base.OnInspectorGUI();
+		if (GUILayout.Button("Convert"))
+			(target as PhysicsConverter).Convert();
+		if (GUILayout.Button("Reload Scene"))
+			Application.LoadLevel(Application.loadedLevelName);
+	}
+}
+
+#endif

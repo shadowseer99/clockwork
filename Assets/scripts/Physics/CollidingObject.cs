@@ -23,6 +23,15 @@ public class CollidingObject:PhysicsObject {
 	protected bool attaching=false;
 	public int numPegs=0;
 
+	public override void Start() {
+		// handle negative acceleration
+		base.Start();
+		if (accel<0) {
+			accelMult = -1;
+			accel = Mathf.Abs(accel);
+		}
+	}
+
 	public override void PhysicsUpdate() {
 		// handle water
 		float cumArea=0;

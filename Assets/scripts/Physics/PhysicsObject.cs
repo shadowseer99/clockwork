@@ -117,14 +117,14 @@ public class PhysicsObject:MonoBehaviour {
 
 		// find coolider, set radius/area/momentOfInertiaMult
 		Transform t = transform;
-		collRadius = area = momentOfInertiaMult = -1;
+		collRadius = area = 0;
+		momentOfInertiaMult = 0.01f;
 		CircleCollider2D[] colls = GetComponents<CircleCollider2D>();
 		for (int i=0; i<colls.Length; ++i) {
 			// find constants
 			float radius = colls[i].radius*Mathf.Sqrt(
 				t.TransformVector(t.InverseTransformVector(Vector3.up).normalized).magnitude
 				*t.TransformVector(t.InverseTransformVector(Vector3.right).normalized).magnitude);
-			area = Mathf.PI*collRadius*collRadius;
 			momentOfInertiaMult = 0.5f;
 			// store results as trigger OR collider
 			if (colls[i].isTrigger) {
@@ -133,6 +133,7 @@ public class PhysicsObject:MonoBehaviour {
 			} else {
 				this.coll = colls[i];
 				this.collRadius = radius;
+				area = Mathf.PI*collRadius*collRadius;
 			}
 		}
 	}
