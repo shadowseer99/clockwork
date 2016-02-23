@@ -11,7 +11,6 @@ public class PlayerGear:CollidingObject {
 	public AudioClip _stickToGearEmpty;
 	public AudioClip _letGoOfGear;
 	public AudioClip _letGoOfGearEmpty;
-	public AudioClip _hitSurface;
 	private AudioSource stickToGear;
 	private AudioSource stickToGearEmpty;
 	private AudioSource letGoOfGear;

@@ -28,8 +28,10 @@ public class CollidingObject:PhysicsObject {
 	protected float timeSinceGrounded=0;
 	public AudioClip _move;
 	public AudioClip _collHit;
+	public AudioClip _hitSurface;
 	private AudioSource move;
 	private AudioSource collHit;
+	private AudioSource hitSurface;
 
 	public override void Start() {
 		// handle negative acceleration
@@ -41,10 +43,13 @@ public class CollidingObject:PhysicsObject {
 		if (Application.isPlaying) {
 			move = gameObject.AddComponent<AudioSource>();
 			collHit = gameObject.AddComponent<AudioSource>();
+			hitSurface = gameObject.AddComponent<AudioSource>();
 			move.clip = _move;
 			collHit.clip = _collHit;
+			hitSurface.clip = _collHit;
 			move.loop = true;
 			collHit.loop = false;
+			hitSurface.loop = false;
 		}
 	}
 
@@ -132,6 +137,7 @@ public class CollidingObject:PhysicsObject {
 		groundedTo.Clear();
 		if ((isMovable && Mathf.Abs(curSpeed)>0.5f && timeSinceGrounded<0.5f) && !move.isPlaying) move.Play();
 		if ((!isMovable || Mathf.Abs(curSpeed)<0.5f || timeSinceGrounded>0.5f) && move.isPlaying) move.Stop();
+		if (move.isPlaying) move.volume = Mathf.Pow(Mathf.Min(1, Mathf.Abs(curSpeed/maxSpeed)), 2);
 	}
 
 	public virtual void OnTriggerEnter2D(Collider2D coll) {
@@ -163,10 +169,8 @@ public class CollidingObject:PhysicsObject {
 
 		// handle exiting water
 		Water water = coll.gameObject.GetComponent<Water>();
-		if (water!=null) {
+		if (water!=null)
 			inwaters.Remove(water);
-			water.splash.Stop();
-		}
 
 		// handle detaching
 		if (collObj!=null && collObj==attachedTo) {
@@ -189,8 +193,11 @@ public class CollidingObject:PhysicsObject {
 
 	public void OnCollisionEnter2D(Collision2D coll) {
 		CollidingObject obj = coll.gameObject.GetComponent<CollidingObject>();
-		if (obj!=null && (obj.isMovable || this.isMovable)) {
+		if (obj!=null && (obj.isMovable || this.isMovable))
 			collHit.Play();
+		if (obj==null) {
+			//hitSurface.Play();
+			//print("hit surface");
 		}
 	}
 

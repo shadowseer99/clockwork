@@ -30,9 +30,12 @@ public class Water : MonoBehaviour {
 	public void Start() {
 		splash = new GameObject("splash").AddComponent<AudioSource>();
 		splash.transform.parent = transform;
-		splash.clip = _splash;
 		flow2 = gameObject.AddComponent<AudioSource>();
+		splash.clip = _splash;
 		flow2.clip = _flow;
+		splash.loop = false;
+		flow2.loop = true;
+		flow2.Play();
 	}
 
 	public Vector3 GetContactPoint(Transform t)
