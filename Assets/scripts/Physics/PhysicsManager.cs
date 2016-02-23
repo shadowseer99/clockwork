@@ -176,7 +176,7 @@ public class PhysicsManager : MonoBehaviour {
 		public void UpdateObjects() {
 			// update gears
 			for (int i=0; i<gears.Count; ++i) {
-print("updating "+gears[i].gameObject.name);
+//print("updating "+gears[i].gameObject.name);
 				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
 				gears[i].curSpeed = gears[i].AngularVelocityToCurSpeed();
 			}
