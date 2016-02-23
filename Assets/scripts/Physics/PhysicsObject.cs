@@ -47,16 +47,16 @@ public class PhysicsObject:MonoBehaviour {
 	[HideInInspector] public uint visited;
 
 	public virtual void Start() {
-		PhysicsManager.physicsManager.Start();
+		if (Application.isPlaying)
+			PhysicsManager.physicsManager.Start();
 		HandleColliders();
 	}
 
 	public virtual void Update() {
 #if UNITY_EDITOR
 		while (UnityEditorInternal.ComponentUtility.MoveComponentUp(this)) { }
-		if (!Application.isPlaying) {
+		if (!Application.isPlaying)
 			HandleColliders();
-		}
 #endif
 	}
 
