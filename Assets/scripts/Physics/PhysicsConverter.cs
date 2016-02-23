@@ -64,6 +64,7 @@ public class PhysicsConverter : MonoBehaviour {
 				newPlayer.Start();
 				newPlayer.mass = oldPlayer.mass;
 				newPlayer.isMovable = true;
+				newPlayer.isRotatable = true;
 				newPlayer.accel = oldPlayer.acceleration;
 				newPlayer.maxSpeed = oldPlayer.maxSpeed;
 				CopyTransform(oldPlayer.gameObject, newPlayer.gameObject, false);

@@ -114,8 +114,7 @@ public class PhysicsObject:MonoBehaviour {
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(PhysicsObject))]
-[CanEditMultipleObjects]
+[CustomEditor(typeof(PhysicsObject))][CanEditMultipleObjects]
 public class PhysicsObjectEditor:Editor {
 	public enum MassType { mass, density, momentOfInertia }
 	public static MassType massType;

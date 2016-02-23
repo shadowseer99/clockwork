@@ -24,6 +24,14 @@ public class CollidingObject:PhysicsObject {
 	[HideInInspector]public CollidingObject attachedTo;
 	[HideInInspector]protected bool attaching=false;
 	public int numPegs=0;
+	protected Collision2D lastGroundedTo=null;
+	protected float timeSinceGrounded=0;
+	public AudioClip _move;
+	public AudioClip _collHit;
+	public AudioClip _hitSurface;
+	private AudioSource move;
+	private AudioSource collHit;
+	private AudioSource hitSurface;
 
 	public override void Start() {
 		// handle negative acceleration
@@ -31,6 +39,17 @@ public class CollidingObject:PhysicsObject {
 		if (accel<0) {
 			accelMult = -1;
 			accel = Mathf.Abs(accel);
+		}
+		if (Application.isPlaying) {
+			move = gameObject.AddComponent<AudioSource>();
+			collHit = gameObject.AddComponent<AudioSource>();
+			hitSurface = gameObject.AddComponent<AudioSource>();
+			move.clip = _move;
+			collHit.clip = _collHit;
+			hitSurface.clip = _collHit;
+			move.loop = true;
+			collHit.loop = false;
+			hitSurface.loop = false;
 		}
 	}
 
@@ -106,8 +125,19 @@ public class CollidingObject:PhysicsObject {
 		
 		// update physics
 		base.PhysicsUpdate();
+
+		// misc
+		if (groundedTo.Count>0) {
+			lastGroundedTo = groundedTo[0];
+			timeSinceGrounded = 0;
+		} else {
+			timeSinceGrounded += Time.fixedDeltaTime;
+		}
 		collidingWith.Clear();
 		groundedTo.Clear();
+		if ((isMovable && Mathf.Abs(curSpeed)>0.5f && timeSinceGrounded<0.5f) && !move.isPlaying) move.Play();
+		if ((!isMovable || Mathf.Abs(curSpeed)<0.5f || timeSinceGrounded>0.5f) && move.isPlaying) move.Stop();
+		if (move.isPlaying) move.volume = Mathf.Pow(Mathf.Min(1, Mathf.Abs(curSpeed/maxSpeed)), 2);
 	}
 
 	public virtual void OnTriggerEnter2D(Collider2D coll) {
@@ -118,8 +148,10 @@ public class CollidingObject:PhysicsObject {
 
 		// handle entering water
 		Water water = coll.gameObject.GetComponent<Water>();
-		if (water!=null)
+		if (water!=null) {
+			water.splash.Play();
 			inwaters.Add(water);
+		}
 
 		// handle attaching
 		if (collObj!=null && (attachedTo==null || coll!=attachedTo) && attaching) {
@@ -152,12 +184,21 @@ public class CollidingObject:PhysicsObject {
 		}
 	}
 
-	//public virtual void OnCollisionEnter2D(Collision2D coll) {}
 	public virtual void OnCollisionStay2D(Collision2D coll) {
 		// add to collidingWith, try adding to groundedTo
 		collidingWith.Add(coll);
 		if (transform.position.y-coll.contacts[0].point.y>0)
 			groundedTo.Add(coll);
+	}
+
+	public void OnCollisionEnter2D(Collision2D coll) {
+		CollidingObject obj = coll.gameObject.GetComponent<CollidingObject>();
+		if (obj!=null && (obj.isMovable || this.isMovable))
+			collHit.Play();
+		if (obj==null) {
+			//hitSurface.Play();
+			//print("hit surface");
+		}
 	}
 
 	// helper functions
@@ -180,6 +221,6 @@ public class CollidingObject:PhysicsObject {
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(CollidingObject))]
+[CustomEditor(typeof(CollidingObject))][CanEditMultipleObjects]
 public class CollidingObjectEditor:PhysicsObjectEditor {}
 #endif

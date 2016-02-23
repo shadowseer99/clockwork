@@ -8,12 +8,14 @@ public class Water : MonoBehaviour {
 	public float densityRatio=0;
 	public float thicknessRatio=1;
 	public Vector3[] contactPoints=new Vector3[0];
+	public AudioClip _flow;
+	public AudioClip _splash;
+	[HideInInspector]public AudioSource flow2;
+	[HideInInspector]public AudioSource splash;
 
 	private static Water _nullWater;
-	public static Water nullWater
-	{
-		get
-		{
+	public static Water nullWater {
+		get {
 			if (_nullWater==null) {
 				GameObject obj = GameObject.Find("Null Water");
 				if (obj)
@@ -23,6 +25,17 @@ public class Water : MonoBehaviour {
 			}
 			return _nullWater;
 		}
+	}
+
+	public void Start() {
+		splash = new GameObject("splash").AddComponent<AudioSource>();
+		splash.transform.parent = transform;
+		flow2 = gameObject.AddComponent<AudioSource>();
+		splash.clip = _splash;
+		flow2.clip = _flow;
+		splash.loop = false;
+		flow2.loop = true;
+		flow2.Play();
 	}
 
 	public Vector3 GetContactPoint(Transform t)

@@ -9,13 +9,19 @@ public class Gear:CollidingObject {
 	public bool isGolden=false;
 	private float goldenRotation=0;
 	
-	public AudioClip _move;
 	public AudioClip _insert;
-	public AudioClip _playerHit;
+	private AudioSource insert;
 
 	public override void Start() {
 		base.Start();
+		if (!Application.isPlaying) return;
 
+		// initialize sounds
+		insert = gameObject.AddComponent<AudioSource>();
+		insert.clip = _insert;
+		insert.loop = false;
+
+		// fix golden gear
 		if (isGolden && Application.isPlaying) {
 			// initialize vars
 			Mesh mesh = GetComponentInChildren<MeshFilter>().mesh;
@@ -49,16 +55,13 @@ public class Gear:CollidingObject {
 				GameObject.FindObjectOfType<Pause>().EndLevel();
 				return;
 			}
-			//Material mat;
-			//DynamicGI.SetEmissive(GetComponent<Renderer>(), 
 		}
 
-		// rotate/move and apply torques
 		base.PhysicsUpdate();
 	}
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(Gear))]
+[CustomEditor(typeof(Gear))][CanEditMultipleObjects]
 public class GearEditor:CollidingObjectEditor {}
 #endif
