@@ -25,6 +25,7 @@ public class PhysicsObject:MonoBehaviour {
 	public Vector3 velocity {
 		get { return (rigidbody==null?Vector2.zero:rigidbody.velocity); }
 		set { if (rigidbody!=null) rigidbody.velocity = (isMovable?value:Vector3.zero); } }
+	protected Vector3 lastVelocity { get; private set; }
 	public Vector3 momentum {
 		get { return velocity*mass; }
 		set { velocity = value/mass; } }
@@ -69,6 +70,7 @@ public class PhysicsObject:MonoBehaviour {
 			transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.forward, Space.World);
 		if (!isMovable)
 			velocity = Vector3.zero;
+		lastVelocity = velocity;
 	}
 
 	/// <summary>Returns the speed of an object rotating around this object at the given point.</summary>

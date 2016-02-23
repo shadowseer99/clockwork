@@ -46,7 +46,7 @@ public class CollidingObject:PhysicsObject {
 			hitSurface = gameObject.AddComponent<AudioSource>();
 			move.clip = _move;
 			collHit.clip = _collHit;
-			hitSurface.clip = _collHit;
+			hitSurface.clip = _hitSurface;
 			move.loop = true;
 			collHit.loop = false;
 			hitSurface.loop = false;
@@ -178,7 +178,7 @@ public class CollidingObject:PhysicsObject {
 			isMovable = true;
 			velocity = attachedTo.GetVelAtPoint(transform.position);
 			Vector3 velocity2 = GetVelAtPoint(attachedTo.transform.position);
-			velocity -= curSpeed*velocity2.normalized*Vector3.Dot(velocity.normalized, velocity2.normalized);
+			velocity += attachedTo.accelMult*curSpeed*velocity2.normalized*Vector3.Dot(velocity.normalized, velocity2.normalized);
 			attachedTo = null;
 			print("vel: "+velocity.magnitude);
 		}
@@ -196,8 +196,14 @@ public class CollidingObject:PhysicsObject {
 		if (obj!=null && (obj.isMovable || this.isMovable))
 			collHit.Play();
 		if (obj==null) {
-			//hitSurface.Play();
-			//print("hit surface");
+			if (coll.gameObject.tag!="Bouncy")
+				velocity -= 0.95f*Vector3.Project(velocity, coll.contacts[0].normal);
+			float vol = Mathf.Pow(Mathf.Min(Mathf.Abs(Vector3.Dot(coll.contacts[0].normal, lastVelocity))/maxSpeed, 1), 3);
+			if (!hitSurface.isPlaying || vol>hitSurface.volume) {
+				hitSurface.volume = vol;
+				hitSurface.Play();
+
+			}
 		}
 	}
 

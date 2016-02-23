@@ -27,7 +27,7 @@ public class GearSelector : MonoBehaviour {
 	}
 
 	public Gear GetGearByTrigSize(float radius, bool isGolden=false) {
-		return GetGearByPegs(2*(int)Mathf.Round((radius-0.1f)/0.1f), isGolden);
+		return GetGearByPegs(2*(int)Mathf.Round((radius)/0.1f), isGolden);
 	}
 
 	public Gear GetGearByCollSize(float radius, bool isGolden=false) {

@@ -12,6 +12,9 @@ public class Boundary2D:MonoBehaviour {
 
 	void Start()
 	{
+		Rigidbody r = GetComponent<Rigidbody>();
+		if (r!=null) DestroyImmediate(r);
+
 		// search for the highest and lowest colliders in the level
 		transform.position = Vector3.zero;
 		transform.rotation = Quaternion.identity;
@@ -22,6 +25,7 @@ public class Boundary2D:MonoBehaviour {
 		float left=float.PositiveInfinity;
 		float right=float.NegativeInfinity;
 
+		print("colls: "+colliders.Length);
 		for (int i=0; i<colliders.Length; ++i)
 		{
 			top = Mathf.Max(top, colliders[i].bounds.max.y);

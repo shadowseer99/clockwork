@@ -11,18 +11,20 @@ public class PlayerGear:CollidingObject {
 	public AudioClip _stickToGearEmpty;
 	public AudioClip _letGoOfGear;
 	public AudioClip _letGoOfGearEmpty;
+	public AudioCustom test;
 	private AudioSource stickToGear;
 	private AudioSource stickToGearEmpty;
 	private AudioSource letGoOfGear;
 	private AudioSource letGoOfGearEmpty;
 	bool wasAttaching=false;
 	bool wasAttached=false;
+	public GameObject attachingSystem;
+	public GameObject attachedSystem;
 
 	public override void Start() {
 		base.Start();
 		
 		if (Application.isPlaying) {
-		print("starting");
 			// initialize AudioSources
 			stickToGear = gameObject.AddComponent<AudioSource>();
 			stickToGearEmpty = gameObject.AddComponent<AudioSource>();
@@ -51,6 +53,8 @@ public class PlayerGear:CollidingObject {
 			OnTriggerExit2D(temp.trig);
 			OnTriggerEnter2D(temp.trig);
 		}
+		attachingSystem.SetActive(attaching && attachedTo==null);
+		attachedSystem.SetActive(attaching && attachedTo!=null);
 
 		// set direction of accel
 		accelMult = CrossPlatformInputManager.GetAxisRaw("Horizontal");
