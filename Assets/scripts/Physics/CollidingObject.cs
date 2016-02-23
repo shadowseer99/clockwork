@@ -92,7 +92,7 @@ public class CollidingObject:PhysicsObject {
 			curAngularVelocity = CurSpeedToAngularVelocity();
 		}
 		// if grounded and not attached
-		else if (attachedTo==null && groundedTo.Count>0) {
+		else if (attachedTo==null && (groundedTo.Count>0 || inwaters.Count>0)) {
 			// helper vectors
 			Vector3 speedDir = Vector3.right;
 			Vector3 projVel = Vector3.Project(velocity, speedDir);
