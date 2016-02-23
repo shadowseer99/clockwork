@@ -98,7 +98,6 @@ public class CollidingObject:PhysicsObject {
 		if (attachedTo!=null) {
 			Vector3 diff = transform.position-attachedTo.transform.position;
 			transform.position = attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius);
-			print("curSpeed: "+curSpeed+" curspeed2: "+(curSpeed+Accel()));
 			curSpeed += Accel();
 			curAngularVelocity = CurSpeedToAngularVelocity();
 			transform.RotateAround(attachedTo.transform.position, Vector3.forward,

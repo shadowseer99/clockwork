@@ -22,7 +22,7 @@ public class Gear:CollidingObject {
 		insert.loop = false;
 
 		// fix golden gear
-		if (isGolden && Application.isPlaying) {
+		/*if (isGolden && Application.isPlaying) {
 			// initialize vars
 			Mesh mesh = GetComponentInChildren<MeshFilter>().mesh;
 			Vector3[] verts = mesh.vertices;
@@ -44,7 +44,7 @@ public class Gear:CollidingObject {
 				}
 			}
 			mesh.uv = uvs;
-		}
+		}*/
 	}
 
 	public override void PhysicsUpdate() {

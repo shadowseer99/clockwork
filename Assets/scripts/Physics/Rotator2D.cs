@@ -27,7 +27,7 @@ public class Rotator2D : MonoBehaviour {
 			Vector3[] verts = m.vertices;
 			for (int i=0; i<verts.Length; ++i)
 				verts[i] = Vector3.Scale(
-					obj.TransformVector(verts[i]),
+					obj.TransformDirection(verts[i]),
 					new Vector3(1/obj.localScale.x, 1/obj.localScale.y, 1/obj.localScale.z));
 
 			// convert vertices to the final rotation
