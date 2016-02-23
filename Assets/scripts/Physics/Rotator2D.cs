@@ -27,12 +27,12 @@ public class Rotator2D : MonoBehaviour {
 			Vector3[] verts = m.vertices;
 			for (int i=0; i<verts.Length; ++i)
 				verts[i] = Vector3.Scale(
-					obj.TransformDirection(verts[i]),
-					new Vector3(1/obj.localScale.x, 1/obj.localScale.y, 1/obj.localScale.z));
+					obj.TransformVector(verts[i]),
+					new Vector3(1/obj.lossyScale.x, 1/obj.lossyScale.y, 1/obj.lossyScale.z));
 
 			// convert vertices to the final rotation
 			Vector3 v1 = obj.TransformDirection(Vector3.right);
-			Vector3 v2 = obj.localScale;
+			Vector3 v2 = obj.lossyScale;
 			float angle = Mathf.Atan2(v1.y, v1.x);
 			for (int i=0; i<verts.Length; ++i)
 				verts[i] = new Vector3(
