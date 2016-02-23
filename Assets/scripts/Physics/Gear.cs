@@ -8,6 +8,10 @@ using System.Collections.Generic;
 public class Gear:CollidingObject {
 	public bool isGolden=false;
 	private float goldenRotation=0;
+	
+	public AudioClip _move;
+	public AudioClip _insert;
+	public AudioClip _playerHit;
 
 	public override void Start() {
 		base.Start();
