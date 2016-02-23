@@ -82,7 +82,12 @@ public class Pause : MonoBehaviour {
     }
 	public void EndLevel()
 	{
-		Time.timeScale = 0;
+#if UNITY_IPHONE || UNITY_ANDROID
+        Mobile.menu = false;
+        Mobile.active = false;
+#endif
+        Time.timeScale = 0;
 		levelend.SetActive (true);
-	}
+
+    }
 }
