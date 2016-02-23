@@ -7,13 +7,11 @@ using UnityStandardAssets.CrossPlatformInput;
 using System;
 
 public class PlayerGear:CollidingObject {
-	public AudioClip _move;
 	public AudioClip _stickToGear;
 	public AudioClip _stickToGearEmpty;
 	public AudioClip _letGoOfGear;
 	public AudioClip _letGoOfGearEmpty;
 	public AudioClip _hitSurface;
-	private AudioSource move;
 	private AudioSource stickToGear;
 	private AudioSource stickToGearEmpty;
 	private AudioSource letGoOfGear;
@@ -27,19 +25,16 @@ public class PlayerGear:CollidingObject {
 		if (Application.isPlaying) {
 		print("starting");
 			// initialize AudioSources
-			move = gameObject.AddComponent<AudioSource>();
 			stickToGear = gameObject.AddComponent<AudioSource>();
 			stickToGearEmpty = gameObject.AddComponent<AudioSource>();
 			letGoOfGear = gameObject.AddComponent<AudioSource>();
 			letGoOfGearEmpty = gameObject.AddComponent<AudioSource>();
 
-			move.clip = _move;
 			stickToGear.clip = _stickToGear;
 			stickToGearEmpty.clip = _stickToGearEmpty;
 			letGoOfGear.clip = _letGoOfGear;
 			letGoOfGearEmpty.clip = _letGoOfGearEmpty;
 
-			move.loop = true;
 			stickToGear.loop = false;
 			stickToGearEmpty.loop = false;
 			letGoOfGear.loop = false;
@@ -67,19 +62,16 @@ public class PlayerGear:CollidingObject {
 		if (!source.isPlaying) source.Play();*/
 		if (!wasAttached && attaching && attachedTo!=null && !stickToGear.isPlaying) stickToGear.Play();
 		if (!wasAttaching && attaching && attachedTo==null && !stickToGearEmpty.isPlaying) stickToGearEmpty.Play();
-		if (!attaching && wasAttaching && wasAttached!=null && !letGoOfGear.isPlaying) letGoOfGear.Play();
-		if (!attaching && wasAttaching && wasAttached==null && !letGoOfGearEmpty.isPlaying) letGoOfGearEmpty.Play();
-		if ((accelMult!=0 && groundedTo.Count!=0) && !move.isPlaying) move.Play();
-		if ((accelMult==0 && groundedTo.Count==0) && move.isPlaying) move.Stop();
+		if (!attaching && wasAttaching && !wasAttached && !letGoOfGear.isPlaying) letGoOfGear.Play();
+		if (!attaching && wasAttaching && wasAttached && !letGoOfGearEmpty.isPlaying) letGoOfGearEmpty.Play();
 		wasAttached = attachedTo!=null;
 		wasAttaching = attaching;
-		
-		
+
 		base.PhysicsUpdate();
 	}
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(PlayerGear))]
+[CustomEditor(typeof(PlayerGear))][CanEditMultipleObjects]
 public class PlayerGearEditor:PhysicsObjectEditor { }
 #endif
