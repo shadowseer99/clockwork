@@ -178,22 +178,35 @@ public class Button2D : MonoBehaviour {
 [CustomEditor(typeof(Button2D))]
 public class Button2DEditor:Editor {
 	public override void OnInspectorGUI() {
-		Button2D obj = (Button2D)target;
+		// initialize vars
+		SerializedProperty duration = serializedObject.FindProperty("duration");
+		SerializedProperty delay = serializedObject.FindProperty("delay");
+		SerializedProperty revert = serializedObject.FindProperty("revert");
+		SerializedProperty repeat = serializedObject.FindProperty("repeat");
+		SerializedProperty allAtOnce = serializedObject.FindProperty("allAtOnce");
+		SerializedProperty target = serializedObject.FindProperty("target");
+		SerializedProperty endPos = serializedObject.FindProperty("endPos");
+		SerializedProperty toggleObject = serializedObject.FindProperty("toggleObject");
+		Button2D obj = (Button2D)this.target;
+
+		// handle type
 		obj.buttonType = (Button2D.ButtonType)EditorGUILayout.EnumPopup("Button Type", obj.buttonType);
 		if (obj.buttonType==Button2D.ButtonType.moveObject) {
-			obj.target = (Transform)EditorGUILayout.ObjectField("Target", obj.target, typeof(Transform), true);
-			obj.endPos = (Transform)EditorGUILayout.ObjectField("End Position", obj.endPos, typeof(Transform), true);
+			target.objectReferenceValue = (Transform)EditorGUILayout.ObjectField("Target", target.objectReferenceValue, typeof(Transform), true);
+			endPos.objectReferenceValue = (Transform)EditorGUILayout.ObjectField("End Position", endPos.objectReferenceValue, typeof(Transform), true);
 		} else if (obj.buttonType==Button2D.ButtonType.toggleObject) {
-			obj.toggleObject = (GameObject)EditorGUILayout.ObjectField("Toggle Object", obj.toggleObject, typeof(GameObject), true);
+			toggleObject.objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Toggle Object", toggleObject.objectReferenceValue, typeof(GameObject), true);
 		} else if (obj.buttonType==Button2D.ButtonType.customAction) {
 			base.OnInspectorGUI();
 		}
 
-		obj.duration = EditorGUILayout.Slider("Duration", obj.duration, 0, 60);
-		obj.delay = EditorGUILayout.Slider("Delay", obj.delay, 0, 60);
-		obj.revert = EditorGUILayout.Toggle("Revert", obj.revert);
-		obj.repeat = EditorGUILayout.Toggle("Repeat", obj.repeat);
-		obj.allAtOnce = EditorGUILayout.Toggle("All At Once", obj.allAtOnce);
+		// generic variables
+		duration.floatValue = EditorGUILayout.Slider("Duration", duration.floatValue, 0, 60);
+		delay.floatValue = EditorGUILayout.Slider("Delay", delay.floatValue, 0, 60);
+		revert.boolValue = EditorGUILayout.Toggle("Revert", revert.boolValue);
+		repeat.boolValue = EditorGUILayout.Toggle("Repeat", repeat.boolValue);
+		allAtOnce.boolValue = EditorGUILayout.Toggle("All At Once", allAtOnce.boolValue);
+		serializedObject.ApplyModifiedProperties();
 		//obj.axis = EditorGUILayout.Slider("Axis", obj.axis, 0, 60);
 		//obj.delay2 = EditorGUILayout.Slider("Delay2", obj.delay2, 0, 60);
 		//obj.state = EditorGUILayout.IntField("State", obj.state);
