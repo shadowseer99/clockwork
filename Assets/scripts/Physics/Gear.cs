@@ -51,18 +51,6 @@ public class Gear:CollidingObject {
 
 		// rotate/move and apply torques
 		base.PhysicsUpdate();
-		/*curAngularVelocity -= Time.fixedDeltaTime*Mathf.Abs(angularAcceleration)*curAngularVelocity/maxAngularVelocity;
-		curAngularVelocity += Time.fixedDeltaTime*(isMovable?0:angularAcceleration);
-
-		// average out angular speed of neighbors
-		for (int i=0; i<neighbors.Count; ++i)
-		{
-			// sum angularMomentum, distribute according to moment of inertia
-			float totalAngularMomentum = angularMomentum - neighbors[i].angularMomentum;
-			float totalMomentOfInertia = momentOfInertia + neighbors[i].momentOfInertia;
-			angularMomentum = totalAngularMomentum*momentOfInertia/totalMomentOfInertia;
-			neighbors[i].angularMomentum = -totalAngularMomentum*neighbors[i].momentOfInertia/totalMomentOfInertia;
-		}*/
 	}
 }
 

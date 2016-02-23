@@ -145,8 +145,8 @@ public class CollidingObject:PhysicsObject {
 			print("detatching; attachedTo: "+attachedTo.name);
 			isMovable = true;
 			velocity = attachedTo.GetVelAtPoint(transform.position);
-
-			velocity = velocity.normalized*(velocity.magnitude-curSpeed);
+			Vector3 velocity2 = GetVelAtPoint(attachedTo.transform.position);
+			velocity -= curSpeed*velocity2.normalized*Vector3.Dot(velocity.normalized, velocity2.normalized);
 			attachedTo = null;
 			print("vel: "+velocity.magnitude);
 		}

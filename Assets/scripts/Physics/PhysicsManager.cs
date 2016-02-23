@@ -69,10 +69,7 @@ public class PhysicsManager : MonoBehaviour {
 				continue;
 			}
 		}
-		// update ColllidingObjects
-		for (int i=objs.Count-1; i>=0; --i)
-		//for (int i=0; i<objs.Count; ++i)
-			objs[i].PhysicsUpdate();
+		// update CollidingObjects
 
 		// rebuild gearSets
 		for (int i=0; i<gearSets.Count; ++i)
@@ -83,7 +80,6 @@ public class PhysicsManager : MonoBehaviour {
 				gearSets.Add(new GearSet(curIndex));
 			if (gearSets[curIndex].TryAddObj(colls[i], null))
 				++curIndex;
-//print("DONE MAKING GEARSET");
 		}
 		while (gearSets.Count>=curIndex+1)
 			gearSets.RemoveAt(gearSets.Count-1);
@@ -94,6 +90,8 @@ public class PhysicsManager : MonoBehaviour {
 		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].UpdateObjects();
 		// move PhysicsObjects
+		for (int i=0; i<objs.Count; ++i)
+			objs[i].PhysicsUpdate();
 		for (int i=0; i<objs.Count; ++i)
 			objs[i].Move();
 	}
@@ -126,12 +124,12 @@ public class PhysicsManager : MonoBehaviour {
 		public bool TryAddObj(CollidingObject obj, CollidingObject oldObj) {
 			// add relations if both objects have gearSets
 			if (IsVisited(obj) && IsVisited(oldObj)) {
-//print("adding relationship between "+obj.gameObject.name+" and "+oldObj.gameObject.name);
 				if (obj.attachedTo==oldObj) oldObj.gearSet.relations.Add(new GearSetRelation(oldObj, obj, true));
 				if (oldObj.attachedTo==obj)    obj.gearSet.relations.Add(new GearSetRelation(obj, oldObj, true));
 				if (obj.isMovable) oldObj.gearSet.relations.Add(new GearSetRelation(oldObj, obj, false));
 				if (oldObj.isMovable) obj.gearSet.relations.Add(new GearSetRelation(obj, oldObj, false));
 			}
+
 			// add if not visited and appropriate
 			if (!IsVisited(obj) && ((!obj.isMovable&&obj.attachedTo==null)||gears.Count==0) && !isMovable) {
 				// adjust data
@@ -147,29 +145,26 @@ public class PhysicsManager : MonoBehaviour {
 				// try adding neighbors
 				for (int i=0; i<obj.neighbors.Count; ++i)
 					TryAddObj(obj.neighbors[i], obj);
-//print(ToString());
 				return true;
 			}
 			return false;
 		}
+
 		public void AnalyzeRelations() {
 			for (int i=0; i<relations.Count; ++i) {
+				// initialize vars
 				CollidingObject obj = relations[i].obj;
 				CollidingObject other = relations[i].other;
 				float mult = Mult(obj)*Mult(other);
 				Vector3 diff = other.transform.position-obj.transform.position;
+
 				if (relations[i].isAttached) {
 					// adds other's acceleration, gravity, and momentum
-					totalAngularMomentum += (mult*180/Mathf.PI)*(other.mass*other.collRadius*other.Accel()
+					totalAngularMomentum += (mult*other.mass*180/Mathf.PI)*(other.collRadius*other.Accel()
 						+ Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward))
-						+ mult*diff.sqrMagnitude*other.mass*obj.curAngularVelocity;
+						+ other.mass*mult*diff.sqrMagnitude*obj.curAngularVelocity;
 					totalMomentOfInertia += diff.sqrMagnitude*other.mass;
-//print("gravity: "+(Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward)));
-//print("acceleration: "+(other.mass*other.collRadius*other.Accel()));
-//print("momentum: "+(mult*diff.sqrMagnitude*other.mass*obj.curAngularVelocity));
-//print("momentum constants: "+(mult*diff.sqrMagnitude*other.mass));
 				} else {
-					//print("adding "+other.name);
 					// apply 1/3 of other's angular momentum, apply full momentOfInertia
 					totalAngularMomentum += (mult/3)* (other.angularMomentum + other.momentum.magnitude
 						*Vector3.Dot(Vector3.Cross(other.velocity.normalized, diff.normalized), Vector3.forward)*diff.magnitude);
@@ -177,13 +172,15 @@ public class PhysicsManager : MonoBehaviour {
 				}
 			}
 		}
+
 		public void UpdateObjects() {
-//print(ToString()+"; TAM: "+totalAngularMomentum+"; TMI: "+totalMomentOfInertia);
 			// update gears
 			for (int i=0; i<gears.Count; ++i) {
+print("updating "+gears[i].gameObject.name);
 				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
 				gears[i].curSpeed = gears[i].AngularVelocityToCurSpeed();
 			}
+
 			// update relations
 			for (int i=0; i<relations.Count; ++i) {
 				/*if (!relations[i].isAttached) {
@@ -196,6 +193,7 @@ public class PhysicsManager : MonoBehaviour {
 				}*/
 			}
 		}
+
 		// prints objects added to this
 		public override string ToString() {
 			string result = index+"("+gears.Count+")"+": ";
@@ -204,10 +202,12 @@ public class PhysicsManager : MonoBehaviour {
 			return result;
 		}
 	}
+
 	public class GearSetRelation {
 		public CollidingObject obj;
 		public CollidingObject other;
 		public bool isAttached;
+
 		public GearSetRelation(CollidingObject obj, CollidingObject other, bool isAttached) {
 			this.obj = obj;
 			this.other = other;
