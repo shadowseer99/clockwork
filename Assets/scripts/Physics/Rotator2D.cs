@@ -13,7 +13,7 @@ public class Rotator2D : MonoBehaviour {
 	/// <summary>Fixes obj, fixes all of obj's children if fixChildren.</summary>
 	public void FixObjs(Transform obj) {
 		if (fixChildren)
-			for (int i=0; i<obj.childCount; ++i)
+			for (int i=obj.childCount-1; i>=0; --i)
 				FixObjs(obj.GetChild(i));
 		FixObj(obj);
 	}
@@ -24,11 +24,13 @@ public class Rotator2D : MonoBehaviour {
 		Mesh m = (mf?mf.mesh:null);
 		if (m) {
 			// convert vertices to Quaternion.Identity
+			Transform parent = obj.parent;
+			obj.parent = null;
 			Vector3[] verts = m.vertices;
 			for (int i=0; i<verts.Length; ++i)
 				verts[i] = Vector3.Scale(
 					obj.TransformVector(verts[i]),
-					new Vector3(1/obj.lossyScale.x, 1/obj.lossyScale.y, 1/obj.lossyScale.z));
+					new Vector3(1/obj.localScale.x, 1/obj.localScale.y, 1/obj.localScale.z));
 
 			// convert vertices to the final rotation
 			Vector3 v1 = obj.TransformDirection(Vector3.right);
@@ -43,6 +45,7 @@ public class Rotator2D : MonoBehaviour {
 			// finalize rotation
 			obj.eulerAngles = new Vector3(0, 0, angle*180/Mathf.PI);
 			//obj.rotation = Quaternion.identity;
+			obj.parent = parent;
 			m.vertices = verts;
 			m.RecalculateNormals();
 			m.RecalculateBounds();
