@@ -20,6 +20,7 @@ public class PlayerGear:CollidingObject {
 	bool wasAttached=false;
 	public GameObject attachingSystem;
 	public GameObject attachedSystem;
+	private float timeSinceChange;
 
 	public override void Start() {
 		base.Start();
@@ -53,8 +54,9 @@ public class PlayerGear:CollidingObject {
 			OnTriggerExit2D(temp.trig);
 			OnTriggerEnter2D(temp.trig);
 		}
-		attachingSystem.SetActive(attaching && attachedTo==null);
-		attachedSystem.SetActive(attaching && attachedTo!=null);
+		attachingSystem.SetActive(attaching && attachedTo==null && timeSinceChange<0.3f);
+		attachedSystem.SetActive(attaching && attachedTo!=null && timeSinceChange<0.3f);
+		timeSinceChange = (attaching==wasAttaching && (attachedTo!=null)==wasAttached?timeSinceChange+Time.fixedDeltaTime:0);
 
 		// set direction of accel
 		accelMult = CrossPlatformInputManager.GetAxisRaw("Horizontal");

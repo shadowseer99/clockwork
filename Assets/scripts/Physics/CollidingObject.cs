@@ -177,7 +177,7 @@ public class CollidingObject:PhysicsObject {
 			isMovable = true;
 			velocity = attachedTo.GetVelAtPoint(transform.position);
 			Vector3 velocity2 = GetVelAtPoint(attachedTo.transform.position);
-			velocity += attachedTo.accelMult*curSpeed*velocity2.normalized*Vector3.Dot(velocity.normalized, velocity2.normalized);
+			velocity -= accelMult*curSpeed*velocity2.normalized;
 			attachedTo = null;
 			print("vel: "+velocity.magnitude);
 		}
