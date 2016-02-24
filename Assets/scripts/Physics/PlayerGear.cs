@@ -45,9 +45,22 @@ public class PlayerGear:CollidingObject {
 	}
 
 	public override void PhysicsUpdate() {
-		// handle attaching
-		attaching = Input.GetKey(KeyCode.LeftShift);
-		trig.enabled = attaching;
+        // handle attaching
+#if UNITY_IPHONE || UNITY_ANDROID
+        attaching = Mobile.engage;
+        accelMult = 0;
+        if (Mobile.left)
+            accelMult -= 1;
+        if (Mobile.right)
+            accelMult += 1;
+#else
+        attaching = Input.GetKey(KeyCode.LeftShift);
+        accelMult = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+#endif
+
+
+
+        trig.enabled = attaching;
 		if (attaching==false && attachedTo!=null) {
 			// do this to detach but remember neighbors
 			CollidingObject temp = attachedTo;
@@ -59,7 +72,7 @@ public class PlayerGear:CollidingObject {
 		timeSinceChange = (attaching==wasAttaching && (attachedTo!=null)==wasAttached?timeSinceChange+Time.fixedDeltaTime:0);
 
 		// set direction of accel
-		accelMult = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+		
 
 		// handle sounds
 		/*source.clip = move;
