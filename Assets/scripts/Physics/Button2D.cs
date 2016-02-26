@@ -20,35 +20,45 @@ public class Button2D : MonoBehaviour {
 	public UnityEngine.UI.Button.ButtonClickedEvent customAction;
 	public UnityEngine.UI.Button.ButtonClickedEvent undoCustomAction;
 	public bool everyFrame=false;
+	[HideInInspector]public bool dontMoveTrigger;
 
 	[HideInInspector] public int state=0;
 	[HideInInspector] public float axis=0;
 	[HideInInspector] public float delay2=0;
+	private Collider2D[] colls;
 	private Transform startPos;
 	private bool canGoForwards=true;
 	private bool canGoBackwards=true;
 
 	// handle transforms
 	public void Start() {
-		if (buttonType!=ButtonType.moveObject) {
-			target = null;
-		} if (buttonType!=ButtonType.toggleObject) {
-			toggleObject = null;
-		} if (buttonType!=ButtonType.customAction) {
+		if (buttonType!=ButtonType.moveObject) target = null;
+		if (buttonType!=ButtonType.toggleObject) toggleObject = null;
+		if (target==null) target = new GameObject("Target").transform;
+		if (endPos==null) endPos = target;
+		if (buttonType!=ButtonType.customAction) {
 			customAction.RemoveAllListeners();
 			undoCustomAction.RemoveAllListeners();
 		}
-		if (target==null)
-			target = new GameObject("Target").transform;
-		if (endPos==null)
-			endPos = target;
 
 		startPos = new GameObject("Start Pos").transform;
 		startPos.position = target.position;
 		startPos.localScale = target.localScale;
 		startPos.rotation = target.rotation;
+
+		if (isParentObjOrSameObj(transform, endPos)) {
+			print("fixing button parent-child issue");
+			Transform newEndPos = new GameObject("End Position").transform;
+			newEndPos.position = endPos.position;
+			newEndPos.localScale = endPos.localScale;
+			newEndPos.rotation = endPos.rotation;
+			endPos = newEndPos;
+		}
+
 		if (duration==60)
 			duration = 3600;
+		colls = GetComponents<Collider2D>();
+		dontMoveTrigger = dontMoveTrigger && target==transform;
 	}
 
 	public void Update() {
@@ -64,11 +74,13 @@ public class Button2D : MonoBehaviour {
 		// undo changes
 		case -1:
 			axis = Mathf.Max(axis-Time.deltaTime, 0);
-			if (everyFrame)
-				undoCustomAction.Invoke();
+			if (everyFrame && buttonType==ButtonType.customAction) undoCustomAction.Invoke();
 			target.position = Vector3.Lerp(startPos.position, endPos.position, axis/duration);
 			target.localScale = Vector3.Lerp(startPos.localScale, endPos.localScale, axis/duration);
 			target.rotation = Quaternion.Lerp(startPos.rotation, endPos.rotation, axis/duration);
+			for (int i=0; i<colls.Length&&dontMoveTrigger; ++i)
+				if (colls[i].isTrigger)
+					colls[i].offset = transform.InverseTransformPoint(startPos.position);
 
 			// detect for transition completion
 			if (axis<=0)
@@ -78,11 +90,13 @@ public class Button2D : MonoBehaviour {
 		case 1:
 			axis = Mathf.Min(axis+Time.deltaTime, duration);
 			axis += Time.deltaTime;
-			if (everyFrame)
-				customAction.Invoke();
+			if (everyFrame && buttonType==ButtonType.customAction) customAction.Invoke();
 			target.position = Vector3.Lerp(startPos.position, endPos.position, axis/duration);
 			target.localScale = Vector3.Lerp(startPos.localScale, endPos.localScale, axis/duration);
 			target.rotation = Quaternion.Lerp(startPos.rotation, endPos.rotation, axis/duration);
+			for (int i=0; i<colls.Length&&dontMoveTrigger; ++i)
+				if (colls[i].isTrigger)
+					colls[i].offset = transform.InverseTransformPoint(startPos.position);
 
 			// detect for transition completion
 			if (axis>=duration)
@@ -116,61 +130,46 @@ public class Button2D : MonoBehaviour {
 			return;
 
 		// make changes based off of the old state
-		switch (state) {
-		case -1:
-			if (!repeat)
-				canGoBackwards = false;
-			break;
-		case 1:
-			if (!repeat)
-				canGoForwards = false;
-			break;
-		}
+		if (state==-1 && !repeat) canGoBackwards = false;
+		if (state==1 && !repeat) canGoForwards = false;
 
 		// adjust to the new state
-		switch (newState) {
-		case -2:
+		if (newState==-2) {
 			// go backwards if possible
-			if (canGoBackwards && axis>0 && revert) {
+			if (canGoBackwards && axis>0 && revert && !(allAtOnce&&state>0)) {
 				state = -2;
 				delay2 = delay;
 			}
 			// stop going forwards if still going forwards
 			if (state>0)
 				SetState(0);
-			break;
-		case -1:
+		} else if (newState==-1) {
 			state = -1;
-			undoCustomAction.Invoke();
-			if (toggleObject)
-				toggleObject.SetActive(!toggleObject.activeSelf);
-			break;
-		case 0:
+			if (buttonType==ButtonType.customAction) undoCustomAction.Invoke();
+			if (toggleObject) toggleObject.SetActive(!toggleObject.activeSelf);
+		} else if (newState==0) {
 			// stop if possible
 			if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration)))
 				state = 0;
-			break;
-		case 1:
+		} else if (newState==1) {
 			state = 1;
-			customAction.Invoke();
-			if (toggleObject)
-				toggleObject.SetActive(!toggleObject.activeSelf);
-			break;
-		case 2:
+			if (buttonType==ButtonType.customAction) customAction.Invoke();
+			if (toggleObject) toggleObject.SetActive(!toggleObject.activeSelf);
+		} else if (newState==2) {
 			// go forwards if possible
-			if (canGoForwards && axis<duration) {
+			if (canGoForwards && axis<duration && !(allAtOnce&&state<0)) {
 				state = 2;
 				delay2 = delay;
 			}
 			// stop going backwards if still going backwards
 			if (state==-1)
 				SetState(0);
-			break;
 		}
 	}
 
-	public void TestFunctionTrue() { /*print("TestFunctionTrue();");*/ }
-	public void TestFunctionFalse() { /*print("TestFunctionFalse();");*/ }
+	public bool isParentObjOrSameObj(Transform parent, Transform child) {
+		return child==parent || child.parent!=null && (child.parent==parent || isParentObjOrSameObj(parent, child.parent));
+	}
 }
 
 
@@ -187,6 +186,7 @@ public class Button2DEditor:Editor {
 		SerializedProperty target = serializedObject.FindProperty("target");
 		SerializedProperty endPos = serializedObject.FindProperty("endPos");
 		SerializedProperty toggleObject = serializedObject.FindProperty("toggleObject");
+		SerializedProperty dontMoveTrigger = serializedObject.FindProperty("dontMoveTrigger");
 		Button2D obj = (Button2D)this.target;
 
 		// handle type
@@ -194,6 +194,8 @@ public class Button2DEditor:Editor {
 		if (obj.buttonType==Button2D.ButtonType.moveObject) {
 			target.objectReferenceValue = (Transform)EditorGUILayout.ObjectField("Target", target.objectReferenceValue, typeof(Transform), true);
 			endPos.objectReferenceValue = (Transform)EditorGUILayout.ObjectField("End Position", endPos.objectReferenceValue, typeof(Transform), true);
+			if (target.objectReferenceValue==obj.transform)
+				dontMoveTrigger.boolValue = EditorGUILayout.Toggle("Don't Move Trigger", dontMoveTrigger.boolValue);
 		} else if (obj.buttonType==Button2D.ButtonType.toggleObject) {
 			toggleObject.objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Toggle Object", toggleObject.objectReferenceValue, typeof(GameObject), true);
 		} else if (obj.buttonType==Button2D.ButtonType.customAction) {

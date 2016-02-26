@@ -88,6 +88,8 @@ public class PhysicsManager : MonoBehaviour {
 		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].AnalyzeRelations();
 		for (int i=0; i<gearSets.Count; ++i)
+			gearSets[i].UpdateRelations();
+		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].UpdateObjects();
 		// move PhysicsObjects
 		for (int i=0; i<objs.Count; ++i)
@@ -106,6 +108,10 @@ public class PhysicsManager : MonoBehaviour {
 		public List<GearSetRelation> relations=new List<GearSetRelation>();
 		public float totalAngularMomentum=0;
 		public float totalMomentOfInertia=0;
+		public float totalAngularVelocity {
+			get { return totalAngularMomentum/totalMomentOfInertia; }
+			set { totalAngularMomentum = value*totalMomentOfInertia; }
+		}
 		public int index=-1;
 		public bool isMovable=false;
 
@@ -166,30 +172,46 @@ public class PhysicsManager : MonoBehaviour {
 					totalMomentOfInertia += diff.sqrMagnitude*other.mass;
 				} else {
 					// apply 1/3 of other's angular momentum, apply full momentOfInertia
-					totalAngularMomentum += (mult/3)* (other.angularMomentum + other.momentum.magnitude
-						*Vector3.Dot(Vector3.Cross(other.velocity.normalized, diff.normalized), Vector3.forward)*diff.magnitude);
-					totalMomentOfInertia += other.momentOfInertia;
+					//float speedDiff = totalAngularMomentum/totalMomentOfInertia - other.curAngularVelocity
+						//+ Vector3.Dot(Vector3.Cross(other.velocity, diff.normalized), Vector3.forward)*180/Mathf.PI/diff.magnitude;
+					//totalAngularMomentum += (mult/3)* (other.angularMomentum + other.momentum.magnitude
+						//*Vector3.Dot(Vector3.Cross(other.velocity.normalized, diff.normalized), Vector3.forward)*diff.magnitude);
+					//totalMomentOfInertia += other.momentOfInertia/3;
+				}
+			}
+		}
+
+		public void UpdateRelations() {
+			for (int i=0; i<relations.Count; ++i) {
+				if (!relations[i].isAttached) {
+					/*CollidingObject obj = relations[i].obj;
+					CollidingObject other = relations[i].other;
+					GearSet otherSet = other.gearSet;
+					float mult = -Mult(obj)*Mult(other);
+					Vector3 diff = other.transform.position - obj.transform.position;
+					Vector3 mid = other.transform.position + diff*other.collRadius/(other.collRadius+obj.collRadius);
+					Vector3 velDiff = obj.GetVelAtPoint(mid) - other.GetVelAtPoint(mid);
+					print("veldiff: "+velDiff);
+					other.velocity += velDiff/3;
+					otherSet.totalAngularVelocity += (-mult*totalAngularVelocity - otherSet.totalAngularVelocity)
+						*(otherSet.totalMomentOfInertia/totalMomentOfInertia)*2/3f;*/
+					/*float speedDiff = totalAngularMomentum/totalMomentOfInertia + other.curAngularVelocity
+						+ Vector3.Dot(Vector3.Cross(other.velocity, diff.normalized), Vector3.forward)*180/Mathf.PI/diff.magnitude;
+					//other.gearSet.totalAngularMomentum -= speedDiff*other.gearSet.totalMomentOfInertia*2/3;
+					Vector3 speedDiff2 = Vector3.Cross(Vector3.forward, diff)*speedDiff*Mathf.PI/180;
+print("speedDiff2: "+100*speedDiff2+"; getVelAtPoint: "+100*obj.GetVelAtPoint(other.transform.position));
+					other.velocity += speedDiff2/3;
+					other.gearSet.UpdateObjects();
+print("other: "+100*other.GetVelAtPoint(other.transform.position-diff.normalized*other.collRadius)+" (at "+(other.transform.position-diff.normalized*other.collRadius)+")");
+print("obj: "+100*obj.GetVelAtPoint(obj.transform.position+diff.normalized*obj.collRadius)+" (at "+(obj.transform.position+diff.normalized*obj.collRadius)+")");*/
 				}
 			}
 		}
 
 		public void UpdateObjects() {
-			// update gears
 			for (int i=0; i<gears.Count; ++i) {
 				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
 				gears[i].curSpeed = gears[i].AngularVelocityToCurSpeed();
-			}
-
-			// update relations
-			for (int i=0; i<relations.Count; ++i) {
-				/*if (!relations[i].isAttached) {
-					CollidingObject obj = relations[i].obj;
-					CollidingObject other = relations[i].other;
-					float mult = -Mult(obj)*Mult(other);
-//print("applying to "+other.name+" ("+mult*(totalAngularMomentum/totalMomentOfInertia)+")");
-					other.angularMomentum = mult*(totalAngularMomentum*other.momentOfInertia/totalMomentOfInertia)*(1f/3f);
-					other.velocity = obj.GetVelAtPoint(other.transform.position);
-				}*/
 			}
 		}
 

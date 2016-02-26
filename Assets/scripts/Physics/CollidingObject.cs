@@ -26,9 +26,9 @@ public class CollidingObject:PhysicsObject {
 	public int numPegs=0;
 	protected Collision2D lastGroundedTo=null;
 	protected float timeSinceGrounded=0;
-	public AudioClip _move;
-	public AudioClip _collHit;
-	public AudioClip _hitSurface;
+	public AudioCustom _move;
+	public AudioCustom _collHit;
+	public AudioCustom _hitSurface;
 	private AudioSource move;
 	private AudioSource collHit;
 	private AudioSource hitSurface;
@@ -44,12 +44,13 @@ public class CollidingObject:PhysicsObject {
 			move = gameObject.AddComponent<AudioSource>();
 			collHit = gameObject.AddComponent<AudioSource>();
 			hitSurface = gameObject.AddComponent<AudioSource>();
-			move.clip = _move;
-			collHit.clip = _collHit;
-			hitSurface.clip = _hitSurface;
+			move.clip = _move.clip;
+			collHit.clip = _collHit.clip;
+			hitSurface.clip = _hitSurface.clip;
 			move.loop = true;
 			collHit.loop = false;
 			hitSurface.loop = false;
+			move.volume = _move.volume;
 		}
 	}
 
@@ -97,7 +98,8 @@ public class CollidingObject:PhysicsObject {
 		// if attached to another gear
 		if (attachedTo!=null) {
 			Vector3 diff = transform.position-attachedTo.transform.position;
-			transform.position = attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius);
+			transform.position = 0.02f*transform.position
+				+ 0.98f * (attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius));
 			curSpeed += Accel();
 			curAngularVelocity = CurSpeedToAngularVelocity();
 			transform.RotateAround(attachedTo.transform.position, Vector3.forward,
@@ -191,15 +193,17 @@ public class CollidingObject:PhysicsObject {
 	}
 
 	public void OnCollisionEnter2D(Collision2D coll) {
+		float vol = Mathf.Pow(Mathf.Min(Mathf.Abs(Vector3.Dot(coll.contacts[0].normal, lastVelocity))/maxSpeed, 1), 3);
 		CollidingObject obj = coll.gameObject.GetComponent<CollidingObject>();
-		if (obj!=null && (obj.isMovable || this.isMovable))
+		if (coll.gameObject.tag!="Bouncy")
+			velocity -= 0.95f*Vector3.Project(velocity, coll.contacts[0].normal);
+		if (obj!=null && (obj.isMovable || this.isMovable)) {
 			collHit.Play();
+			collHit.volume = vol*_collHit.volume;
+		}
 		if (obj==null) {
-			if (coll.gameObject.tag!="Bouncy")
-				velocity -= 0.95f*Vector3.Project(velocity, coll.contacts[0].normal);
-			float vol = Mathf.Pow(Mathf.Min(Mathf.Abs(Vector3.Dot(coll.contacts[0].normal, lastVelocity))/maxSpeed, 1), 3);
 			if (!hitSurface.isPlaying || vol>hitSurface.volume) {
-				hitSurface.volume = vol;
+				hitSurface.volume = vol*_hitSurface.volume;
 				hitSurface.Play();
 
 			}

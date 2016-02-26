@@ -7,23 +7,23 @@ using UnityStandardAssets.CrossPlatformInput;
 using System;
 
 public class PlayerGear:CollidingObject {
-	public AudioClip _stickToGear;
-	public AudioClip _stickToGearEmpty;
-	public AudioClip _letGoOfGear;
-	public AudioClip _letGoOfGearEmpty;
-	public AudioCustom test;
+	public AudioCustom _stickToGear;
+	public AudioCustom _stickToGearEmpty;
+	public AudioCustom _letGoOfGear;
+	public AudioCustom _letGoOfGearEmpty;
 	private AudioSource stickToGear;
 	private AudioSource stickToGearEmpty;
 	private AudioSource letGoOfGear;
 	private AudioSource letGoOfGearEmpty;
-	bool wasAttaching=false;
-	bool wasAttached=false;
-	public GameObject attachingSystem;
-	public GameObject attachedSystem;
-	private float timeSinceChange;
+	private bool wasAttaching=false;
+	private CollidingObject wasAttached;
+	public Animator attachingSystem;
+	public Animator attachedSystem;
+	private Renderer attachingSystemRenderer;
 
 	public override void Start() {
 		base.Start();
+		attachingSystemRenderer = attachingSystem.GetComponent<Renderer>();
 		
 		if (Application.isPlaying) {
 			// initialize AudioSources
@@ -32,10 +32,15 @@ public class PlayerGear:CollidingObject {
 			letGoOfGear = gameObject.AddComponent<AudioSource>();
 			letGoOfGearEmpty = gameObject.AddComponent<AudioSource>();
 
-			stickToGear.clip = _stickToGear;
-			stickToGearEmpty.clip = _stickToGearEmpty;
-			letGoOfGear.clip = _letGoOfGear;
-			letGoOfGearEmpty.clip = _letGoOfGearEmpty;
+			stickToGear.clip = _stickToGear.clip;
+			stickToGearEmpty.clip = _stickToGearEmpty.clip;
+			letGoOfGear.clip = _letGoOfGear.clip;
+			letGoOfGearEmpty.clip = _letGoOfGearEmpty.clip;
+
+			stickToGear.volume = _stickToGear.volume;
+			stickToGearEmpty.volume = _stickToGearEmpty.volume;
+			letGoOfGear.volume = _letGoOfGear.volume;
+			letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume;
 
 			stickToGear.loop = false;
 			stickToGearEmpty.loop = false;
@@ -67,22 +72,17 @@ public class PlayerGear:CollidingObject {
 			OnTriggerExit2D(temp.trig);
 			OnTriggerEnter2D(temp.trig);
 		}
-		attachingSystem.SetActive(attaching && attachedTo==null && timeSinceChange<0.3f);
-		attachedSystem.SetActive(attaching && attachedTo!=null && timeSinceChange<0.3f);
-		timeSinceChange = (attaching==wasAttaching && (attachedTo!=null)==wasAttached?timeSinceChange+Time.fixedDeltaTime:0);
-
-		// set direction of accel
-		
+		if (attaching && attachedTo==null && !wasAttaching) attachingSystem.SetBool("RunForwards", true);
+		attachingSystemRenderer.enabled = !attachingSystem.GetCurrentAnimatorStateInfo(0).IsName("Off");
+		if (attaching && attachedTo!=null && !wasAttaching) attachedSystem.SetBool("RunForwards", true);
+		if (!attaching && wasAttaching) attachedSystem.SetBool("RunBackwards", true);
 
 		// handle sounds
-		/*source.clip = move;
-		source.loop = true;
-		if (!source.isPlaying) source.Play();*/
 		if (!wasAttached && attaching && attachedTo!=null && !stickToGear.isPlaying) stickToGear.Play();
 		if (!wasAttaching && attaching && attachedTo==null && !stickToGearEmpty.isPlaying) stickToGearEmpty.Play();
-		if (!attaching && wasAttaching && !wasAttached && !letGoOfGear.isPlaying) letGoOfGear.Play();
-		if (!attaching && wasAttaching && wasAttached && !letGoOfGearEmpty.isPlaying) letGoOfGearEmpty.Play();
-		wasAttached = attachedTo!=null;
+		if (!attaching && wasAttaching && wasAttached==null && !letGoOfGear.isPlaying) letGoOfGear.Play();
+		if (!attaching && wasAttaching && wasAttached!=null && !letGoOfGearEmpty.isPlaying) letGoOfGearEmpty.Play();
+		wasAttached = attachedTo;
 		wasAttaching = attaching;
 
 		base.PhysicsUpdate();

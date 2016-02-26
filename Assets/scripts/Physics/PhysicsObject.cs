@@ -79,7 +79,7 @@ public class PhysicsObject:MonoBehaviour {
 		Vector3 diff = point-transform.position;
 		Vector3 result = Vector3.Cross(Vector3.forward, diff);
 		// extra logic to prevent returning Vector3.zero
-		return result*(Mathf.Abs(curAngularVelocity)>0.001f?curAngularVelocity:(float)1e-3)*Mathf.PI/180;
+		return velocity + result*(Mathf.Abs(curAngularVelocity)>0.001f?curAngularVelocity:(float)1e-3)*Mathf.PI/180;
 	}
 
 	/// <summary>Resets radius/area, based off of the collider values</summary>
