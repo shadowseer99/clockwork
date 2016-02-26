@@ -136,8 +136,8 @@ public class CollidingObject:PhysicsObject {
 		}
 		collidingWith.Clear();
 		groundedTo.Clear();
-		if ((isMovable && Mathf.Abs(curSpeed)>0.5f && timeSinceGrounded<0.5f) && !move.isPlaying) move.Play();
-		if ((!isMovable || Mathf.Abs(curSpeed)<0.5f || timeSinceGrounded>0.5f) && move.isPlaying) move.Stop();
+		if ((isMovable && Mathf.Abs(curSpeed)>0.5f && timeSinceGrounded<0.2f) && !move.isPlaying) move.Play();
+		if ((!isMovable || Mathf.Abs(curSpeed)<0.5f || timeSinceGrounded>0.2f) && move.isPlaying) move.Stop();
 		if (move.isPlaying) move.volume = Mathf.Pow(Mathf.Min(1, Mathf.Abs(curSpeed/maxSpeed)), 2);
 	}
 

@@ -9,7 +9,7 @@ public class Gear:CollidingObject {
 	public bool isGolden=false;
 	private float goldenRotation=0;
 	
-	public AudioClip _insert;
+	public AudioCustom _insert;
 	private AudioSource insert;
 
 	public override void Start() {
@@ -18,7 +18,8 @@ public class Gear:CollidingObject {
 
 		// initialize sounds
 		insert = gameObject.AddComponent<AudioSource>();
-		insert.clip = _insert;
+		insert.clip = _insert.clip;
+		insert.volume = _insert.volume;
 		insert.loop = false;
 
 		// fix golden gear

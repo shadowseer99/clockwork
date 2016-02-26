@@ -72,10 +72,10 @@ public class PlayerGear:CollidingObject {
 			OnTriggerExit2D(temp.trig);
 			OnTriggerEnter2D(temp.trig);
 		}
-		if (attaching && attachedTo==null && !wasAttaching) attachingSystem.SetBool("RunForwards", true);
+		if (attaching && attachedTo==null && !wasAttaching) attachingSystem.SetTrigger("RunForwards");
 		attachingSystemRenderer.enabled = !attachingSystem.GetCurrentAnimatorStateInfo(0).IsName("Off");
-		if (attaching && attachedTo!=null && !wasAttaching) attachedSystem.SetBool("RunForwards", true);
-		if (!attaching && wasAttaching) attachedSystem.SetBool("RunBackwards", true);
+		if (attachedTo!=wasAttached && attachedTo!=null) attachedSystem.SetTrigger("RunForwards");
+		if (wasAttached!=null && attachedTo==null) attachedSystem.SetTrigger("RunBackwards");
 
 		// handle sounds
 		if (!wasAttached && attaching && attachedTo!=null && !stickToGear.isPlaying) stickToGear.Play();

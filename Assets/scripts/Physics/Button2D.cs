@@ -29,6 +29,7 @@ public class Button2D : MonoBehaviour {
 	private Transform startPos;
 	private bool canGoForwards=true;
 	private bool canGoBackwards=true;
+	private PlayerGear player;
 
 	// handle transforms
 	public void Start() {
@@ -89,7 +90,6 @@ public class Button2D : MonoBehaviour {
 		// apply changes
 		case 1:
 			axis = Mathf.Min(axis+Time.deltaTime, duration);
-			axis += Time.deltaTime;
 			if (everyFrame && buttonType==ButtonType.customAction) customAction.Invoke();
 			target.position = Vector3.Lerp(startPos.position, endPos.position, axis/duration);
 			target.localScale = Vector3.Lerp(startPos.localScale, endPos.localScale, axis/duration);
@@ -115,14 +115,20 @@ public class Button2D : MonoBehaviour {
 
 	public void OnTriggerEnter2D(Collider2D coll) {
 		// go forwards, if possible
-		if (coll.GetComponent<PlayerGear>())
+		PlayerGear player = coll.GetComponent<PlayerGear>();
+		if (player) {
 			SetState(2);
+			this.player = player;
+		}
 	}
 
 	public void OnTriggerExit2D(Collider2D coll) {
 		// go backwards, if possible
-		if (coll.GetComponent<PlayerGear>())
+		PlayerGear player = coll.GetComponent<PlayerGear>();
+		if (player) {
 			SetState(-2);
+			this.player = player;
+		}
 	}
 
 	private void SetState(int newState) {
@@ -148,8 +154,12 @@ public class Button2D : MonoBehaviour {
 			if (buttonType==ButtonType.customAction) undoCustomAction.Invoke();
 			if (toggleObject) toggleObject.SetActive(!toggleObject.activeSelf);
 		} else if (newState==0) {
-			// stop if possible
-			if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration)))
+			// stop if possible, handle allAtOnce special cases
+			if (allAtOnce && axis==0 && player.coll.IsTouching(colls[0]))
+				state = 2;
+			else if (allAtOnce && axis==duration && !player.coll.IsTouching(colls[0]))
+				state = -2;
+			else if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration)))
 				state = 0;
 		} else if (newState==1) {
 			state = 1;
