@@ -112,7 +112,7 @@ public class CollidingObject:PhysicsObject {
 			curAngularVelocity = CurSpeedToAngularVelocity();
 		}
 		// if grounded and not attached
-		else if (attachedTo==null && (groundedTo.Count>0 || inwaters.Count>0)) {
+		else {
 			// helper vectors
 			Vector3 speedDir = Vector3.right;
 			Vector3 projVel = Vector3.Project(velocity, speedDir);
@@ -209,7 +209,8 @@ public class CollidingObject:PhysicsObject {
 
 	// helper functions
 	public float Accel() {
-		return Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed);
+		float mult = (groundedTo.Count>0 || attachedTo!=null || !isMovable?1:(inwaters.Count>0?0.5f:0.1f));
+		return Time.fixedDeltaTime*mult*accel*(accelMult-curSpeed/maxSpeed);
 		//return Time.fixedDeltaTime*accel*accelMult;
 	}
 	public float CurSpeedToAngularVelocity() {
