@@ -90,7 +90,8 @@ public class CollidingObject:PhysicsObject {
 		if (cumThickness>0)
 			cumVelocity /= cumThickness;
 		// update velocity
-		velocity += Time.fixedDeltaTime*(1-cumDensity)*Physics.gravity;
+		if (name=="PCgear") print("density: "+density+"; cumDensity: "+cumDensity);
+		velocity += Time.fixedDeltaTime*(density-cumDensity)*Physics.gravity;
 		float f = Time.fixedDeltaTime*cumThickness;//(1-1/(Time.fixedDeltaTime*cumThickness+1));
 		velocity = f*cumVelocity + (1-f)*velocity;
 
