@@ -8,8 +8,8 @@ public class Water : MonoBehaviour {
 	public float densityRatio=0;
 	public float thicknessRatio=1;
 	public Vector3[] contactPoints=new Vector3[0];
-	public AudioClip _flow;
-	public AudioClip _splash;
+	public AudioCustom _flow;
+	public AudioCustom _splash;
 	[HideInInspector]public AudioSource flow2;
 	[HideInInspector]public AudioSource splash;
 
@@ -31,9 +31,11 @@ public class Water : MonoBehaviour {
 		splash = new GameObject("splash").AddComponent<AudioSource>();
 		splash.transform.parent = transform;
 		flow2 = gameObject.AddComponent<AudioSource>();
-		splash.clip = _splash;
-		flow2.clip = _flow;
+		splash.clip = _splash.clip;
+		flow2.clip = _flow.clip;
 		splash.loop = false;
+		flow2.volume = _flow.volume;
+		splash.volume = _splash.volume;
 		flow2.loop = true;
 		flow2.Play();
 	}

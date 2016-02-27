@@ -21,6 +21,8 @@ public class Button2D : MonoBehaviour {
 	public UnityEngine.UI.Button.ButtonClickedEvent undoCustomAction;
 	public bool everyFrame=false;
 	[HideInInspector]public bool dontMoveTrigger;
+	[HideInInspector]public AudioCustom _buttonOn;
+	[HideInInspector]public AudioCustom _buttonOff;
 
 	[HideInInspector] public int state=0;
 	[HideInInspector] public float axis=0;
@@ -30,9 +32,15 @@ public class Button2D : MonoBehaviour {
 	private bool canGoForwards=true;
 	private bool canGoBackwards=true;
 	private PlayerGear player;
+	private static AudioCustom buttonOn2;
+	private static AudioCustom buttonOff2;
+	private AudioSource buttonOn;
+	private AudioSource buttonOff;
 
 	// handle transforms
 	public void Start() {
+		if (_buttonOn!=null) buttonOn2 = _buttonOn;
+		if (_buttonOff!=null) buttonOff2 = _buttonOff;
 		if (buttonType!=ButtonType.moveObject) target = null;
 		if (buttonType!=ButtonType.toggleObject) toggleObject = null;
 		if (target==null) target = new GameObject("Target").transform;
@@ -63,6 +71,18 @@ public class Button2D : MonoBehaviour {
 	}
 
 	public void Update() {
+		// handle audio
+		if (buttonOn==null && buttonOn2!=null) {
+			buttonOn = gameObject.AddComponent<AudioSource>();
+			buttonOn.clip = buttonOn2.clip;
+			buttonOn.volume = buttonOn2.volume;
+		}
+		if (buttonOff==null && buttonOff2!=null) {
+			buttonOff = gameObject.AddComponent<AudioSource>();
+			buttonOff.clip = buttonOff2.clip;
+			buttonOff.volume = buttonOff2.volume;
+		}
+
 		switch (state) {
 		// waiting to undo
 		case -2:
@@ -145,6 +165,7 @@ public class Button2D : MonoBehaviour {
 			if (canGoBackwards && axis>0 && revert && !(allAtOnce&&state>0)) {
 				state = -2;
 				delay2 = delay;
+				buttonOn.Play();
 			}
 			// stop going forwards if still going forwards
 			if (state>0)
@@ -155,12 +176,15 @@ public class Button2D : MonoBehaviour {
 			if (toggleObject) toggleObject.SetActive(!toggleObject.activeSelf);
 		} else if (newState==0) {
 			// stop if possible, handle allAtOnce special cases
-			if (allAtOnce && axis==0 && player.coll.IsTouching(colls[0]))
+			if (allAtOnce && axis==0 && player.coll.IsTouching(colls[0])) {
 				state = 2;
-			else if (allAtOnce && axis==duration && !player.coll.IsTouching(colls[0]))
+				buttonOn.Play();
+			} else if (allAtOnce && axis==duration && !player.coll.IsTouching(colls[0])) {
 				state = -2;
-			else if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration)))
+				buttonOff.Play();
+			} else if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration))) {
 				state = 0;
+			}
 		} else if (newState==1) {
 			state = 1;
 			if (buttonType==ButtonType.customAction) customAction.Invoke();
@@ -170,6 +194,7 @@ public class Button2D : MonoBehaviour {
 			if (canGoForwards && axis<duration && !(allAtOnce&&state<0)) {
 				state = 2;
 				delay2 = delay;
+				buttonOff.Play();
 			}
 			// stop going backwards if still going backwards
 			if (state==-1)
@@ -197,6 +222,8 @@ public class Button2DEditor:Editor {
 		SerializedProperty endPos = serializedObject.FindProperty("endPos");
 		SerializedProperty toggleObject = serializedObject.FindProperty("toggleObject");
 		SerializedProperty dontMoveTrigger = serializedObject.FindProperty("dontMoveTrigger");
+		SerializedProperty buttonOn = serializedObject.FindProperty("_buttonOn");
+		SerializedProperty buttonOff = serializedObject.FindProperty("_buttonOff");
 		Button2D obj = (Button2D)this.target;
 
 		// handle type
@@ -211,6 +238,8 @@ public class Button2DEditor:Editor {
 		} else if (obj.buttonType==Button2D.ButtonType.customAction) {
 			base.OnInspectorGUI();
 		}
+		EditorGUILayout.PropertyField(buttonOn);
+		EditorGUILayout.PropertyField(buttonOff);
 
 		// generic variables
 		duration.floatValue = EditorGUILayout.Slider("Duration", duration.floatValue, 0, 60);

@@ -197,16 +197,13 @@ public class CollidingObject:PhysicsObject {
 		CollidingObject obj = coll.gameObject.GetComponent<CollidingObject>();
 		if (coll.gameObject.tag!="Bouncy")
 			velocity -= 0.95f*Vector3.Project(velocity, coll.contacts[0].normal);
-		if (obj!=null && (obj.isMovable || this.isMovable)) {
+		if ((obj!=null && (obj.isMovable || this.isMovable)) && (!collHit.isPlaying || vol>collHit.volume)) {
 			collHit.Play();
 			collHit.volume = vol*_collHit.volume;
 		}
-		if (obj==null) {
-			if (!hitSurface.isPlaying || vol>hitSurface.volume) {
-				hitSurface.volume = vol*_hitSurface.volume;
-				hitSurface.Play();
-
-			}
+		if (obj==null && (!hitSurface.isPlaying || vol>hitSurface.volume)) {
+			hitSurface.volume = vol*_hitSurface.volume;
+			hitSurface.Play();
 		}
 	}
 
