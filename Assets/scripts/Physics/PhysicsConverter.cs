@@ -71,7 +71,13 @@ public class PhysicsConverter : MonoBehaviour {
 			});
 		CopyObjects<DeathZone, DeathZone2D>(x=>PrefabUtility.InstantiatePrefab(deathZonePrefab) as GameObject);
 		CopyObjects<Boundary, Boundary2D>(x=>PrefabUtility.InstantiatePrefab(boundaryPrefab) as GameObject);
-		CopyObjects<Button, Button2D>(x=>PrefabUtility.InstantiatePrefab(buttonPrefab) as GameObject);
+		CopyObjects<Button, Button2D>(
+			x => PrefabUtility.InstantiatePrefab(buttonPrefab) as GameObject,
+			(oldComp, newComp) => {
+				CopyTransform(oldComp.gameObject, newComp.gameObject, false);
+				CopyColliders(oldComp.gameObject, newComp.gameObject);
+				CopyComponent(oldComp, newComp, typeof(Button), typeof(Button2D));
+			});
 
 		// prepare to convert prefabs, track replacements
 		for (int i=0; i<conversions.Count; ++i)
@@ -171,7 +177,7 @@ public class PhysicsConverter : MonoBehaviour {
 				OldType[] oldComps = oldObj.GetComponents<OldType>();
 				for (int i=0; i<oldComps.Length; ++i) {
 					NewType newComp = newObj.GetComponent<NewType>();
-					if (newComp==null || i!=0)
+					if (newComp==null || i!=0 || typeof(NewType)==typeof(Button2D))
 						newComp = newObj.AddComponent<NewType>();
 					if (customCopy==null) {
 						CopyTransform(oldComps[i].gameObject, newObj);

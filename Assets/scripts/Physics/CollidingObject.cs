@@ -90,7 +90,8 @@ public class CollidingObject:PhysicsObject {
 		if (cumThickness>0)
 			cumVelocity /= cumThickness;
 		// update velocity
-		velocity += Time.fixedDeltaTime*(1-cumDensity)*Physics.gravity;
+		if (name=="PCgear") print("density: "+density+"; cumDensity: "+cumDensity);
+		velocity += Time.fixedDeltaTime*(density-cumDensity)*Physics.gravity;
 		float f = Time.fixedDeltaTime*cumThickness;//(1-1/(Time.fixedDeltaTime*cumThickness+1));
 		velocity = f*cumVelocity + (1-f)*velocity;
 
@@ -112,7 +113,7 @@ public class CollidingObject:PhysicsObject {
 			curAngularVelocity = CurSpeedToAngularVelocity();
 		}
 		// if grounded and not attached
-		else if (attachedTo==null && (groundedTo.Count>0 || inwaters.Count>0)) {
+		else {
 			// helper vectors
 			Vector3 speedDir = Vector3.right;
 			Vector3 projVel = Vector3.Project(velocity, speedDir);
@@ -197,22 +198,20 @@ public class CollidingObject:PhysicsObject {
 		CollidingObject obj = coll.gameObject.GetComponent<CollidingObject>();
 		if (coll.gameObject.tag!="Bouncy")
 			velocity -= 0.95f*Vector3.Project(velocity, coll.contacts[0].normal);
-		if (obj!=null && (obj.isMovable || this.isMovable)) {
+		if ((obj!=null && (obj.isMovable || this.isMovable)) && (!collHit.isPlaying || vol>collHit.volume)) {
 			collHit.Play();
 			collHit.volume = vol*_collHit.volume;
 		}
-		if (obj==null) {
-			if (!hitSurface.isPlaying || vol>hitSurface.volume) {
-				hitSurface.volume = vol*_hitSurface.volume;
-				hitSurface.Play();
-
-			}
+		if (obj==null && (!hitSurface.isPlaying || vol>hitSurface.volume)) {
+			hitSurface.volume = vol*_hitSurface.volume;
+			hitSurface.Play();
 		}
 	}
 
 	// helper functions
 	public float Accel() {
-		return Time.fixedDeltaTime*accel*(accelMult-curSpeed/maxSpeed);
+		float mult = (groundedTo.Count>0 || attachedTo!=null || !isMovable?1:(inwaters.Count>0?0.5f:0.1f));
+		return Time.fixedDeltaTime*mult*accel*(accelMult-curSpeed/maxSpeed);
 		//return Time.fixedDeltaTime*accel*accelMult;
 	}
 	public float CurSpeedToAngularVelocity() {
