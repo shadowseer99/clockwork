@@ -12,8 +12,7 @@ public class splashScript : MonoBehaviour {
 	void Update () {
 		timer -= Time.deltaTime;
 		if (timer < 0) {
-			timer = float.PositiveInfinity;
-			Application.LoadLevelAdditive(Application.loadedLevel+1);
+			Application.LoadLevel(Application.loadedLevel+1);
 		}
 	}
 }
