@@ -23,7 +23,10 @@ public class CollidingObject:PhysicsObject {
 	public float accelMult=1;
 	[HideInInspector]public CollidingObject attachedTo;
 	[HideInInspector]protected bool attaching=false;
+	public GameObject pegObject;
 	public int numPegs=0;
+	public float pegOffset=0;
+	public float origAngle;
 	protected Collision2D lastGroundedTo=null;
 	protected float timeSinceGrounded=0;
 	public AudioCustom _move;
@@ -51,6 +54,9 @@ public class CollidingObject:PhysicsObject {
 			collHit.loop = false;
 			hitSurface.loop = false;
 			move.volume = _move.volume;
+
+			Vector3 v = transform.TransformDirection(Vector3.right);
+			origAngle = Mathf.Atan2(v.y, v.x);
 		}
 	}
 
@@ -90,7 +96,6 @@ public class CollidingObject:PhysicsObject {
 		if (cumThickness>0)
 			cumVelocity /= cumThickness;
 		// update velocity
-		if (name=="PCgear") print("density: "+density+"; cumDensity: "+cumDensity);
 		velocity += Time.fixedDeltaTime*(density-cumDensity)*Physics.gravity;
 		float f = Time.fixedDeltaTime*cumThickness;//(1-1/(Time.fixedDeltaTime*cumThickness+1));
 		velocity = f*cumVelocity + (1-f)*velocity;
@@ -145,8 +150,13 @@ public class CollidingObject:PhysicsObject {
 	public virtual void OnTriggerEnter2D(Collider2D coll) {
 		// add neighboring CollidingObjects
 		CollidingObject collObj = coll.GetComponent<CollidingObject>();
-		if (collObj!=null && !neighbors.Contains(collObj))
+		if (collObj!=null && !neighbors.Contains(collObj)) {
 			neighbors.Add(collObj);
+
+			// align pegs
+			this.GetPegOffset(collObj);
+			collObj.GetPegOffset(this);
+		}
 
 		// handle entering water
 		Water water = coll.gameObject.GetComponent<Water>();
@@ -163,6 +173,7 @@ public class CollidingObject:PhysicsObject {
 			print("attaching to: "+attachedTo.name);
 		}
 	}
+
 	public virtual void OnTriggerExit2D(Collider2D coll) {
 		// add neighboring CollidingObjects
 		CollidingObject collObj = coll.GetComponent<CollidingObject>();
@@ -225,6 +236,32 @@ public class CollidingObject:PhysicsObject {
 			return -curAngularVelocity*(Mathf.PI*(collRadius+collRadius*collRadius/attachedTo.collRadius))/180;
 		else
 			return -curAngularVelocity*collRadius*Mathf.PI/180;
+	}
+	public float GetPegOffset(CollidingObject obj) {
+		Vector3 diff = obj.transform.position - transform.position;
+		Vector3 v1 = transform.TransformDirection(Vector3.right);
+		float diffAngle = Mathf.Atan2(diff.y, diff.x)*180/Mathf.PI;
+		float angle = Mathf.Atan2(v1.y, v1.x)*180/Mathf.PI;
+		float cumAngle = angle+diffAngle - this.pegOffset - origAngle + 720;
+		float pegAngle = 360f/numPegs;
+		float pegOffset = (cumAngle%pegAngle)/pegAngle - 0.5f;
+		if (name=="Player Gear" || name=="gear04") print(name+": dangle="+diffAngle+", angle="+angle+", cumAngle="+cumAngle+", final="+pegOffset);
+		return pegOffset;
+			/*Vector3 diff = coll.transform.position - transform.position;
+			Vector3 v1 = transform.TransformDirection(Vector3.right);
+			Vector3 v2 = coll.transform.TransformDirection(Vector3.right);
+			float diffAngle = Mathf.Atan2(diff.y, diff.x)*180/Mathf.PI;
+			float angle1 = Mathf.Atan2(v1.y, v1.x)*180/Mathf.PI + diffAngle;
+			float angle2 = Mathf.Atan2(v2.y, v2.x)*180/Mathf.PI - diffAngle;
+			float pegAngle1 = angle1%(360/numPegs);
+			float pegAngle2 = angle2%(360/collObj.numPegs);
+			if (pegAngle1<0) pegAngle1 += 360f/numPegs;
+			if (pegAngle2<0) pegAngle2 += 360f/collObj.numPegs;
+			float test = angle1%15;
+			print(name+": "+angle1+", "+angle2+", "+diffAngle);
+			print("self peg angle: "+ (pegAngle1));
+			print("other peg angle: "+(pegAngle2));*/
+
 	}
 }
 
