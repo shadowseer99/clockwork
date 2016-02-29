@@ -25,7 +25,6 @@ public class Boundary2D:MonoBehaviour {
 		float left=float.PositiveInfinity;
 		float right=float.NegativeInfinity;
 
-		print("colls: "+colliders.Length);
 		for (int i=0; i<colliders.Length; ++i)
 		{
 			top = Mathf.Max(top, colliders[i].bounds.max.y);

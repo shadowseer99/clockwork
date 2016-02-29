@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class Pause : MonoBehaviour {
 
     [SerializeField] private GameObject screen;
 	[SerializeField] private GameObject levelend;
+	[SerializeField] private float fadeTime=1;
+    private float timer=0;
+	private List<Image> images=new List<Image>();
 
     private bool activated = false;
     
@@ -15,9 +20,33 @@ public class Pause : MonoBehaviour {
 	void Start()
 	{
 		levelend.SetActive (false);
+
+		// find all images, levelend.GetComponentsInChildren<Image>() wasn't working for some reason
+		Stack<Transform> todo = new Stack<Transform>();
+		todo.Push(levelend.transform);
+		while (todo.Count>0) {
+			Transform t = todo.Pop();
+			for (int i=0; i<t.childCount; ++i)
+				todo.Push(t.GetChild(i));
+			Image img = t.GetComponent<Image>();
+			if (img!=null)
+				images.Add(img);
+		}
 	}
     void Update()
     {
+		// handle fade
+		if (levelend.activeSelf)
+		{
+			timer = Mathf.Min(timer+Time.unscaledDeltaTime, fadeTime);
+			for (int i=0; i<images.Count; ++i)
+			{
+				Color c = images[i].color;
+				images[i].color = new Color(c.r, c.g, c.b, timer/fadeTime);
+			}
+		}
+
+
 #if UNITY_IPHONE || UNITY_ANDROID
         bool reset = Mobile.reset;
         bool menu = Mobile.menu;
@@ -56,8 +85,10 @@ public class Pause : MonoBehaviour {
         }
         screen.SetActive(activated);
     }
+	public void PrintText() { print("Text"); }
 	public void NextLevel()
 	{
+		print("next level...");
 		Time.timeScale = 1;
 		Application.LoadLevel (Application.loadedLevel + 1);
 	}

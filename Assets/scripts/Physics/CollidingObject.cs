@@ -11,24 +11,30 @@ using System.Collections.Generic;
 /// This class handles water, collects colliding objects, and collects grounded objects
 /// </summary>
 public class CollidingObject:PhysicsObject {
+	// interaction variables
 	[HideInInspector]public List<Water> inwaters=new List<Water>();
 	[HideInInspector]public List<Collision2D> collidingWith=new List<Collision2D>();
 	[HideInInspector]public List<Collision2D> groundedTo=new List<Collision2D>();
-	public List<CollidingObject> neighbors=new List<CollidingObject>();
+	[HideInInspector]public List<CollidingObject> neighbors=new List<CollidingObject>();
+	[HideInInspector]public CollidingObject attachedTo;
+	[HideInInspector]protected bool attaching=false;
+
+	// physics variables
 	public float curSpeed=0;
 	public float maxSpeed=4;
 	//public float additionalFriction=0;
 	public float accel=4;
 	//public float power=4;
 	public float accelMult=1;
-	[HideInInspector]public CollidingObject attachedTo;
-	[HideInInspector]protected bool attaching=false;
+	public bool airControl=true;
 	public GameObject pegObject;
 	public int numPegs=0;
 	public float pegOffset=0;
 	public float origAngle;
 	protected Collision2D lastGroundedTo=null;
 	protected float timeSinceGrounded=0;
+
+	// sounds
 	public AudioCustom _move;
 	public AudioCustom _collHit;
 	public AudioCustom _hitSurface;
@@ -221,9 +227,14 @@ public class CollidingObject:PhysicsObject {
 
 	// helper functions
 	public float Accel() {
-		float mult = (groundedTo.Count>0 || attachedTo!=null || !isMovable?1:(inwaters.Count>0?0.5f:0.1f));
-		return Time.fixedDeltaTime*mult*accel*(accelMult-curSpeed/maxSpeed);
-		//return Time.fixedDeltaTime*accel*accelMult;
+		float mult = 0;
+		if (airControl) mult = 0.1f;
+		if (inwaters.Count>0) mult = 0.5f;
+		if (groundedTo.Count>0 || attachedTo!=null || !isMovable) mult = 1;
+		float result = Time.fixedDeltaTime*mult*accel*(accelMult-curSpeed/maxSpeed);
+		if (groundedTo.Count>0 && groundedTo[0].collider.sharedMaterial!=null && groundedTo[0].collider.sharedMaterial.name=="Ramp" && result*curSpeed<0 && accelMult==0) result *= 0.1f;
+		if (result*curSpeed<0 && accelMult*curSpeed>0) result = 0;
+		return result;
 	}
 	public float CurSpeedToAngularVelocity() {
 		if (attachedTo!=null)
