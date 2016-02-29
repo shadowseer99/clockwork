@@ -6,6 +6,7 @@ using System.Collections;
 
 public class MenuManager : MonoBehaviour {
 
+	public int initMenu=0;
 	public GameObject canvas;
 	private GameObject[] menus;
 	//public string[] levels;
@@ -24,7 +25,7 @@ public class MenuManager : MonoBehaviour {
 		}
 		
 		// display first menu
-		DisplayMenu(0);
+		DisplayMenu(initMenu);
 	}
 
 	//void Update() { print("curlevel: "+curLevel); }
