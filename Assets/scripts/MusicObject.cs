@@ -2,10 +2,15 @@
 using System.Collections;
 
 public class MusicObject : MonoBehaviour {
+	static bool exists;
 
 	// Use this for initialization
 	void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+		if (exists)
+			Destroy(gameObject);
+		else
+			DontDestroyOnLoad(this.gameObject);
+		exists = true;
     }
 }

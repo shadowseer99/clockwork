@@ -9,13 +9,11 @@ public class MainMenuSplashScript:MonoBehaviour {
 	public float timer=5;
 	public float fadeTime=1;
 	private float fadeTimer=0;
+	private static bool hasRun;
 	private MenuManager menu;
 	private List<Image> images=new List<Image>();
 
 	public void Start() {
-		menu = GameObject.FindObjectOfType<MenuManager>();
-		//print("Main menu splash is on "+gameObject.name);
-
 		// find all images, levelend.GetComponentsInChildren<Image>() wasn't working for some reason
 		Stack<Transform> todo = new Stack<Transform>();
 		todo.Push(transform);
@@ -30,14 +28,17 @@ public class MainMenuSplashScript:MonoBehaviour {
 	}
 
 	public void Update() {
-		if (timer <= 0) {
+		if (timer <= 0 || hasRun) {
+			transform.parent.GetChild(0).gameObject.SetActive(true);
 			fadeTimer = Mathf.Min(fadeTimer+Time.deltaTime, fadeTime);
 			for (int i=0; i<images.Count; ++i) {
 				Color c = images[i].color;
 				images[i].color = new Color(c.r, c.g, c.b, 1-fadeTimer/fadeTime);
 			}
-			transform.parent.GetChild(0).gameObject.SetActive(true);
-			if (fadeTimer==fadeTime) gameObject.SetActive(false);
+		}
+		if (hasRun || fadeTimer==fadeTime) {
+			hasRun = true;
+			gameObject.SetActive(false);
 		}
 		timer -= Time.deltaTime;
 	}
