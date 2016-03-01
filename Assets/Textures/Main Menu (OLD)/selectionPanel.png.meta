@@ -18,7 +18,7 @@ TextureImporter:
   bumpmap:
     convertToNormalMap: 0
     externalNormalMap: 0
-    heightScale: .25
+    heightScale: 0.25
     normalMapFilter: 0
   isReadable: 0
   grayScaleToAlpha: 0
@@ -28,7 +28,7 @@ TextureImporter:
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -1
-  maxTextureSize: 2048
+  maxTextureSize: 1024
   textureSettings:
     filterMode: -1
     aniso: 1
@@ -43,7 +43,7 @@ TextureImporter:
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
-  spritePivot: {x: .5, y: .5}
+  spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 91, y: 60, z: 85, w: 43}
   spritePixelsToUnits: 100
   alphaIsTransparency: 1
@@ -61,6 +61,44 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 260, y: -24}
+        - {x: 264, y: -17}
+        - {x: 264, y: 11}
+        - {x: 260, y: 24}
+        - {x: 252, y: 51}
+        - {x: 247, y: 58}
+        - {x: 235, y: 69}
+        - {x: 231, y: 72}
+        - {x: -287, y: 72}
+        - {x: -289, y: 70}
+        - {x: -292, y: 64}
+        - {x: -292, y: 23}
+        - {x: -289, y: 16}
+        - {x: -286, y: 12}
+        - {x: -270, y: 4}
+        - {x: -268, y: -12}
+        - {x: -265, y: -30}
+        - {x: -262, y: -39}
+        - {x: -269, y: -47}
+        - {x: -282, y: -54}
+        - {x: -287, y: -57}
+        - {x: -286, y: -72}
+        - {x: 232, y: -72}
+        - {x: 243, y: -63}
+        - {x: 247, y: -43}
+      - - {x: 247, y: 67}
+        - {x: 248, y: 64}
+        - {x: 251, y: 64}
+        - {x: 253, y: 66}
+        - {x: 252, y: 69}
+        - {x: 249, y: 69}
+      - - {x: 289, y: 72}
+        - {x: 288, y: 71}
+        - {x: 289, y: 68}
+        - {x: 292, y: 68}
+        - {x: 292, y: 72}
+    outline: []
   spritePackingTag: 
   userData: 
   assetBundleName: 
