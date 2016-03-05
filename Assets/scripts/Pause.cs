@@ -8,7 +8,8 @@ public class Pause : MonoBehaviour {
 
     [SerializeField] private GameObject screen;
 	[SerializeField] private GameObject levelend;
-	[SerializeField] private float fadeTime=1;
+    [SerializeField] private GameObject options;
+    [SerializeField] private float fadeTime=1;
     private float timer=0;
 	private List<Image> images=new List<Image>();
 
@@ -101,6 +102,16 @@ public class Pause : MonoBehaviour {
     {
         Time.timeScale = 1;
         Application.LoadLevel(Application.loadedLevel);
+    }
+    public void Options()
+    {
+        activated = false;
+        options.SetActive(true);
+    }
+    public void closeOp()
+    {
+        activated = true;
+        options.SetActive(false);
     }
     public void MainMenu()
     {
