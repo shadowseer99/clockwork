@@ -8,10 +8,11 @@ public class PlaySoundOnClick : MonoBehaviour {
 	public void Start() {
 		sound = new GameObject("sound player").AddComponent<AudioSource>();
 		sound.clip = _sound.clip;
-		sound.volume = _sound.volume;
+		sound.volume = _sound.volume * SoundProfile.effects;
 	}
 
 	public void Play() {
-		sound.Play();
+        sound.volume = _sound.volume*SoundProfile.effects;
+        sound.Play();
 	}
 }

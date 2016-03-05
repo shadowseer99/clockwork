@@ -37,10 +37,10 @@ public class PlayerGear:CollidingObject {
 			letGoOfGear.clip = _letGoOfGear.clip;
 			letGoOfGearEmpty.clip = _letGoOfGearEmpty.clip;
 
-			stickToGear.volume = _stickToGear.volume;
-			stickToGearEmpty.volume = _stickToGearEmpty.volume;
-			letGoOfGear.volume = _letGoOfGear.volume;
-			letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume;
+			stickToGear.volume = _stickToGear.volume * SoundProfile.effects;
+			stickToGearEmpty.volume = _stickToGearEmpty.volume * SoundProfile.effects;
+			letGoOfGear.volume = _letGoOfGear.volume * SoundProfile.effects;
+			letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume * SoundProfile.effects;
 
 			stickToGear.loop = false;
 			stickToGearEmpty.loop = false;
@@ -48,6 +48,14 @@ public class PlayerGear:CollidingObject {
 			letGoOfGearEmpty.loop = false;
 		}
 	}
+    public override void Update()
+    {
+        base.Update();
+        stickToGear.volume = _stickToGear.volume*SoundProfile.effects;
+        stickToGearEmpty.volume = _stickToGearEmpty.volume * SoundProfile.effects;
+        letGoOfGear.volume = _letGoOfGear.volume * SoundProfile.effects;
+        letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume * SoundProfile.effects;
+    }
 
 	public override void PhysicsUpdate() {
         // handle attaching
