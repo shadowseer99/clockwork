@@ -12,6 +12,8 @@ public class Pause : MonoBehaviour {
     [SerializeField] private float fadeTime=1;
     private float timer=0;
 	private List<Image> images=new List<Image>();
+	public Sprite[] numbers;
+	public RectTransform timeObject;
 
     private bool activated = false;
     
@@ -131,5 +133,20 @@ public class Pause : MonoBehaviour {
         Time.timeScale = 0;
 		levelend.SetActive (true);
 
+		string timeStr = Mathf.RoundToInt(Time.timeSinceLevelLoad).ToString();
+		timeStr = "129";
+		float offset=0;
+		for (int i=0; i<timeStr.Length; ++i) {
+			GameObject temp = new GameObject("");
+			temp.transform.parent = timeObject;
+			temp.AddComponent<RectTransform>();
+			RectTransform newObj = temp.transform as RectTransform;
+			Image img = newObj.gameObject.AddComponent<Image>();
+			img.sprite = numbers[timeStr[i]-'0'];
+			newObj.localPosition = Vector3.zero;
+			newObj.position += Vector3.right*offset;
+			offset += img.preferredWidth;
+			print("width1: "+img.flexibleWidth+", width2: "+img.minWidth+", width3: "+img.preferredWidth);
+		}
     }
 }
