@@ -57,6 +57,7 @@ public class PlayerGear:CollidingObject {
 			letGoOfGear.volume = _letGoOfGear.volume * SoundProfile.effects;
 			letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume * SoundProfile.effects;
 		}
+
     }
 
 	public override void PhysicsUpdate() {
