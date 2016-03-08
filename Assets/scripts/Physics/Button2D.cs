@@ -27,6 +27,7 @@ public class Button2D : MonoBehaviour {
 	[HideInInspector] public int state=0;
 	[HideInInspector] public float axis=0;
 	[HideInInspector] public float delay2=0;
+	[HideInInspector] public bool adaptiveMovement;
 	private Collider2D[] colls;
 	private Transform startPos;
 	private bool canGoForwards=true;
@@ -58,18 +59,20 @@ public class Button2D : MonoBehaviour {
 		}
 
 		startPos = new GameObject("Start Pos").transform;
+		startPos.parent = target.parent;
 		startPos.position = target.position;
 		startPos.localScale = target.localScale;
 		startPos.rotation = target.rotation;
-
-		if (isParentObjOrSameObj(transform, endPos)) {
-			print("fixing button parent-child issue");
-			Transform newEndPos = new GameObject("End Position").transform;
-			newEndPos.position = endPos.position;
-			newEndPos.localScale = endPos.localScale;
-			newEndPos.rotation = endPos.rotation;
-			endPos = newEndPos;
-		}
+		startPos.parent = (adaptiveMovement?transform.parent:null);
+		
+		Transform newEndPos = new GameObject("End Position").transform;
+		newEndPos.parent = endPos.parent;
+		newEndPos.position = endPos.position;
+		newEndPos.localScale = endPos.localScale;
+		newEndPos.rotation = endPos.rotation;
+		newEndPos.parent = (adaptiveMovement?endPos.parent:null);
+		if (isParentObjOrSameObj(transform, newEndPos)) newEndPos.parent = transform.parent;
+		endPos = newEndPos;
 
 		if (duration==60)
 			duration = 3600;
@@ -134,6 +137,7 @@ public class Button2D : MonoBehaviour {
 		if (player) {
 			SetState(2);
 			this.player = player;
+			//print("OnTriggerEnter2D: "+name);
 		}
 	}
 
@@ -143,6 +147,7 @@ public class Button2D : MonoBehaviour {
 		if (player) {
 			SetState(-2);
 			this.player = player;
+			//print("OnTriggerExit2D: "+name);
 		}
 	}
 
@@ -171,10 +176,10 @@ public class Button2D : MonoBehaviour {
 			if (toggleObject) toggleObject.SetActive(!toggleObject.activeSelf);
 		} else if (newState==0) {
 			// stop if possible, handle allAtOnce special cases
-			if (allAtOnce  && canGoForwards && axis==0 && player.coll.IsTouching(colls[0])) {
+			if (allAtOnce && axis==0 && player.coll.IsTouching(colls[0])) {
 				state = 2;
 				if (buttonOn!=null) buttonOn.Play();
-			} else if (allAtOnce && canGoBackwards && revert && axis==duration && !player.coll.IsTouching(colls[0])) {
+			} else if (allAtOnce && axis==duration && !player.coll.IsTouching(colls[0])) {
 				state = -2;
 				if (buttonOff!=null) buttonOff.Play();
 			} else if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration))) {
@@ -219,6 +224,7 @@ public class Button2DEditor:Editor {
 		SerializedProperty dontMoveTrigger = serializedObject.FindProperty("dontMoveTrigger");
 		SerializedProperty buttonOn = serializedObject.FindProperty("_buttonOn");
 		SerializedProperty buttonOff = serializedObject.FindProperty("_buttonOff");
+		SerializedProperty adaptiveMovement = serializedObject.FindProperty("adaptiveMovement");
 		Button2D obj = (Button2D)this.target;
 
 		// handle type
@@ -228,6 +234,7 @@ public class Button2DEditor:Editor {
 			endPos.objectReferenceValue = (Transform)EditorGUILayout.ObjectField("End Position", endPos.objectReferenceValue, typeof(Transform), true);
 			if (target.objectReferenceValue==obj.transform)
 				dontMoveTrigger.boolValue = EditorGUILayout.Toggle("Don't Move Trigger", dontMoveTrigger.boolValue);
+			adaptiveMovement.boolValue = EditorGUILayout.Toggle("Use Adaptive Movement", adaptiveMovement.boolValue);
 		} else if (obj.buttonType==Button2D.ButtonType.toggleObject) {
 			toggleObject.objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Toggle Object", toggleObject.objectReferenceValue, typeof(GameObject), true);
 		} else if (obj.buttonType==Button2D.ButtonType.customAction) {

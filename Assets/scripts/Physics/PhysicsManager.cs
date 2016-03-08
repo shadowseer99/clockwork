@@ -69,7 +69,12 @@ public class PhysicsManager : MonoBehaviour {
 				continue;
 			}
 		}
-		// update CollidingObjects
+		
+		// move PhysicsObjects
+		for (int i=0; i<objs.Count; ++i)
+			objs[i].PhysicsUpdate();
+		for (int i=0; i<objs.Count; ++i)
+			objs[i].Move();
 
 		// rebuild gearSets
 		for (int i=0; i<gearSets.Count; ++i)
@@ -83,6 +88,9 @@ public class PhysicsManager : MonoBehaviour {
 		}
 		while (gearSets.Count>=curIndex+1)
 			gearSets.RemoveAt(gearSets.Count-1);
+		//gearSets.RemoveRange(curIndex, gearSets.Count-curIndex);
+		//for (int i=0; i<gearSets.Count; ++i)
+			//print(gearSets[i]);
 
 		// update gearSets
 		for (int i=0; i<gearSets.Count; ++i)
@@ -91,11 +99,6 @@ public class PhysicsManager : MonoBehaviour {
 			gearSets[i].UpdateRelations();
 		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].UpdateObjects();
-		// move PhysicsObjects
-		for (int i=0; i<objs.Count; ++i)
-			objs[i].PhysicsUpdate();
-		for (int i=0; i<objs.Count; ++i)
-			objs[i].Move();
 	}
 
 	// helper functions
@@ -166,10 +169,12 @@ public class PhysicsManager : MonoBehaviour {
 
 				if (relations[i].isAttached) {
 					// adds other's acceleration, gravity, and momentum
-					totalAngularMomentum += (mult*other.mass*180/Mathf.PI)*(other.collRadius*other.Accel()
+					//if (gears[i].name=="newEnviroGear (2)") print("other.ratio: "+(other.mass*mult*diff.sqrMagnitude*obj.curAngularVelocity)/(diff.sqrMagnitude*other.mass)+", other.gravityRatio: "+(mult*other.mass*180/Mathf.PI)*Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward)/(diff.sqrMagnitude*other.mass)+", this.ratio: "+totalAngularVelocity+", obj.ratio: "+obj.curAngularVelocity);
+					totalAngularMomentum += (mult*other.mass*180/Mathf.PI)*(0*other.collRadius*other.Accel()
 						+ Time.fixedDeltaTime*Vector3.Dot(Vector3.Cross(diff.normalized, Physics.gravity), Vector3.forward))
-						+ other.mass*mult*diff.sqrMagnitude*obj.curAngularVelocity;
+						+ mult*other.mass*diff.sqrMagnitude*obj.curAngularVelocity;
 					totalMomentOfInertia += diff.sqrMagnitude*other.mass;
+					//print("newRatio: "+totalAngularVelocity);
 				} else {
 					// apply 1/3 of other's angular momentum, apply full momentOfInertia
 					//float speedDiff = totalAngularMomentum/totalMomentOfInertia - other.curAngularVelocity
@@ -212,6 +217,8 @@ print("obj: "+100*obj.GetVelAtPoint(obj.transform.position+diff.normalized*obj.c
 			for (int i=0; i<gears.Count; ++i) {
 				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
 				gears[i].curSpeed = gears[i].AngularVelocityToCurSpeed();
+				if (gears[i].isMovable) gears[i].PhysicsUpdateMoving(false);
+				//if (gears[i].name=="newEnviroGear (2)") print("AM: "+gears[i].angularMomentum+", cs: "+gears[i].curSpeed+", totalAM: "+totalAngularMomentum+", totalMI: "+totalMomentOfInertia);
 			}
 		}
 

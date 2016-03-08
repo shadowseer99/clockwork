@@ -24,7 +24,7 @@ public class PhysicsObject:MonoBehaviour {
 	public bool isMovable=true;
 	public Vector3 velocity {
 		get { return (rigidbody==null?Vector2.zero:rigidbody.velocity); }
-		set { if (rigidbody!=null) rigidbody.velocity = (isMovable?value:Vector3.zero); } }
+		set { if (rigidbody!=null) rigidbody.velocity = value; } }
 	protected Vector3 lastVelocity { get; private set; }
 	public Vector3 momentum {
 		get { return velocity*mass; }
@@ -66,10 +66,7 @@ public class PhysicsObject:MonoBehaviour {
 	public virtual void PhysicsUpdate() {}
 
 	public virtual void Move() {
-		if (isRotatable)
-			transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.forward, Space.World);
-		if (!isMovable)
-			velocity = Vector3.zero;
+		if (isRotatable) transform.Rotate(Time.fixedDeltaTime*curAngularVelocity*Vector3.forward, Space.World);
 		lastVelocity = velocity;
 	}
 
@@ -78,7 +75,7 @@ public class PhysicsObject:MonoBehaviour {
 		// use the cross product, multiply by angularSpeed in radians
 		Vector3 diff = point-transform.position;
 		Vector3 result = Vector3.Cross(Vector3.forward, diff);
-		// extra logic to prevent returning Vector3.zero
+		// extra logic to prevent returning Vector3.zero (to preserve vector direction)
 		return velocity + result*(Mathf.Abs(curAngularVelocity)>0.001f?curAngularVelocity:(float)1e-3)*Mathf.PI/180;
 	}
 
