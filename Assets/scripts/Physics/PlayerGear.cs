@@ -50,11 +50,13 @@ public class PlayerGear:CollidingObject {
 	}
     public override void Update()
     {
-        base.Update();
-        stickToGear.volume = _stickToGear.volume*SoundProfile.effects;
-        stickToGearEmpty.volume = _stickToGearEmpty.volume * SoundProfile.effects;
-        letGoOfGear.volume = _letGoOfGear.volume * SoundProfile.effects;
-        letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume * SoundProfile.effects;
+		if (Application.isPlaying) {
+			base.Update();
+			stickToGear.volume = _stickToGear.volume*SoundProfile.effects;
+			stickToGearEmpty.volume = _stickToGearEmpty.volume * SoundProfile.effects;
+			letGoOfGear.volume = _letGoOfGear.volume * SoundProfile.effects;
+			letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume * SoundProfile.effects;
+		}
     }
 
 	public override void PhysicsUpdate() {

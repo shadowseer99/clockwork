@@ -33,6 +33,9 @@ public class CollidingObject:PhysicsObject {
 	public float origAngle;
 	protected Collision2D lastGroundedTo=null;
 	protected float timeSinceGrounded=0;
+	[HideInInspector]public float waterThickness=0;
+	[HideInInspector]public float waterDensity=0;
+	[HideInInspector]public Vector3 waterVelocity=Vector3.zero;
 
 	// sounds
 	public AudioCustom _move;
@@ -43,12 +46,15 @@ public class CollidingObject:PhysicsObject {
 	private AudioSource hitSurface;
 
 	public override void Start() {
-		// handle negative acceleration
 		base.Start();
+		
+		// handle negative acceleration, 0 maxSpeed
+		maxSpeed = Mathf.Max(Mathf.Abs(maxSpeed), 0.01f);
 		if (accel<0) {
 			accelMult = -1;
 			accel = Mathf.Abs(accel);
 		}
+
 		if (Application.isPlaying) {
 			move = gameObject.AddComponent<AudioSource>();
 			collHit = gameObject.AddComponent<AudioSource>();
@@ -63,6 +69,7 @@ public class CollidingObject:PhysicsObject {
 
 			Vector3 v = transform.TransformDirection(Vector3.right);
 			origAngle = Mathf.Atan2(v.y, v.x);
+			if (accel<0.001f) accelMult = 0;
 		}
 	}
 
@@ -96,45 +103,20 @@ public class CollidingObject:PhysicsObject {
 		}
 		// adjust results
 		float totalArea = Mathf.PI*collRadius*collRadius;
-		cumThickness /= Mathf.Max(totalArea, cumArea);
-		cumDensity /= Mathf.Max(totalArea, cumArea);
-		cumVelocity /= Mathf.Max(totalArea, cumArea);
-		if (cumThickness>0)
-			cumVelocity /= cumThickness;
+		waterThickness /= Mathf.Max(totalArea, cumArea);
+		waterDensity /= Mathf.Max(totalArea, cumArea);
+		waterVelocity /= Mathf.Max(totalArea, cumArea);
+		if (waterThickness>0)
+			waterVelocity /= waterThickness;
 		// update velocity
-		velocity += Time.fixedDeltaTime*(density-cumDensity)*Physics.gravity;
-		float f = Time.fixedDeltaTime*cumThickness;//(1-1/(Time.fixedDeltaTime*cumThickness+1));
+		velocity += Time.fixedDeltaTime*(density-waterDensity)*Physics.gravity;
+		float f = Time.fixedDeltaTime*waterThickness;//(1-1/(Time.fixedDeltaTime*waterThickness+1));
 		velocity = f*cumVelocity + (1-f)*velocity;
 
-		// handle acceleration
-		// if attached to another gear
-		if (attachedTo!=null) {
-			Vector3 diff = transform.position-attachedTo.transform.position;
-			transform.position = 0.02f*transform.position
-				+ 0.98f * (attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius));
-			curSpeed += Accel();
-			curAngularVelocity = CurSpeedToAngularVelocity();
-			transform.RotateAround(attachedTo.transform.position, Vector3.forward,
-				Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude));
-			velocity = Vector3.zero;
-		}
-		// if not moving
-		else if (!isMovable) {
-			curSpeed += Accel();
-			curAngularVelocity = CurSpeedToAngularVelocity();
-		}
-		// if grounded and not attached
-		else {
-			// helper vectors
-			Vector3 speedDir = Vector3.right;
-			Vector3 projVel = Vector3.Project(velocity, speedDir);
-			Vector3 defaultSpeed = velocity-projVel;
-			// calculate curSpeed, in the direction of speedDir
-			curSpeed = Vector3.Dot(projVel, speedDir);
-			curSpeed += Accel();
-			velocity = defaultSpeed + curSpeed*speedDir;
-			curAngularVelocity = CurSpeedToAngularVelocity();
-		}
+		// update curSpeed, accel, etc.
+		if (attachedTo!=null) PhysicsUpdateAttached();
+		else if (!isMovable) PhysicsUpdateNotMoving();
+		else PhysicsUpdateMoving();
 		
 		// update physics
 		base.PhysicsUpdate();
@@ -151,6 +133,33 @@ public class CollidingObject:PhysicsObject {
 		if ((isMovable && Mathf.Abs(curSpeed)>0.5f && timeSinceGrounded<0.2f) && !move.isPlaying) move.Play();
 		if ((!isMovable || Mathf.Abs(curSpeed)<0.5f || timeSinceGrounded>0.2f) && move.isPlaying) move.Stop();
 		if (move.isPlaying) move.volume = Mathf.Pow(Mathf.Min(1, Mathf.Abs(curSpeed/maxSpeed)), 2);
+	}
+
+	public virtual void PhysicsUpdateAttached() {
+		Vector3 diff = transform.position-attachedTo.transform.position;
+		transform.position = 0.02f*transform.position
+			+ 0.98f * (attachedTo.transform.position + diff.normalized*(attachedTo.collRadius+this.collRadius));
+		curSpeed += Accel();
+		curAngularVelocity = CurSpeedToAngularVelocity();
+		transform.RotateAround(attachedTo.transform.position, Vector3.forward,
+			Time.fixedDeltaTime*(attachedTo.curAngularVelocity - curSpeed*180/Mathf.PI/diff.magnitude));
+		velocity = attachedTo.velocity;
+	}
+
+	public virtual void PhysicsUpdateNotMoving() {
+		curSpeed += Accel();
+		curAngularVelocity = CurSpeedToAngularVelocity();
+	}
+
+	public virtual void PhysicsUpdateMoving(bool overrideCurspeed=true) {
+		// helper vectors
+		Vector3 speedDir = Vector3.right;
+		Vector3 projVel = Vector3.Project(velocity, speedDir);
+		Vector3 defaultSpeed = velocity-projVel;
+		// calculate curSpeed, in the direction of speedDir
+		if (overrideCurspeed) curSpeed = Vector3.Dot(projVel, speedDir) + Accel();
+		velocity = defaultSpeed + curSpeed*speedDir;
+		curAngularVelocity = CurSpeedToAngularVelocity();
 	}
 
 	public virtual void OnTriggerEnter2D(Collider2D coll) {
@@ -175,8 +184,9 @@ public class CollidingObject:PhysicsObject {
 		if (collObj!=null && (attachedTo==null || coll!=attachedTo) && attaching) {
 			PhysicsUpdate();
 			attachedTo = collObj;
+			//Physics2D.IgnoreCollision(coll, attachedTo.coll, true);
 			isMovable = false;
-			print("attaching to: "+attachedTo.name);
+			//print("attaching to: "+attachedTo.name);
 		}
 	}
 
@@ -193,13 +203,13 @@ public class CollidingObject:PhysicsObject {
 
 		// handle detaching
 		if (collObj!=null && collObj==attachedTo) {
-			print("detatching; attachedTo: "+attachedTo.name);
+			//print("detatching from "+attachedTo.name);
 			isMovable = true;
-			velocity = attachedTo.GetVelAtPoint(transform.position);
-			Vector3 velocity2 = GetVelAtPoint(attachedTo.transform.position);
-			velocity -= accelMult*curSpeed*velocity2.normalized;
+			Vector3 velocity = attachedTo.GetVelAtPoint(transform.position);
+			Vector3 velocity2 = -accelMult*curSpeed*GetVelAtPoint(attachedTo.transform.position).normalized;
+			this.velocity = velocity + velocity2;
+			//Physics2D.IgnoreCollision(coll, attachedTo.coll, false);
 			attachedTo = null;
-			print("vel: "+velocity.magnitude);
 		}
 	}
 
