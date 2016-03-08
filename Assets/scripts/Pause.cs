@@ -134,19 +134,14 @@ public class Pause : MonoBehaviour {
 		levelend.SetActive (true);
 
 		string timeStr = Mathf.RoundToInt(Time.timeSinceLevelLoad).ToString();
-		timeStr = "129";
-		float offset=0;
 		for (int i=0; i<timeStr.Length; ++i) {
-			GameObject temp = new GameObject("");
+			GameObject temp = new GameObject("Number "+(timeStr[i]-'0'));
 			temp.transform.parent = timeObject;
 			temp.AddComponent<RectTransform>();
 			RectTransform newObj = temp.transform as RectTransform;
 			Image img = newObj.gameObject.AddComponent<Image>();
 			img.sprite = numbers[timeStr[i]-'0'];
-			newObj.localPosition = Vector3.zero;
-			newObj.position += Vector3.right*offset;
-			offset += img.preferredWidth;
-			print("width1: "+img.flexibleWidth+", width2: "+img.minWidth+", width3: "+img.preferredWidth);
+			newObj.localPosition = Vector3.right*40*i;
 		}
     }
 }

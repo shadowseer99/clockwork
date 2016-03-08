@@ -156,24 +156,27 @@ public class CollidingObject:PhysicsObject {
 		// find average ground velocity, average angle
 		Vector3 avgGroundVel = Vector3.zero;
 		Vector3 normal = Vector3.zero;
-		int velCount=0, normCount=0;
+		int groundCount=0, normCount=0;
 		for (int i=0; i<groundedTo.Count; ++i) {
 			if (groundedTo[i].rigidbody!=null) {
 				avgGroundVel += (Vector3)groundedTo[i].rigidbody.velocity;
-				++velCount;
+				++groundCount;
 			}
 			for (int j=0; j<groundedTo[i].contacts.Length; ++j)
 				normal += (Vector3)groundedTo[i].contacts[j].normal;
 			normCount += groundedTo[i].contacts.Length;
 		}
+		normal /= Mathf.Max(1, normCount);
+		avgGroundVel /= Mathf.Max(1, groundCount);
 
 		// helper vectors
-		Vector3 speedDir = Vector3.right;// Vector3.Cross(normal/normCount, Vector3.forward);
+		Vector3 speedDir = Vector3.right;// Vector3.Cross(normal, Vector3.forward);
 		Vector3 projVel = Vector3.Project(velocity, speedDir);
-		Vector3 defaultSpeed = velocity-projVel;//(velocity-avgGroundVel/velCount)-projVel;
+		Vector3 defaultSpeed = velocity/*-avgGroundVel*/-projVel;
 		// calculate curSpeed, in the direction of speedDir
 		if (overrideCurspeed) curSpeed = Vector3.Dot(projVel, speedDir) + Accel();
-		velocity = defaultSpeed + curSpeed*speedDir;// + avgGroundVel/velCount
+		//if (name=="PCgear") print("speedDir: "+100*speedDir+", projVel: "+100*projVel+", defaultSpeed: "+100*defaultSpeed+", curSpeed: "+curSpeed);
+		velocity = defaultSpeed /*+ avgGroundVel*/ + curSpeed*speedDir;
 		curAngularVelocity = CurSpeedToAngularVelocity();
 	}
 
