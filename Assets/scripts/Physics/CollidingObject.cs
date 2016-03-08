@@ -149,6 +149,7 @@ public class CollidingObject:PhysicsObject {
 	public virtual void PhysicsUpdateNotMoving() {
 		curSpeed += Accel();
 		curAngularVelocity = CurSpeedToAngularVelocity();
+		velocity = Vector3.zero;
 	}
 
 	public virtual void PhysicsUpdateMoving(bool overrideCurspeed=true) {
