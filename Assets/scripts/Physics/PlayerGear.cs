@@ -70,7 +70,7 @@ public class PlayerGear:CollidingObject {
         if (Mobile.right)
             accelMult += 1;
 #else
-        attaching = Input.GetKey(KeyCode.LeftShift);
+		attaching = Input.GetKey(KeyCode.Space);
         accelMult = CrossPlatformInputManager.GetAxisRaw("Horizontal");
 #endif
 
