@@ -65,7 +65,6 @@ public class CollidingObject:PhysicsObject {
 			move.loop = true;
 			collHit.loop = false;
 			hitSurface.loop = false;
-			move.volume = _move.volume;
 
 			Vector3 v = transform.TransformDirection(Vector3.right);
 			origAngle = Mathf.Atan2(v.y, v.x);
@@ -132,7 +131,7 @@ public class CollidingObject:PhysicsObject {
 		groundedTo.Clear();
 		if ((isMovable && Mathf.Abs(curSpeed)>0.5f && timeSinceGrounded<0.2f) && !move.isPlaying) move.Play();
 		if ((!isMovable || Mathf.Abs(curSpeed)<0.5f || timeSinceGrounded>0.2f) && move.isPlaying) move.Stop();
-		if (move.isPlaying) move.volume = Mathf.Pow(Mathf.Min(1, Mathf.Abs(curSpeed/maxSpeed)), 2);
+		if (move.isPlaying) move.volume = Mathf.Pow(Mathf.Min(1, Mathf.Abs(curSpeed/maxSpeed)), 2)*_move.volume;
 	}
 
 	public virtual void PhysicsUpdateAttached() {
