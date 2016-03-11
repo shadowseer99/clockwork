@@ -37,11 +37,6 @@ public class PlayerGear:CollidingObject {
 			letGoOfGear.clip = _letGoOfGear.clip;
 			letGoOfGearEmpty.clip = _letGoOfGearEmpty.clip;
 
-			stickToGear.volume = _stickToGear.volume * SoundProfile.effects;
-			stickToGearEmpty.volume = _stickToGearEmpty.volume * SoundProfile.effects;
-			letGoOfGear.volume = _letGoOfGear.volume * SoundProfile.effects;
-			letGoOfGearEmpty.volume = _letGoOfGearEmpty.volume * SoundProfile.effects;
-
 			stickToGear.loop = false;
 			stickToGearEmpty.loop = false;
 			letGoOfGear.loop = false;
