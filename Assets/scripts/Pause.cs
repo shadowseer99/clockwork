@@ -12,6 +12,7 @@ public class Pause : MonoBehaviour {
     [SerializeField] private float fadeTime=1;
     private float timer=0;
 	private List<Image> images=new List<Image>();
+	private float timeSpent=0;
 	public Sprite[] numbers;
 	public RectTransform timeObject;
 
@@ -38,6 +39,8 @@ public class Pause : MonoBehaviour {
 	}
     void Update()
     {
+		timeSpent += Time.deltaTime;
+
 		// handle fade
 		if (levelend.activeSelf)
 		{
@@ -133,7 +136,7 @@ public class Pause : MonoBehaviour {
         Time.timeScale = 0;
 		levelend.SetActive (true);
 
-		string timeStr = Mathf.RoundToInt(Time.timeSinceLevelLoad).ToString();
+		string timeStr = Mathf.RoundToInt(timeSpent).ToString();
 		for (int i=0; i<timeStr.Length; ++i) {
 			GameObject temp = new GameObject("Number "+(timeStr[i]-'0'));
 			temp.transform.parent = timeObject;

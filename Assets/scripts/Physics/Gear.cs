@@ -19,7 +19,6 @@ public class Gear:CollidingObject {
 		// initialize sounds
 		insert = gameObject.AddComponent<AudioSource>();
 		insert.clip = _insert.clip;
-		insert.volume = _insert.volume;
 		insert.loop = false;
 
 		// fix golden gear
@@ -46,6 +45,11 @@ public class Gear:CollidingObject {
 			}
 			mesh.uv = uvs;
 		}*/
+	}
+
+	public override void Update() {
+		base.Update();
+		insert.volume = _insert.volume*SoundProfile.effects;
 	}
 
 	public override void PhysicsUpdate() {

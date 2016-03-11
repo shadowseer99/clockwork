@@ -26,7 +26,7 @@ public class CollidingObject:PhysicsObject {
 	public float accel=4;
 	//public float power=4;
 	public float accelMult=1;
-	public bool airControl=true;
+	public float airControl=0.1f;
 	public GameObject pegObject;
 	public int numPegs=0;
 	public float pegOffset=0;
@@ -255,8 +255,8 @@ public class CollidingObject:PhysicsObject {
 	// helper functions
 	public float Accel() {
 		float mult = 0;
-		if (airControl) mult = 0.1f;
-		if (inwaters.Count>0) mult = 0.5f;
+		if (airControl!=0) mult = airControl;
+		if (inwaters.Count>0) mult = 0.5f + 0.5f*mult;
 		if (groundedTo.Count>0 || attachedTo!=null || !isMovable) mult = 1;
 		float result = Time.fixedDeltaTime*mult*accel*(accelMult-curSpeed/maxSpeed);
 		if (groundedTo.Count>0 && groundedTo[0].collider.sharedMaterial!=null && groundedTo[0].collider.sharedMaterial.name=="Ramp" && result*curSpeed<0 && accelMult==0) result *= 0.1f;
