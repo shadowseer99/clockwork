@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityStandardAssets._2D;
 
 public class Boundary2D:MonoBehaviour {
 
@@ -9,6 +10,7 @@ public class Boundary2D:MonoBehaviour {
 	public float rightPadding=20;
 	public float thickness=100;
 	private bool end=false;
+    private float count = 0;
 
 	void Start()
 	{
@@ -72,6 +74,22 @@ public class Boundary2D:MonoBehaviour {
 	void Update()
 	{
 		if (end)
-            Application.LoadLevel(Application.loadedLevel);
+        {
+            if(count==0)
+            {
+                count = 1.5f;
+                GameObject cam = GameObject.FindGameObjectWithTag("MainCamera");
+                Camera2DFollowCustom temp = cam.GetComponent<Camera2DFollowCustom>();
+                temp.enabled = false;
+            }
+            count -= Time.deltaTime;
+            
+            if(count<0)
+            {
+                Application.LoadLevel(Application.loadedLevel);
+            }
+        }
+            
     }
+    
 }
