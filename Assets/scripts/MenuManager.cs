@@ -8,7 +8,7 @@ public class MenuManager : MonoBehaviour {
 
 	public int initMenu=0;
 	public GameObject canvas;
-	private GameObject[] menus;
+	private MenuMover[] menus;
 	//public string[] levels;
 	private static int curLevel=-1;
 	public Texture2D cursor;
@@ -17,15 +17,17 @@ public class MenuManager : MonoBehaviour {
 	void Start ()
 	{
 		// find menus
-		menus = new GameObject[canvas.transform.childCount];
+		menus = new MenuMover[canvas.transform.childCount];
 		for (int i=0; i<canvas.transform.childCount; ++i)
 		{
-			menus[i] = canvas.transform.GetChild(i).gameObject;
+			GameObject obj = canvas.transform.GetChild(i).gameObject;
+			menus[i] = obj.GetComponent<MenuMover>() ?? obj.AddComponent<MenuMover>();
 			menus[i].GetComponent<RectTransform>().localScale = Vector3.one*(Screen.height/327f);
 		}
 		
 		// display first menu
 		DisplayMenu(initMenu);
+		menus[0].MoveDown();
 	}
 
 	//void Update() { print("curlevel: "+curLevel); }
@@ -33,7 +35,7 @@ public class MenuManager : MonoBehaviour {
 	public void HideMenus()
 	{
 		for (int i=0; i<menus.Length; ++i)
-			menus[i].SetActive(false);
+			menus[i].MoveUp();
 		Behaviour[] behaviors = GetComponents<Behaviour>();
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = false;
@@ -53,7 +55,7 @@ public class MenuManager : MonoBehaviour {
 	{
 		// set only the appropriate menu active
 		HideMenus();
-		menus[menu].SetActive(true);
+		menus[menu].MoveDown();
 		Behaviour[] behaviors = GetComponents<Behaviour>();
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = true;
