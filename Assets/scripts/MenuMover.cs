@@ -50,7 +50,7 @@ public class MenuMover : MonoBehaviour {
 
 	public void MoveUp() {
 		gameObject.SetActive(true);
-		pos = min;
+		if (!hasStarted) pos = max;
 		Start();
 		dir = 1;
 	}
@@ -58,6 +58,7 @@ public class MenuMover : MonoBehaviour {
 	public void MoveDown() {
 		gameObject.SetActive(true);
 		pos = max;
+		if (!hasStarted) pos = min;
 		Start();
 		dir = -1;
 	}
