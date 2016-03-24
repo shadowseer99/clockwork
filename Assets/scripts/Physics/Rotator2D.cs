@@ -6,7 +6,7 @@ using System;
 public class Rotator2D : MonoBehaviour {
 	public bool fixChildren=true;
 
-	public void Start() {
+	public void Awake() {
 		FixObjs(transform);
 	}
 
