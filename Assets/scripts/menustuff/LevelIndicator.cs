@@ -21,11 +21,11 @@ public class LevelIndicator : MonoBehaviour {
         tile = gameObject.GetComponent<Image>();
         one=first.GetComponent<Image>();
         ten=second.GetComponent<Image>();
-        if(level>=1&&level<=16)
+        if(level>=1&&level<=15)
         {
             tile.sprite = backings[0];
         }
-        else if (level >= 17 && level <= 30)
+        else if (level >= 16 && level <= 30)
         {
             tile.sprite = backings[1];
         }
@@ -49,8 +49,8 @@ public class LevelIndicator : MonoBehaviour {
             ten.color = Color.white;
             int a = level / 10;
             int b = level % 10;
-            one.sprite = ones[a];
-            ten.sprite = tens[b];
+            one.sprite = ones[b];
+            ten.sprite = tens[a];
 
         }
 
