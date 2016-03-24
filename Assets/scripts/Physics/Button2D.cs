@@ -176,10 +176,10 @@ public class Button2D : MonoBehaviour {
 			if (toggleObject) toggleObject.SetActive(!toggleObject.activeSelf);
 		} else if (newState==0) {
 			// stop if possible, handle allAtOnce special cases
-			if (allAtOnce && axis==0 && player.coll.IsTouching(colls[0])) {
+			if (allAtOnce && canGoForwards && axis==0 && player.coll.IsTouching(colls[0])) {
 				state = 2;
 				if (buttonOn!=null) buttonOn.Play();
-			} else if (allAtOnce && axis==duration && !player.coll.IsTouching(colls[0])) {
+			} else if (allAtOnce && canGoForwards && revert && axis==duration && !player.coll.IsTouching(colls[0])) {
 				state = -2;
 				if (buttonOff!=null) buttonOff.Play();
 			} else if (!allAtOnce || (delay2<0 && (axis<=0 || axis>=duration))) {
