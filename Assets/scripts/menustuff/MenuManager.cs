@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour {
 	//public string[] levels;
 	private static int curLevel=-1;
 	public Texture2D cursor;
+    public GameObject banner;
 
 	// Use this for initialization
 	void Start ()
@@ -79,29 +80,38 @@ public class MenuManager : MonoBehaviour {
     }
 	public void LoadLevel(int level=-1)
 	{
-		// remove any unnecessary levels/menus
-		HideMenus();
-		if (curLevel>=0)
-		{
-			Application.UnloadLevel(curLevel);
-			// additional clean that unity FAILS to unload
-			try { Destroy(GameObject.FindObjectOfType<GearGuyCtrl1>().gameObject); } catch { }
-		}
-		
-		// load new level OR load victory menu
-		if (level==-1)
-			level = curLevel+1;
+        DisplayMenu(7);
+        loadBackend(level);
+        if (curLevel >= 0)
+        {
+            Application.UnloadLevel(curLevel);
+            // additional clean that unity FAILS to unload
+            try { Destroy(GameObject.FindObjectOfType<GearGuyCtrl1>().gameObject); } catch { }
+        }
 
-		print("level: "+level+"; levelCount: "+Application.levelCount);
-		if (level<Application.levelCount)
-		{
-			Application.LoadLevel(level);
-			curLevel = level;
-		} else
-		{
-			DisplayMenu2(5);
-		}
-	}
+        // load new level OR load victory menu
+        if (level == -1)
+            level = curLevel + 1;
+
+        print("level: " + level + "; levelCount: " + Application.levelCount);
+        if (level < Application.levelCount)
+        {
+            Application.LoadLevel(level);
+            curLevel = level;
+        }
+        else
+        {
+            DisplayMenu2(5);
+        }
+    }
+    private IEnumerator loadBackend(int level)
+    {
+        yield return new WaitForSeconds(2);
+
+
+        
+    }
+
     public void LoadLevelVar(UnityEngine.UI.Text slevel)
     {
         // remove any unnecessary levels/menus
