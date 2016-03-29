@@ -69,6 +69,12 @@ public class PhysicsManager : MonoBehaviour {
 				continue;
 			}
 		}
+		
+		// move PhysicsObjects
+		for (int i=0; i<objs.Count; ++i)
+			objs[i].PhysicsUpdate();
+		for (int i=0; i<objs.Count; ++i)
+			objs[i].Move();
 
 		// rebuild gearSets
 		for (int i=0; i<gearSets.Count; ++i)
@@ -93,12 +99,6 @@ public class PhysicsManager : MonoBehaviour {
 			gearSets[i].UpdateRelations();
 		for (int i=0; i<gearSets.Count; ++i)
 			gearSets[i].UpdateObjects();
-		
-		// move PhysicsObjects
-		for (int i=0; i<objs.Count; ++i)
-			objs[i].PhysicsUpdate();
-		for (int i=0; i<objs.Count; ++i)
-			objs[i].Move();
 	}
 
 	// helper functions
@@ -218,6 +218,7 @@ print("obj: "+100*obj.GetVelAtPoint(obj.transform.position+diff.normalized*obj.c
 				gears[i].angularMomentum = Mult(gears[i])*totalAngularMomentum*(gears[i].momentOfInertia/totalMomentOfInertia);
 				gears[i].curSpeed = gears[i].AngularVelocityToCurSpeed();
 				if (gears[i].isMovable) gears[i].PhysicsUpdateMoving(false);
+				//if (gears[i].name=="newEnviroGear (2)") print("AM: "+gears[i].angularMomentum+", cs: "+gears[i].curSpeed+", totalAM: "+totalAngularMomentum+", totalMI: "+totalMomentOfInertia);
 			}
 		}
 
