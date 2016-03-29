@@ -49,10 +49,10 @@ public class MenuMover : MonoBehaviour {
 	}
 
 	public void MoveUp() {
-		gameObject.SetActive(true);
-		if (!hasStarted) pos = max;
-		Start();
-		dir = 1;
+		gameObject.SetActive(false);
+		//if (!hasStarted) pos = max;
+		//Start();
+		//dir = 1;
 	}
 
 	public void MoveDown() {

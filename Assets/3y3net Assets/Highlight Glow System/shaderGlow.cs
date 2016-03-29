@@ -15,7 +15,7 @@ public class shaderGlow : MonoBehaviour {
 	public float flashSpeed=1f; //Flash speed
 	public bool noOcclusion=false; //Show glow when object is occluded
 	public bool scaleGlow = true; //If object is very sharp (nor squared) this help to get better glow
-	[Range (0.15f,3.0f)]
+	[Range (0.15f,6.0f)]
 	public float glowIntensity=1f; //Glow intensity on screen of the object
 	[Range (0.5f,2.0f)]
 	public float glowOpacity=1f; //Glow opacity on screen of the object

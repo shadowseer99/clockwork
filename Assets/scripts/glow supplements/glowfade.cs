@@ -9,11 +9,13 @@ public class glowfade : MonoBehaviour {
 	void Start ()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+		aura.glowIntensity = 6;
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        aura.glowOpacity = (10 - Vector3.Distance(transform.position, player.transform.position)) / 5;
+        aura.glowOpacity = (6 - Vector3.Distance(transform.position, player.transform.position)) / 3;
+
 	}
 }

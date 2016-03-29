@@ -35,8 +35,11 @@ public class MenuManager : MonoBehaviour {
 
 	public void HideMenus()
 	{
-		for (int i=0; i<menus.Length; ++i)
+		for (int i = 0; i < menus.Length; ++i) 
+		{
 			menus[i].MoveUp();
+		}
+			
 		Behaviour[] behaviors = GetComponents<Behaviour>();
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = false;
