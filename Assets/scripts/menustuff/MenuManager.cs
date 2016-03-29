@@ -12,7 +12,7 @@ public class MenuManager : MonoBehaviour {
 	//public string[] levels;
 	private static int curLevel=-1;
 	public Texture2D cursor;
-    public GameObject banner;
+    private int loader = 0;
 
 	// Use this for initialization
 	void Start ()
@@ -81,7 +81,12 @@ public class MenuManager : MonoBehaviour {
 	public void LoadLevel(int level=-1)
 	{
         DisplayMenu(7);
-        loadBackend(level);
+        loader = level;
+        Invoke("loadBackend", 2.5f);
+    }
+    private void loadBackend()
+    {
+        int level = loader;
         if (curLevel >= 0)
         {
             Application.UnloadLevel(curLevel);
@@ -103,13 +108,8 @@ public class MenuManager : MonoBehaviour {
         {
             DisplayMenu2(5);
         }
-    }
-    private IEnumerator loadBackend(int level)
-    {
-        yield return new WaitForSeconds(2);
 
 
-        
     }
 
     public void LoadLevelVar(UnityEngine.UI.Text slevel)
