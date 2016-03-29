@@ -16,7 +16,11 @@ public class Pause : MonoBehaviour {
 	private List<Image> images=new List<Image>();
 	private float timeSpent=0;
 	public Sprite[] numbers;
+	public Sprite colon;
 	public RectTransform timeObject;
+	public float bronzeTime=180;
+	public float silverTime=120;
+	public float goldTime=60;
     private bool activated = false;
     private bool dropping = false;
     private float timedelay=0;
@@ -168,17 +172,26 @@ public class Pause : MonoBehaviour {
 #endif
         Time.timeScale = 0;
 		levelend.GetComponent<MenuMover>().MoveDown();
+		string level = "Level "+Application.loadedLevel;
+		PlayerPrefs.SetFloat(level, PlayerPrefs.HasKey(level)?Mathf.Min(PlayerPrefs.GetFloat(level), timeSpent):timeSpent);
+		PlayerPrefs.Save();
+		AddNumber(timeObject, timeSpent, true);
+    }
 
-		string timeStr = Mathf.RoundToInt(timeSpent).ToString();
+	public void AddNumber(RectTransform neighbor, float number, bool isTime) {
+		int time = Mathf.RoundToInt(number);
+		string timeStr = (isTime?(time/60)+":"+(time%60).ToString().PadLeft(2, '0'):time.ToString());
+		
 		for (int i=0; i<timeStr.Length; ++i) {
 			GameObject temp = new GameObject("Number "+(timeStr[i]-'0'));
-			temp.transform.parent = timeObject;
-			temp.AddComponent<RectTransform>();
-			RectTransform newObj = temp.transform as RectTransform;
+			RectTransform newObj = temp.AddComponent<RectTransform>();
+			newObj.SetParent(neighbor.parent);
+			newObj.sizeDelta = new Vector2(150, 150);
+			newObj.localPosition = neighbor.transform.localPosition + new Vector3(50*(i-(timeStr.Length-1)/2f), -100);
+			newObj.localScale = neighbor.localScale*1.727862f;
 			Image img = newObj.gameObject.AddComponent<Image>();
 			images.Add(img);
-			img.sprite = numbers[timeStr[i]-'0'];
-			newObj.localPosition = Vector3.right*40*i;
+			img.sprite = (timeStr[i]==':'?colon:numbers[timeStr[i]-'0']);
 		}
-    }
+	}
 }

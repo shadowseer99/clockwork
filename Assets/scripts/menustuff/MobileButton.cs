@@ -10,6 +10,12 @@ public class MobileButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 	public Sprite ibuttondown;
     public UnityEngine.UI.Button.ButtonClickedEvent buttonDown;
     public UnityEngine.UI.Button.ButtonClickedEvent buttonUp;
-	public void OnPointerDown(PointerEventData eventData) { buttonDown.Invoke();dis.sprite = ibuttondown; }
-	public void OnPointerUp(PointerEventData eventData) { buttonUp.Invoke(); dis.sprite = ibuttonup;}
+	public void OnPointerDown(PointerEventData eventData) {
+		if (buttonDown!=null) buttonDown.Invoke();
+		if (ibuttondown!=null) dis.sprite = ibuttondown;
+	}
+	public void OnPointerUp(PointerEventData eventData) {
+		if (buttonUp!=null) buttonUp.Invoke();
+		if (ibuttonup!=null) dis.sprite = ibuttonup;
+	}
 }
