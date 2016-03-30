@@ -48,28 +48,32 @@ public class Pause : MonoBehaviour {
 	}
     void Update()
     {
-        if(dropping && timer<fadeTime)
+        if(dropping)
         {
 			if (endBanner.transform.position.y>0)
 				endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
-            // handle fade
-            timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
-			if (timer<0)
-			{
-				for (int i = 0; i < images.Count; ++i)
-				{
-					Color c = images[i].color;
-					images[i].color = new Color(c.r, c.g, c.b, 0);
-				}
-			}
-			else if (timer<fadeTime)
-			{
-				for (int i = 0; i < images.Count; ++i)
-				{
-					Color c = images[i].color;
-					images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer/fadeTime, 0));
-				}
-			}
+            if(timer < fadeTime)
+            {
+                // handle fade
+                timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
+                if (timer < 0)
+                {
+                    for (int i = 0; i < images.Count; ++i)
+                    {
+                        Color c = images[i].color;
+                        images[i].color = new Color(c.r, c.g, c.b, 0);
+                    }
+                }
+                else if (timer < fadeTime)
+                {
+                    for (int i = 0; i < images.Count; ++i)
+                    {
+                        Color c = images[i].color;
+                        images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer / fadeTime, 0));
+                    }
+                }
+            }
+            
         }
         else if(!dropping)
         {
