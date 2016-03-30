@@ -24,6 +24,7 @@ public class Pause : MonoBehaviour {
     private bool activated = false;
     private bool dropping = false;
     private float timedelay=0;
+    private Image[] faders;
     
     // Use this for initialization
 
@@ -50,9 +51,19 @@ public class Pause : MonoBehaviour {
         if(dropping&&endBanner.transform.position.y>0)
         {
             endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
-            if(Time.realtimeSinceStartup-timedelay>2)
+            if(Time.realtimeSinceStartup-timedelay<2)
             {
-                loadnext();
+                foreach(Image i in faders)
+                {
+                    i.color = new Color(1, 1, 1, (Time.realtimeSinceStartup - timedelay)-1);
+                }
+            }
+            else
+            {
+                foreach (Image i in faders)
+                {
+                    i.color = new Color(1, 1, 1);
+                }
             }
         }
         else if(!dropping)
@@ -123,15 +134,7 @@ public class Pause : MonoBehaviour {
 	public void PrintText() { print("Text"); }
 	public void NextLevel()
 	{
-        dropping = true;
 		print("next level...");
-
-        timedelay = Time.realtimeSinceStartup;
-        
-	}
-
-    private void loadnext()
-    {
         Time.timeScale = 1;
         Application.LoadLevel(Application.loadedLevel + 1);
     }
@@ -171,7 +174,10 @@ public class Pause : MonoBehaviour {
         Mobile.active = false;
 #endif
         Time.timeScale = 0;
-		levelend.GetComponent<MenuMover>().MoveDown();
+        dropping = true;
+        timedelay = Time.realtimeSinceStartup;
+        levelend.SetActive(true);
+        faders = levelend.GetComponentsInChildren<Image>();
 		string level = "Level "+Application.loadedLevel;
 		PlayerPrefs.SetFloat(level, PlayerPrefs.HasKey(level)?Mathf.Min(PlayerPrefs.GetFloat(level), timeSpent):timeSpent);
 		PlayerPrefs.Save();
