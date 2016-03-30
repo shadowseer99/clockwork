@@ -25,6 +25,10 @@ public class Pause : MonoBehaviour {
     private bool dropping = false;
     private float timedelay=0;
     private Image[] faders;
+	public RectTransform bronzeImage;
+	public RectTransform silverImage;
+	public RectTransform goldImage;
+	public float rotationSpeed=360;
     
     // Use this for initialization
 
@@ -73,6 +77,10 @@ public class Pause : MonoBehaviour {
                     }
                 }
             }
+
+			bronzeImage.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			silverImage.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			goldImage.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
             
         }
         else if(!dropping)
@@ -173,8 +181,17 @@ public class Pause : MonoBehaviour {
         faders = levelend.GetComponentsInChildren<Image>();
 		string level = "Level "+Application.loadedLevel;
 		PlayerPrefs.SetFloat(level, PlayerPrefs.HasKey(level)?Mathf.Min(PlayerPrefs.GetFloat(level), timeSpent):timeSpent);
+		PlayerPrefs.SetFloat(level+" Bronze", bronzeTime);
+		PlayerPrefs.SetFloat(level+" Silver", silverTime);
+		PlayerPrefs.SetFloat(level+" Gold", goldTime);
 		PlayerPrefs.Save();
 		AddNumber(timeObject, timeSpent, true);
+		if (timeSpent>bronzeTime) bronzeImage.gameObject.SetActive(false);
+		if (timeSpent>silverTime) silverImage.gameObject.SetActive(false);
+		if (timeSpent>goldTime) goldImage.gameObject.SetActive(false);
+		//bronzeImage.Rotate(0*Vector3.up, Space.World);
+		//silverImage.Rotate(120*Vector3.up, Space.World);
+		//goldImage.Rotate(240*Vector3.up, Space.World);
     }
 
 	public void AddNumber(RectTransform neighbor, float number, bool isTime) {

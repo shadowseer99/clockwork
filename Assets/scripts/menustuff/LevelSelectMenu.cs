@@ -26,7 +26,7 @@ public class LevelSelectMenu : MonoBehaviour {
 			img.sprite = locked;
 			locks.Add(levelLock);
 
-			levels[i].GetComponent<UnityEngine.UI.Button>().enabled = false;
+			UnlockLevel(i, false);
 		}
 		for (int i=0; i<transform.childCount; ++i) {
 			/*RectTransform t = transform.GetChild(i) as RectTransform;
@@ -45,14 +45,30 @@ public class LevelSelectMenu : MonoBehaviour {
 				for (int remaining=1; i<levels.Count&&remaining>0; --remaining) {
 					if (unlockedLevels.Contains(i+2)) ++remaining;
 					if (PlayerPrefs.HasKey("Level "+(i+1))) ++remaining;
-					levels[i].GetComponent<UnityEngine.UI.Button>().enabled = true;
-					locks[i++].gameObject.SetActive(false);
+					UnlockLevel(i++, true);
 				}
 			}
 		}
 
+		bool l46=true, l48=true, l49=true;
+		for (int i=0; i<15; ++i) {
+			l46 = l46 && PlayerPrefs.HasKey("Level "+(i+1));
+			l48 = l48 && PlayerPrefs.HasKey("Level "+(i+16));
+			l49 = l49 && PlayerPrefs.HasKey("Level "+(i+31));
+		}
+		UnlockLevel(46, l46);
+		UnlockLevel(47, PlayerPrefs.HasKey("Level 46"));
+		UnlockLevel(48, l48);
+		UnlockLevel(49, l49);
+		UnlockLevel(50, PlayerPrefs.HasKey("Level 47") && PlayerPrefs.HasKey("Level 48") && PlayerPrefs.HasKey("Level 49"));
+
 		for (int i=0; i<levels.Count; ++i)
 			if (PlayerPrefs.HasKey("Level "+i))
 				print("level "+i+" took "+PlayerPrefs.GetFloat("Level "+i)+" seconds");
+	}
+
+	private void UnlockLevel(int level, bool lockLevel) {
+		levels[level].GetComponent<UnityEngine.UI.Button>().enabled = lockLevel;
+		locks[level].gameObject.SetActive(!lockLevel);
 	}
 }
