@@ -48,6 +48,7 @@ public class Pause : MonoBehaviour {
 	}
     void Update()
     {
+<<<<<<< HEAD
         //hotkeys
         if(screen.activeInHierarchy)
         {
@@ -93,42 +94,34 @@ public class Pause : MonoBehaviour {
         }
 
         if (dropping&&endBanner.transform.position.y>0)
+=======
+        if(dropping && timer<fadeTime)
+>>>>>>> origin/master
         {
-            endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
-            if(Time.realtimeSinceStartup-timedelay<2)
-            {
-                foreach(Image i in faders)
-                {
-                    i.color = new Color(1, 1, 1, (Time.realtimeSinceStartup - timedelay)-1);
-                }
-            }
-            else
-            {
-                foreach (Image i in faders)
-                {
-                    i.color = new Color(1, 1, 1);
-                }
-            }
+			if (endBanner.transform.position.y>0)
+				endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
+            // handle fade
+            timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
+			if (timer<0)
+			{
+				for (int i = 0; i < images.Count; ++i)
+				{
+					Color c = images[i].color;
+					images[i].color = new Color(c.r, c.g, c.b, 0);
+				}
+			}
+			else if (timer<fadeTime)
+			{
+				for (int i = 0; i < images.Count; ++i)
+				{
+					Color c = images[i].color;
+					images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer/fadeTime, 0));
+				}
+			}
         }
         else if(!dropping)
         {
             timeSpent += Time.deltaTime;
-
-            // handle fade
-            if (levelend.activeSelf)
-            {
-                timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
-                for (int i = 0; i < images.Count; ++i)
-                {
-                    Color c = images[i].color;
-                    images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer / fadeTime, 0));
-                }
-                Text t = timeObject.GetComponent<Text>();
-                t.color = new Color(t.color.r, t.color.b, t.color.b, Mathf.Max(timer / fadeTime, 0));
-                Image img = levelend.GetComponent<Image>();
-                img.color = new Color(img.color.r, img.color.g, img.color.b, Mathf.Min(Mathf.Max((timer + fadeDelay) / fadeTime, 0), 1));
-            }
-
 
 #if UNITY_IPHONE || UNITY_ANDROID
         bool reset = Mobile.reset;
@@ -230,7 +223,9 @@ public class Pause : MonoBehaviour {
 
 	public void AddNumber(RectTransform neighbor, float number, bool isTime) {
 		int time = Mathf.RoundToInt(number);
-		string timeStr = (isTime?(time/60)+":"+(time%60).ToString().PadLeft(2, '0'):time.ToString());
+		string timeStr = (isTime
+			?(time/60).ToString().PadLeft(1, '0')+":"+(time%60).ToString().PadLeft(2, '0')
+			:time.ToString());
 		
 		for (int i=0; i<timeStr.Length; ++i) {
 			GameObject temp = new GameObject("Number "+(timeStr[i]-'0'));
@@ -242,6 +237,7 @@ public class Pause : MonoBehaviour {
 			Image img = newObj.gameObject.AddComponent<Image>();
 			images.Add(img);
 			img.sprite = (timeStr[i]==':'?colon:numbers[timeStr[i]-'0']);
+			images.Add(img);
 		}
 	}
 }
