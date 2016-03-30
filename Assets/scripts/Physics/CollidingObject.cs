@@ -75,9 +75,9 @@ public class CollidingObject:PhysicsObject {
 	public override void PhysicsUpdate() {
 		// handle water
 		float cumArea=0;
-		float cumDensity=0;
-		float cumThickness=0;
-		Vector3 cumVelocity=Vector3.zero;
+		waterDensity=0;
+		waterThickness=0;
+		waterVelocity=Vector3.zero;
 		for (int i=0; i<inwaters.Count; ++i) {
 			// find approximate contact point (can be improved, TODO)
 			BoxCollider2D coll = inwaters[i].GetComponent<BoxCollider2D>();
@@ -95,9 +95,9 @@ public class CollidingObject:PhysicsObject {
 				float angle = Mathf.Acos(distance/collRadius);
 				float area = angle*collRadius*collRadius - distance*distance*Mathf.Tan(angle);
 				cumArea += area;
-				cumDensity += area*inwaters[i].densityRatio;
-				cumThickness += area*inwaters[i].thicknessRatio;
-				cumVelocity += area*inwaters[i].thicknessRatio*inwaters[i].flow;
+				waterDensity += area*inwaters[i].densityRatio;
+				waterThickness += area*inwaters[i].thicknessRatio;
+				waterVelocity += area*inwaters[i].thicknessRatio*inwaters[i].flow;
 			}
 		}
 		// adjust results
@@ -110,7 +110,7 @@ public class CollidingObject:PhysicsObject {
 		// update velocity
 		velocity += Time.fixedDeltaTime*(density-waterDensity)*Physics.gravity;
 		float f = Time.fixedDeltaTime*waterThickness;//(1-1/(Time.fixedDeltaTime*waterThickness+1));
-		velocity = f*cumVelocity + (1-f)*velocity;
+		velocity = f*waterVelocity + (1-f)*velocity;
 
 		// update curSpeed, accel, etc.
 		if (attachedTo!=null) PhysicsUpdateAttached();
