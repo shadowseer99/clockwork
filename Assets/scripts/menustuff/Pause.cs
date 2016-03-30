@@ -79,8 +79,6 @@ public class Pause : MonoBehaviour {
                     Color c = images[i].color;
                     images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer / fadeTime, 0));
                 }
-                Text t = timeObject.GetComponent<Text>();
-                t.color = new Color(t.color.r, t.color.b, t.color.b, Mathf.Max(timer / fadeTime, 0));
                 Image img = levelend.GetComponent<Image>();
                 img.color = new Color(img.color.r, img.color.g, img.color.b, Mathf.Min(Mathf.Max((timer + fadeDelay) / fadeTime, 0), 1));
             }
@@ -186,7 +184,9 @@ public class Pause : MonoBehaviour {
 
 	public void AddNumber(RectTransform neighbor, float number, bool isTime) {
 		int time = Mathf.RoundToInt(number);
-		string timeStr = (isTime?(time/60)+":"+(time%60).ToString().PadLeft(2, '0'):time.ToString());
+		string timeStr = (isTime
+			?(time/60).ToString().PadLeft(1, '0')+":"+(time%60).ToString().PadLeft(2, '0')
+			:time.ToString());
 		
 		for (int i=0; i<timeStr.Length; ++i) {
 			GameObject temp = new GameObject("Number "+(timeStr[i]-'0'));
@@ -198,6 +198,7 @@ public class Pause : MonoBehaviour {
 			Image img = newObj.gameObject.AddComponent<Image>();
 			images.Add(img);
 			img.sprite = (timeStr[i]==':'?colon:numbers[timeStr[i]-'0']);
+			images.Add(img);
 		}
 	}
 }
