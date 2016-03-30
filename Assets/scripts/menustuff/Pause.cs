@@ -25,10 +25,13 @@ public class Pause : MonoBehaviour {
     private bool dropping = false;
     private float timedelay=0;
     private Image[] faders;
-	public RectTransform bronzeImage;
-	public RectTransform silverImage;
-	public RectTransform goldImage;
+	public Image bronzeImage;
+	public Image silverImage;
+	public Image goldImage;
 	public float rotationSpeed=360;
+	public float coinDelayTime;
+	public float coinFadeTime;
+	public float coinStaggerTime;
     
     // Use this for initialization
 
@@ -56,10 +59,10 @@ public class Pause : MonoBehaviour {
         {
 			if (endBanner.transform.position.y>0)
 				endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
+            timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime+coinDelayTime+2*coinStaggerTime+coinFadeTime);
             if(timer < fadeTime)
             {
                 // handle fade
-                timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
                 if (timer < 0)
                 {
                     for (int i = 0; i < images.Count; ++i)
@@ -78,9 +81,15 @@ public class Pause : MonoBehaviour {
                 }
             }
 
-			bronzeImage.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
-			silverImage.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
-			goldImage.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			bronzeImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			silverImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			goldImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			bronzeImage.color = new Color(bronzeImage.color.r, bronzeImage.color.g, bronzeImage.color.b,
+				Mathf.Min((timer-fadeTime-coinDelayTime-0*coinStaggerTime)/coinFadeTime, 1));
+			silverImage.color = new Color(silverImage.color.r, silverImage.color.g, silverImage.color.b,
+				Mathf.Min((timer-fadeTime-coinDelayTime-1*coinStaggerTime)/coinFadeTime, 1));
+			goldImage.color = new Color(goldImage.color.r, goldImage.color.g, goldImage.color.b,
+				Mathf.Min((timer-fadeTime-coinDelayTime-2*coinStaggerTime)/coinFadeTime, 1));
             
         }
         else if(!dropping)

@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -72,3 +75,37 @@ public class LevelSelectMenu : MonoBehaviour {
 		locks[level].gameObject.SetActive(!lockLevel);
 	}
 }
+
+
+
+#if UNITY_EDITOR
+/*[CustomEditor(typeof(LevelSelectMenu))]
+[CanEditMultipleObjects]
+public class LevelSelectMenuEditor:Editor {
+	private List<float> times=new List<float>();
+	private List<float> bronzeTimes=new List<float>();
+	private List<float> silverTimes=new List<float>();
+	private List<float> goldTimes=new List<float>();
+	
+	public override void OnInspectorGUI() {
+		base.OnInspectorGUI();
+		LevelSelectMenu m = target as LevelSelectMenu;
+
+		for (int i=0; i<m.levels.Count; ++i) {
+			EditorGUILayout.BeginHorizontal();
+			
+		}
+		
+		isGolden = EditorGUILayout.Toggle("Golden Gear", isGolden);
+		numPegs = EditorGUILayout.IntField("Number of Pegs", numPegs);
+		if (GUILayout.Button("Create Gear with "+numPegs+" pegs"))
+			(target as GearSelector).GetGearByPegs(numPegs, isGolden);
+		collSize = EditorGUILayout.FloatField("Collider size", collSize);
+		if (GUILayout.Button("Create Gear with coll radius of "+collSize))
+			(target as GearSelector).GetGearByCollSize(collSize, isGolden);
+		trigSize = EditorGUILayout.FloatField("Trigger size", trigSize);
+		if (GUILayout.Button("Create Gear with trig radius of "+trigSize))
+			(target as GearSelector).GetGearByTrigSize(trigSize, isGolden);
+	}
+}*/
+#endif
