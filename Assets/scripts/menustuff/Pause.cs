@@ -48,41 +48,32 @@ public class Pause : MonoBehaviour {
 	}
     void Update()
     {
-        if(dropping&&endBanner.transform.position.y>0)
+        if(dropping && timer<fadeTime)
         {
-            endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
-            if(Time.realtimeSinceStartup-timedelay<2)
-            {
-                foreach(Image i in faders)
-                {
-                    i.color = new Color(1, 1, 1, (Time.realtimeSinceStartup - timedelay)-1);
-                }
-            }
-            else
-            {
-                foreach (Image i in faders)
-                {
-                    i.color = new Color(1, 1, 1);
-                }
-            }
+			if (endBanner.transform.position.y>0)
+				endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
+            // handle fade
+            timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
+			if (timer<0)
+			{
+				for (int i = 0; i < images.Count; ++i)
+				{
+					Color c = images[i].color;
+					images[i].color = new Color(c.r, c.g, c.b, 0);
+				}
+			}
+			else if (timer<fadeTime)
+			{
+				for (int i = 0; i < images.Count; ++i)
+				{
+					Color c = images[i].color;
+					images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer/fadeTime, 0));
+				}
+			}
         }
         else if(!dropping)
         {
             timeSpent += Time.deltaTime;
-
-            // handle fade
-            if (levelend.activeSelf)
-            {
-                timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime);
-                for (int i = 0; i < images.Count; ++i)
-                {
-                    Color c = images[i].color;
-                    images[i].color = new Color(c.r, c.g, c.b, Mathf.Max(timer / fadeTime, 0));
-                }
-                Image img = levelend.GetComponent<Image>();
-                img.color = new Color(img.color.r, img.color.g, img.color.b, Mathf.Min(Mathf.Max((timer + fadeDelay) / fadeTime, 0), 1));
-            }
-
 
 #if UNITY_IPHONE || UNITY_ANDROID
         bool reset = Mobile.reset;
