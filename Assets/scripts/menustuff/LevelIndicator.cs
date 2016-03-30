@@ -14,10 +14,11 @@ public class LevelIndicator : MonoBehaviour {
     private Image one;
     private Image ten;
 
-
+    
     // Use this for initialization
     void OnLevelWasLoaded (int level)
     {
+        print("woo");
         tile = gameObject.GetComponent<Image>();
         one=first.GetComponent<Image>();
         ten=second.GetComponent<Image>();
