@@ -48,7 +48,51 @@ public class Pause : MonoBehaviour {
 	}
     void Update()
     {
-        if(dropping&&endBanner.transform.position.y>0)
+        //hotkeys
+        if(screen.activeInHierarchy)
+        {
+            if(Input.GetKeyDown(KeyCode.C)|| Input.GetKeyDown(KeyCode.Escape))
+            {
+                Resume();
+                return;
+            }
+            else if(Input.GetKeyDown(KeyCode.O))
+            {
+                Options();
+            }
+            else if (Input.GetKeyDown(KeyCode.R))
+            {
+                Reset();
+            }
+            else if (Input.GetKeyDown(KeyCode.M))
+            {
+                MainMenu();
+            }
+        }
+        else if (options.activeInHierarchy)
+        {
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                options.GetComponent<OptionsMenu>().setSounds();
+                Invoke("closeOp", .001f);
+                //closeOp();
+                
+            }
+            else if (Input.GetKeyDown(KeyCode.O))
+            {
+                closeOp();
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                options.GetComponent<OptionsMenu>().setSounds();
+                Invoke("closeOp", .001f);
+                Invoke("Resume", .00105f);
+                return;
+            }
+            
+        }
+
+        if (dropping&&endBanner.transform.position.y>0)
         {
             endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
             if(Time.realtimeSinceStartup-timedelay<2)
@@ -116,7 +160,7 @@ public class Pause : MonoBehaviour {
 
                     activated = true;
                 }
-                else
+                else if(false)
                 {
 #if UNITY_IPHONE || UNITY_ANDROID
             
