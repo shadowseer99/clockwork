@@ -45,7 +45,7 @@ public class Gear:CollidingObject {
 				//if (!goldenRotating.isPlaying) goldenRotating.Play();
 				if (Mathf.Floor(Mathf.Abs(goldenRotation)/40) != Mathf.Floor(Mathf.Abs(goldenRotation+Time.fixedDeltaTime*curAngularVelocity)/40))
 					goldenRotating.PlayDelayed(0.1f);
-				goldenRotating.volume = 1;//_goldenRotating.volume*SoundProfile.effects*Mathf.Abs(AngularVelocityToCurSpeed()/maxSpeed);
+				goldenRotating.volume = _goldenRotating.volume*SoundProfile.effects*Mathf.Abs(AngularVelocityToCurSpeed()/maxSpeed);
 				goldenRotating.pitch = SemitonesToPitch(Mathf.Abs(goldenRotation)*24/360-12);
 				//print("pitch: "+goldenRotating.pitch);
 			}
