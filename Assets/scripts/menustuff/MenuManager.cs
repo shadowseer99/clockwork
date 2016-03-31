@@ -13,9 +13,13 @@ public class MenuManager : MonoBehaviour {
 	private static int curLevel=-1;
 	public Texture2D cursor;
     private int loader = 0;
+    public GameObject titleCorners;
+    private bool corIn = false;
+    private bool corOut = false;
+    private float strechTime = 0;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
 	{
 		// find menus
 		menus = new MenuMover[canvas.transform.childCount];
@@ -28,16 +32,60 @@ public class MenuManager : MonoBehaviour {
 		
 		// display first menu
 		DisplayMenu(initMenu);
-		menus[0].MoveDown();
+        //menus[0].MoveDown();
+        for (int i = 1; i < menus[0].transform.childCount; ++i)
+        {
+            menus[0].transform.GetChild(i).gameObject.SetActive(true);
+        }
+        corOut = false;
+        corIn = true;
 	}
 
-	//void Update() { print("curlevel: "+curLevel); }
+	void Update()
+    {
+        
+        if(corIn)
+        {
+            if(strechTime<=1)
+            {
+                titleCorners.transform.localScale= Vector3.Lerp(new Vector3(1.5f, 1.5f, 1), Vector3.one, strechTime);
+                strechTime += Time.deltaTime;
+            }
+            else
+            {
+                corIn = false;
+                titleCorners.transform.localScale = Vector3.one;
+            }
+        }
+        else if(corOut)
+        {
+            if (strechTime <= 1)
+            {
+                titleCorners.transform.localScale = Vector3.Lerp(Vector3.one,new Vector3(1.5f, 1.5f, 1),  strechTime);
+                strechTime += Time.deltaTime;
+            }
+            else
+            {
+                corOut = false;
+                titleCorners.transform.localScale = new Vector3(1.5f, 1.5f, 1);
+            }
+        }
+    }
 
 	public void HideMenus()
 	{
-        for (int i = 0; i < canvas.transform.childCount; ++i)
+        corOut = true;
+        strechTime = 0;
+        //menus[0].gameObject.SetActive(false);
+        for (int i = 1; i < menus[0].transform.childCount; ++i)
         {
-            canvas.transform.GetChild(i).gameObject.SetActive(false);
+            menus[0].transform.GetChild(i).gameObject.SetActive(false);
+        }
+
+        for (int i = 1; i < menus.Length; ++i)
+        {
+            menus[i].gameObject.transform.position = new Vector3(menus[i].gameObject.transform.position.x, 1000, menus[i].gameObject.transform.position.z);
+            menus[i].gameObject.SetActive(false);
         }
 
         Behaviour[] behaviors = GetComponents<Behaviour>();
@@ -59,7 +107,22 @@ public class MenuManager : MonoBehaviour {
 	{
 		// set only the appropriate menu active
 		HideMenus();
-		menus[menu].MoveDown();
+        if(menu!=0)
+        {
+            menus[menu].MoveDown();
+        }
+        else
+        {
+            //menus[menu].gameObject.SetActive(true);
+            for (int i = 1; i < menus[0].transform.childCount; ++i)
+            {
+                menus[0].transform.GetChild(i).gameObject.SetActive(true);
+            }
+            corOut = false;
+            corIn = true;
+            strechTime = 0;
+        }
+		
 		Behaviour[] behaviors = GetComponents<Behaviour>();
 		for (int i=0; i<behaviors.Length; ++i)
 			behaviors[i].enabled = true;

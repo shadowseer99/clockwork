@@ -4,7 +4,7 @@ using System.Collections;
 public class MenuMover : MonoBehaviour {
 	public float duration=0.5f;
 	public float upDelayRatio=0;
-	public float downDelayRatio=1;
+	public float downDelayRatio=0;
 	public float additionalMoveUp=0;
 	public float pos;
 	public float max { get { return 1+downDelayRatio; } }
@@ -22,7 +22,8 @@ public class MenuMover : MonoBehaviour {
 			duration *= 1+additionalMoveUp;
 			downDelayRatio -= additionalMoveUp;
 			downDelayRatio /= (1+additionalMoveUp);
-			downPos = transform.position;
+            //changed
+			downPos = new Vector3(transform.position.x, 0,transform.position.z);
 			upPos = downPos + (1+additionalMoveUp)*transform.TransformVector(Vector3.up*(transform.root as RectTransform).sizeDelta.y);
 			if (stretchThis) {
 				RectTransform rt = transform as RectTransform;
@@ -56,12 +57,13 @@ public class MenuMover : MonoBehaviour {
 	}
 
 	public void MoveDown() {
-		gameObject.SetActive(true);
+		//gameObject.SetActive(true);
 		pos = max;
 		if (!hasStarted) pos = min;
 		Start();
 		dir = -1;
-	}
+        gameObject.SetActive(true);
+    }
 
 	public void MoveDir(bool up) {
 		if (up) MoveUp();
