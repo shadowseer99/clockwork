@@ -42,11 +42,12 @@ public class Gear:CollidingObject {
 		// handle goldenGear
 		if (isGolden) {
 			if (Application.isPlaying) {
-				//if (!goldenRotating.isPlaying) goldenRotating.Play();
-				if (Mathf.Floor(Mathf.Abs(goldenRotation)/40) != Mathf.Floor(Mathf.Abs(goldenRotation+Time.fixedDeltaTime*curAngularVelocity)/40))
-					goldenRotating.PlayDelayed(0.1f);
+				if (!goldenRotating.isPlaying) goldenRotating.Play();
+				//if (Mathf.Floor(Mathf.Abs(goldenRotation)/4) != Mathf.Floor(Mathf.Abs(goldenRotation+Time.fixedDeltaTime*curAngularVelocity)/4))
+					//goldenRotating.Play();
+					//goldenRotating.PlayDelayed(0.05f);
 				goldenRotating.volume = _goldenRotating.volume*SoundProfile.effects*Mathf.Abs(AngularVelocityToCurSpeed()/maxSpeed);
-				goldenRotating.pitch = SemitonesToPitch(Mathf.Abs(goldenRotation)*24/360-12);
+				goldenRotating.pitch = SemitonesToPitch(Mathf.Abs(goldenRotation)*18/360-6);
 				//print("pitch: "+goldenRotating.pitch);
 			}
 			goldenRotation += Time.fixedDeltaTime*curAngularVelocity;
