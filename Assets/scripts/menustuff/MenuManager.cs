@@ -85,7 +85,7 @@ public class MenuManager : MonoBehaviour {
         for (int i = 1; i < menus.Length; ++i)
         {
             menus[i].gameObject.transform.position = new Vector3(menus[i].gameObject.transform.position.x, 1000, menus[i].gameObject.transform.position.z);
-            menus[i].gameObject.SetActive(false);
+            //menus[i].gameObject.SetActive(false);
         }
 
         Behaviour[] behaviors = GetComponents<Behaviour>();
