@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 public class PlayerPrefsEditor : MonoBehaviour {}
 
 
-#if UNITY_EDITOR
 [CustomEditor(typeof(PlayerPrefsEditor))]
 [CanEditMultipleObjects]
 public class PlayerPrefsEditorEditor:Editor {
@@ -57,11 +57,11 @@ public class PlayerPrefsEditorEditor:Editor {
 
 		for (int i=0; i<times.Count; ++i) {
 			EditorGUILayout.BeginHorizontal();
-			GUILayout.Label("Level "+i);
-			times[i] = HandleField(times[i], "Level "+i);
-			bronzeTimes[i] = HandleField(bronzeTimes[i], "Level "+i+" Bronze");
-			silverTimes[i] = HandleField(silverTimes[i], "Level "+i+" Silver");
-			goldTimes[i] = HandleField(goldTimes[i], "Level "+i+" Gold");
+			GUILayout.Label("Level "+(i+1));
+			times[i] = HandleField(times[i], "Level "+(i+1));
+			bronzeTimes[i] = HandleField(bronzeTimes[i], "Level "+(i+1)+" Bronze");
+			silverTimes[i] = HandleField(silverTimes[i], "Level "+(i+1)+" Silver");
+			goldTimes[i] = HandleField(goldTimes[i], "Level "+(i+1)+" Gold");
 			EditorGUILayout.EndHorizontal();
 		}
 	}
