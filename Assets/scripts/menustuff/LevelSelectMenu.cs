@@ -1,7 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-#endif
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -17,19 +14,26 @@ public class LevelSelectMenu : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		unlockedLevels = new HashSet<int>(_unlockedLevels);
-		for (int i=0; i<levels.Count; ++i) {
-			RectTransform t = levels[i].GetComponent<RectTransform>();
-			RectTransform levelLock = new GameObject("Level "+levels.Count+" Lock").AddComponent<RectTransform>();
-			levelLock.SetParent(t.parent);
-			levelLock.sizeDelta = t.sizeDelta;
-			levelLock.localScale = t.localScale;
-			levelLock.localPosition = t.localPosition;
-			Image img = levelLock.gameObject.AddComponent<Image>();
-			img.sprite = locked;
-			locks.Add(levelLock);
+		ResetLocks();
+	}
 
-			UnlockLevel(i, false);
+	public void ResetLocks() {
+		if (unlockedLevels==null || unlockedLevels.Count==0)
+			unlockedLevels = new HashSet<int>(_unlockedLevels);
+		if (levels.Count==0) {
+			for (int i=0; i<levels.Count; ++i) {
+				RectTransform t = levels[i].GetComponent<RectTransform>();
+				RectTransform levelLock = new GameObject("Level "+levels.Count+" Lock").AddComponent<RectTransform>();
+				levelLock.SetParent(t.parent);
+				levelLock.sizeDelta = t.sizeDelta;
+				levelLock.localScale = t.localScale;
+				levelLock.localPosition = t.localPosition;
+				Image img = levelLock.gameObject.AddComponent<Image>();
+				img.sprite = locked;
+				locks.Add(levelLock);
+
+				UnlockLevel(i, false);
+			}
 		}
 		for (int i=0; i<transform.childCount; ++i) {
 			/*RectTransform t = transform.GetChild(i) as RectTransform;
@@ -64,10 +68,6 @@ public class LevelSelectMenu : MonoBehaviour {
 		UnlockLevel(48, l48);
 		UnlockLevel(49, l49);
 		UnlockLevel(50, PlayerPrefs.HasKey("Level 47") && PlayerPrefs.HasKey("Level 48") && PlayerPrefs.HasKey("Level 49"));
-
-		for (int i=0; i<levels.Count; ++i)
-			if (PlayerPrefs.HasKey("Level "+i))
-				print("level "+i+" took "+PlayerPrefs.GetFloat("Level "+i)+" seconds");
 	}
 
 	private void UnlockLevel(int level, bool lockLevel) {
@@ -75,63 +75,3 @@ public class LevelSelectMenu : MonoBehaviour {
 		locks[level].gameObject.SetActive(!lockLevel);
 	}
 }
-
-
-
-#if UNITY_EDITOR
-[CustomEditor(typeof(LevelSelectMenu))]
-[CanEditMultipleObjects]
-public class LevelSelectMenuEditor:Editor {
-	private List<float> times=new List<float>();
-	private List<float> bronzeTimes=new List<float>();
-	private List<float> silverTimes=new List<float>();
-	private List<float> goldTimes=new List<float>();
-
-	private void Begin() {
-		times.Clear();
-		bronzeTimes.Clear();
-		silverTimes.Clear();
-		goldTimes.Clear();
-		//(target as LevelSelectMenu).levels.Count
-		for (int i=0; i<50; ++i) {
-			times.Add(PlayerPrefs.GetFloat("Level "+i));
-			bronzeTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Bronze"));
-			silverTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Silver"));
-			goldTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Gold"));
-			//PlayerPrefs.DeleteKey(
-		}
-	}
-	
-	public override void OnInspectorGUI() {
-		base.OnInspectorGUI();
-		if (times.Count==0)
-			Begin();
-
-		if (GUILayout.Button("Reset all data")) {
-			PlayerPrefs.DeleteAll();
-			PlayerPrefs.SetString("test", "test");
-			PlayerPrefs.Save();
-			Begin();
-		}
-		for (int i=0; i<times.Count; ++i) {
-			Rect r = EditorGUILayout.BeginHorizontal();
-			GUILayout.Label("Level "+i);
-			times[i] = HandleField(times[i], "Level "+i);
-			bronzeTimes[i] = HandleField(bronzeTimes[i], "Level "+i+" Bronze");
-			silverTimes[i] = HandleField(silverTimes[i], "Level "+i+" Silver");
-			goldTimes[i] = HandleField(goldTimes[i], "Level "+i+" Gold");
-			EditorGUILayout.EndHorizontal();
-		}
-	}
-
-	private float HandleField(float value, string name) {
-		float f = EditorGUILayout.FloatField(value);
-		if (f!=value) {
-			if (f==0) PlayerPrefs.DeleteKey(name);
-			else PlayerPrefs.SetFloat(name, f);
-			PlayerPrefs.Save();
-		}
-		return f;
-	}
-}
-#endif

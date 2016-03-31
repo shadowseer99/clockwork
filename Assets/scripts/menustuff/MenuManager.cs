@@ -88,10 +88,6 @@ public class MenuManager : MonoBehaviour {
             //menus[i].gameObject.SetActive(false);
         }
 
-        Behaviour[] behaviors = GetComponents<Behaviour>();
-		for (int i=0; i<behaviors.Length; ++i)
-			behaviors[i].enabled = false;
-		this.enabled = true;
 		Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
 	}
 
@@ -123,9 +119,6 @@ public class MenuManager : MonoBehaviour {
             strechTime = 0;
         }
 		
-		Behaviour[] behaviors = GetComponents<Behaviour>();
-		for (int i=0; i<behaviors.Length; ++i)
-			behaviors[i].enabled = true;
 		this.enabled = true;
 		//Cursor.SetCursor(cursor, new Vector2(cursor.width/2, cursor.height/2), CursorMode.ForceSoftware);
 		Cursor.SetCursor(cursor, Vector2.zero, CursorMode.ForceSoftware);
