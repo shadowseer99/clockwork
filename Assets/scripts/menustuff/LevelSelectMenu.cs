@@ -79,40 +79,59 @@ public class LevelSelectMenu : MonoBehaviour {
 
 
 #if UNITY_EDITOR
-/*[CustomEditor(typeof(LevelSelectMenu))]
+[CustomEditor(typeof(LevelSelectMenu))]
 [CanEditMultipleObjects]
 public class LevelSelectMenuEditor:Editor {
 	private List<float> times=new List<float>();
 	private List<float> bronzeTimes=new List<float>();
 	private List<float> silverTimes=new List<float>();
 	private List<float> goldTimes=new List<float>();
+
+	private void Begin() {
+		times.Clear();
+		bronzeTimes.Clear();
+		silverTimes.Clear();
+		goldTimes.Clear();
+		//(target as LevelSelectMenu).levels.Count
+		for (int i=0; i<50; ++i) {
+			times.Add(PlayerPrefs.GetFloat("Level "+i));
+			bronzeTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Bronze"));
+			silverTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Silver"));
+			goldTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Gold"));
+			//PlayerPrefs.DeleteKey(
+		}
+	}
 	
 	public override void OnInspectorGUI() {
-		if (times.Count==0) {
-			for (int i=0; i<(target as LevelSelectMenu).levels.Count; ++i) {
-				times.Add(PlayerPrefs.GetFloat("Level "+i));
-				bronzeTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Bronze"));
-				silverTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Silver"));
-				goldTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Gold"));
-			}
-		}
+		base.OnInspectorGUI();
+		if (times.Count==0)
+			Begin();
 
+		if (GUILayout.Button("Reset all data")) {
+			PlayerPrefs.DeleteAll();
+			PlayerPrefs.SetString("test", "test");
+			PlayerPrefs.Save();
+			Begin();
+		}
 		for (int i=0; i<times.Count; ++i) {
 			Rect r = EditorGUILayout.BeginHorizontal();
-			GUILayout.Label(("L"+i).PadLeft(3, ' '));
-			//EditorGUI.
+			GUILayout.Label("Level "+i);
+			times[i] = HandleField(times[i], "Level "+i);
+			bronzeTimes[i] = HandleField(bronzeTimes[i], "Level "+i+" Bronze");
+			silverTimes[i] = HandleField(silverTimes[i], "Level "+i+" Silver");
+			goldTimes[i] = HandleField(goldTimes[i], "Level "+i+" Gold");
+			EditorGUILayout.EndHorizontal();
 		}
-		
-		isGolden = EditorGUILayout.Toggle("Golden Gear", isGolden);
-		numPegs = EditorGUILayout.IntField("Number of Pegs", numPegs);
-		if (GUILayout.Button("Create Gear with "+numPegs+" pegs"))
-			(target as GearSelector).GetGearByPegs(numPegs, isGolden);
-		collSize = EditorGUILayout.FloatField("Collider size", collSize);
-		if (GUILayout.Button("Create Gear with coll radius of "+collSize))
-			(target as GearSelector).GetGearByCollSize(collSize, isGolden);
-		trigSize = EditorGUILayout.FloatField("Trigger size", trigSize);
-		if (GUILayout.Button("Create Gear with trig radius of "+trigSize))
-			(target as GearSelector).GetGearByTrigSize(trigSize, isGolden);
 	}
-}*/
+
+	private float HandleField(float value, string name) {
+		float f = EditorGUILayout.FloatField(value);
+		if (f!=value) {
+			if (f==0) PlayerPrefs.DeleteKey(name);
+			else PlayerPrefs.SetFloat(name, f);
+			PlayerPrefs.Save();
+		}
+		return f;
+	}
+}
 #endif
