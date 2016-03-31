@@ -88,12 +88,19 @@ public class LevelSelectMenuEditor:Editor {
 	private List<float> goldTimes=new List<float>();
 	
 	public override void OnInspectorGUI() {
-		base.OnInspectorGUI();
-		LevelSelectMenu m = target as LevelSelectMenu;
+		if (times.Count==0) {
+			for (int i=0; i<(target as LevelSelectMenu).levels.Count; ++i) {
+				times.Add(PlayerPrefs.GetFloat("Level "+i));
+				bronzeTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Bronze"));
+				silverTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Silver"));
+				goldTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Gold"));
+			}
+		}
 
-		for (int i=0; i<m.levels.Count; ++i) {
-			EditorGUILayout.BeginHorizontal();
-			
+		for (int i=0; i<times.Count; ++i) {
+			Rect r = EditorGUILayout.BeginHorizontal();
+			GUILayout.Label(("L"+i).PadLeft(3, ' '));
+			//EditorGUI.
 		}
 		
 		isGolden = EditorGUILayout.Toggle("Golden Gear", isGolden);
