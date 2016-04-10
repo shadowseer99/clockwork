@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class MenuMover : MonoBehaviour {
 	public float duration=0.5f;
@@ -15,6 +16,9 @@ public class MenuMover : MonoBehaviour {
 	private Vector3 upPos;
 	private Vector3 downPos;
 	private int dir=0;
+    private bool drop = false;
+    private bool fade = false;
+    private float fader = 0;
 
 	public void Start() {
 		if (!hasStarted) {
@@ -42,9 +46,41 @@ public class MenuMover : MonoBehaviour {
 		} else if (dir==-1) {
 			pos = Mathf.Max(min, pos-Time.unscaledDeltaTime/duration);
 			if (pos==min)
-				dir = 0;
+            {
+                dir = 0;
+                if(drop)
+                {
+                    fade = true;
+                    fader = 0;
+                    for (int i = 0; i < transform.childCount; ++i)
+                    {
+                        transform.GetChild(i).gameObject.SetActive(true);
+                    }
+                }
+            }
+				
 			transform.position = Vector3.Lerp(downPos, upPos, pos);
 		}
+        if(fade)
+        {
+            if(fader>=1)
+            {
+                fade = false;
+            }
+            else
+            {
+                fader += Time.deltaTime;
+                foreach(Image i in transform.GetComponentsInChildren<Image>())
+                {
+                    i.color = new Color(1, 1, 1, fader);
+                }
+
+
+                transform.GetChild(1).GetComponent<Image>().color = Color.white;
+                
+            }
+            
+        }
 		if (dir==0&&pos==max)
 			gameObject.SetActive(false);
 	}
@@ -55,6 +91,12 @@ public class MenuMover : MonoBehaviour {
 		//Start();
 		//dir = 1;
 	}
+    public void bannerDrop()
+    {
+        drop = true;
+        transform.GetChild(1).gameObject.SetActive(true);
+        MoveDown();
+    }
 
 	public void MoveDown() {
 		//gameObject.SetActive(true);

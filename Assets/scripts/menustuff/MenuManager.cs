@@ -86,6 +86,10 @@ public class MenuManager : MonoBehaviour {
         {
             menus[i].gameObject.transform.position = new Vector3(menus[i].gameObject.transform.position.x, 1000, menus[i].gameObject.transform.position.z);
             //menus[i].gameObject.SetActive(false);
+            for (int u = 0; u < menus[i].transform.childCount; ++u)
+            {
+                menus[i].transform.GetChild(u).gameObject.SetActive(false);
+            }
         }
 
 		Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
@@ -103,23 +107,39 @@ public class MenuManager : MonoBehaviour {
 	{
 		// set only the appropriate menu active
 		HideMenus();
-        if(menu!=0)
+        if(menu==7)
         {
+            for (int i = 0; i < menus[menu].transform.childCount; ++i)
+            {
+                menus[menu].transform.GetChild(i).gameObject.SetActive(true);
+            }
             menus[menu].MoveDown();
+        }
+        else if(menu==1||menu==4)
+        {
+            menus[menu].bannerDrop();
+        }
+        else if(menu!=0)
+        {
+            for (int i = 0; i < menus[menu].transform.childCount; ++i)
+            {
+                menus[menu].transform.GetChild(i).gameObject.SetActive(true);
+            }
+            menus[menu].transform.localPosition = Vector3.zero;
         }
         else
         {
             //menus[menu].gameObject.SetActive(true);
-            for (int i = 1; i < menus[0].transform.childCount; ++i)
+            for (int i = 0; i < menus[menu].transform.childCount; ++i)
             {
-                menus[0].transform.GetChild(i).gameObject.SetActive(true);
+                menus[menu].transform.GetChild(i).gameObject.SetActive(true);
             }
             corOut = false;
             corIn = true;
             strechTime = 0;
         }
-		
-		this.enabled = true;
+        
+        this.enabled = true;
 		//Cursor.SetCursor(cursor, new Vector2(cursor.width/2, cursor.height/2), CursorMode.ForceSoftware);
 		Cursor.SetCursor(cursor, Vector2.zero, CursorMode.ForceSoftware);
 	}
