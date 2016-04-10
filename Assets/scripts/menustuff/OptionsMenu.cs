@@ -11,6 +11,24 @@ public class OptionsMenu : MonoBehaviour {
     private float tmus=1;
     private float teff=1;
 
+    void Awake()
+    {
+        if(PlayerPrefs.HasKey("master"))
+        {
+            SoundProfile.master = PlayerPrefs.GetFloat("master");
+            SoundProfile.music = PlayerPrefs.GetFloat("music");
+            SoundProfile.effects = PlayerPrefs.GetFloat("effects");
+        }
+        else
+        {
+            SoundProfile.master = .5f;
+            SoundProfile.music = .5f;
+            SoundProfile.effects = .5f;
+            PlayerPrefs.SetFloat("master", SoundProfile.master);
+            PlayerPrefs.SetFloat("music", SoundProfile.music);
+            PlayerPrefs.SetFloat("effects", SoundProfile.effects);
+        }
+    }
 
     public void setSliders()
     {
@@ -42,5 +60,9 @@ public class OptionsMenu : MonoBehaviour {
         {
             SoundProfile.effects = effects.value;
         }
+
+        PlayerPrefs.SetFloat("master", SoundProfile.master);
+        PlayerPrefs.SetFloat("music", SoundProfile.music);
+        PlayerPrefs.SetFloat("effects", SoundProfile.effects);
     }
 }
