@@ -7,10 +7,14 @@ using UnityEngine.UI;
 
 public class LevelSelectMenu : MonoBehaviour {
 	public Sprite locked;
+	public Sprite bronze;
+	public Sprite silver;
+	public Sprite gold;
 	public List<int> _unlockedLevels;
-	private static HashSet<int> unlockedLevels;
 	public List<RectTransform> levels=new List<RectTransform>();
+	private static HashSet<int> unlockedLevels;
 	private List<RectTransform> locks=new List<RectTransform>();
+	private List<RectTransform> medals=new List<RectTransform>();
 
 	// Use this for initialization
 	void Start () {
@@ -18,12 +22,12 @@ public class LevelSelectMenu : MonoBehaviour {
 	}
 
 	public void ResetLocks() {
-		if (unlockedLevels==null || unlockedLevels.Count==0)
+		// create new locks/medals if necessary
+		if (unlockedLevels==null || unlockedLevels.Count==0 || locks.Count==0) {
 			unlockedLevels = new HashSet<int>(_unlockedLevels);
-		if (levels.Count==0) {
 			for (int i=0; i<levels.Count; ++i) {
 				RectTransform t = levels[i].GetComponent<RectTransform>();
-				RectTransform levelLock = new GameObject("Level "+levels.Count+" Lock").AddComponent<RectTransform>();
+				RectTransform levelLock = new GameObject("Level "+(levels.Count+1)+" Lock").AddComponent<RectTransform>();
 				levelLock.SetParent(t.parent);
 				levelLock.sizeDelta = t.sizeDelta;
 				levelLock.localScale = t.localScale;
@@ -32,21 +36,21 @@ public class LevelSelectMenu : MonoBehaviour {
 				img.sprite = locked;
 				locks.Add(levelLock);
 
-				UnlockLevel(i, false);
+				RectTransform medal = new GameObject("Level "+(levels.Count+1)+" Medal").AddComponent<RectTransform>();
+				medal.SetParent(t.parent);
+				medal.sizeDelta = t.sizeDelta;
+				medal.localScale = t.localScale;
+				medal.localPosition = t.localPosition;
+				medals.Add(medal);
+				medal.gameObject.SetActive(false);
 			}
 		}
-		for (int i=0; i<transform.childCount; ++i) {
-			/*RectTransform t = transform.GetChild(i) as RectTransform;
-			UnityEngine.UI.Button b = t.GetComponent<UnityEngine.UI.Button>();
-			if (b!=null) {
-			}*/
-			/*FieldInfo[] fields = b.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-			print("fields length: "+fields.Length);
-			for (int k=0; k<fields.Length; ++k) {
-				print("fields["+k+"]: "+fields[k].Name+", "+fields[k].GetValue(b)+", "+fields[k].DeclaringType+", "+fields[k].FieldType+", "+fields[k].MemberType+", "+fields[k].ReflectedType);
-			}*/
-		}
 
+		// lock all levels
+		for (int i=0; i<levels.Count; ++i)
+			UnlockLevel(i, false);
+
+		// unlock preselected levels
 		for (int i=0; i<levels.Count; ++i) {
 			if (unlockedLevels.Contains(i+1)) {
 				for (int remaining=1; i<levels.Count&&remaining>0; --remaining) {
@@ -57,17 +61,32 @@ public class LevelSelectMenu : MonoBehaviour {
 			}
 		}
 
+		// unlock special levels
 		bool l46=true, l48=true, l49=true;
 		for (int i=0; i<15; ++i) {
 			l46 = l46 && PlayerPrefs.HasKey("Level "+(i+1));
 			l48 = l48 && PlayerPrefs.HasKey("Level "+(i+16));
 			l49 = l49 && PlayerPrefs.HasKey("Level "+(i+31));
 		}
-		UnlockLevel(46, l46);
-		UnlockLevel(47, PlayerPrefs.HasKey("Level 46"));
-		UnlockLevel(48, l48);
-		UnlockLevel(49, l49);
-		UnlockLevel(50, PlayerPrefs.HasKey("Level 47") && PlayerPrefs.HasKey("Level 48") && PlayerPrefs.HasKey("Level 49"));
+		UnlockLevel(45, l46);
+		UnlockLevel(46, PlayerPrefs.HasKey("Level 46"));
+		UnlockLevel(47, l48);
+		UnlockLevel(48, l49);
+		UnlockLevel(49, PlayerPrefs.HasKey("Level 47") && PlayerPrefs.HasKey("Level 48") && PlayerPrefs.HasKey("Level 49"));
+
+		// add medals
+		for (int i=0; i<levels.Count; ++i) {
+			if (!levels[i].gameObject.activeSelf) {
+				float time = PlayerPrefs.GetFloat("Level "+(i+1));
+				float bronze = PlayerPrefs.GetFloat("Level "+(i+1)+" Bronze");
+				float silver = PlayerPrefs.GetFloat("Level "+(i+1)+" Silver");
+				float gold = PlayerPrefs.GetFloat("Level "+(i+1)+" Gold");
+				if (time!=0) medals[i].gameObject.SetActive(true);
+				if (time<bronze) medals[i].GetComponent<Image>().sprite = this.bronze;
+				if (time<silver) medals[i].GetComponent<Image>().sprite = this.silver;
+				if (time<gold) medals[i].GetComponent<Image>().sprite = this.gold;
+			}
+		}
 	}
 
 	private void UnlockLevel(int level, bool lockLevel) {
