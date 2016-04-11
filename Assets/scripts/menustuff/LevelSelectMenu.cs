@@ -27,20 +27,23 @@ public class LevelSelectMenu : MonoBehaviour {
 			unlockedLevels = new HashSet<int>(_unlockedLevels);
 			for (int i=0; i<levels.Count; ++i) {
 				RectTransform t = levels[i].GetComponent<RectTransform>();
-				RectTransform levelLock = new GameObject("Level "+(levels.Count+1)+" Lock").AddComponent<RectTransform>();
+				RectTransform levelLock = new GameObject("Level "+(i+1)+" Lock").AddComponent<RectTransform>();
 				levelLock.SetParent(t.parent);
 				levelLock.sizeDelta = t.sizeDelta;
 				levelLock.localScale = t.localScale;
 				levelLock.localPosition = t.localPosition;
+				levelLock.SetParent(t);
 				Image img = levelLock.gameObject.AddComponent<Image>();
 				img.sprite = locked;
 				locks.Add(levelLock);
 
-				RectTransform medal = new GameObject("Level "+(levels.Count+1)+" Medal").AddComponent<RectTransform>();
+				RectTransform medal = new GameObject("Level "+(i+1)+" Medal").AddComponent<RectTransform>();
 				medal.SetParent(t.parent);
-				medal.sizeDelta = t.sizeDelta;
+				medal.sizeDelta = t.sizeDelta/2;
 				medal.localScale = t.localScale;
-				medal.localPosition = t.localPosition;
+				medal.localPosition = t.localPosition + Vector3.down*t.sizeDelta.y/4;
+				medal.SetParent(t);
+				medal.gameObject.AddComponent<Image>();
 				medals.Add(medal);
 				medal.gameObject.SetActive(false);
 			}
@@ -76,15 +79,16 @@ public class LevelSelectMenu : MonoBehaviour {
 
 		// add medals
 		for (int i=0; i<levels.Count; ++i) {
-			if (!levels[i].gameObject.activeSelf) {
+			if (!locks[i].gameObject.activeSelf) {
 				float time = PlayerPrefs.GetFloat("Level "+(i+1));
 				float bronze = PlayerPrefs.GetFloat("Level "+(i+1)+" Bronze");
 				float silver = PlayerPrefs.GetFloat("Level "+(i+1)+" Silver");
 				float gold = PlayerPrefs.GetFloat("Level "+(i+1)+" Gold");
 				if (time!=0) medals[i].gameObject.SetActive(true);
-				if (time<bronze) medals[i].GetComponent<Image>().sprite = this.bronze;
-				if (time<silver) medals[i].GetComponent<Image>().sprite = this.silver;
-				if (time<gold) medals[i].GetComponent<Image>().sprite = this.gold;
+				if (time>bronze || time==0) medals[i].gameObject.SetActive(false);
+				if (time<=bronze && time!=0) medals[i].GetComponent<Image>().sprite = this.bronze;
+				if (time<=silver && time!=0) medals[i].GetComponent<Image>().sprite = this.silver;
+				if (time<=gold && time!=0) medals[i].GetComponent<Image>().sprite = this.gold;
 			}
 		}
 	}

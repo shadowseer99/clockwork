@@ -14,18 +14,21 @@ public class PlayerPrefsEditorEditor:Editor {
 	private List<float> bronzeTimes=new List<float>();
 	private List<float> silverTimes=new List<float>();
 	private List<float> goldTimes=new List<float>();
+	private bool changed;
+	public int numLevels=50;
 
 	private void Begin() {
 		times.Clear();
 		bronzeTimes.Clear();
 		silverTimes.Clear();
 		goldTimes.Clear();
-		//(target as LevelSelectMenu).levels.Count
-		for (int i=0; i<50; ++i) {
-			times.Add(PlayerPrefs.GetFloat("Level "+i));
-			bronzeTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Bronze"));
-			silverTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Silver"));
-			goldTimes.Add(PlayerPrefs.GetFloat("Level "+i+" Gold"));
+		changed = false;
+		
+		for (int i=0; i<numLevels; ++i) {
+			times.Add(PlayerPrefs.GetFloat("Level "+(i+1)));
+			bronzeTimes.Add(PlayerPrefs.GetFloat("Level "+(i+1)+" Bronze"));
+			silverTimes.Add(PlayerPrefs.GetFloat("Level "+(i+1)+" Silver"));
+			goldTimes.Add(PlayerPrefs.GetFloat("Level "+(i+1)+" Gold"));
 		}
 	}
 	
@@ -34,8 +37,9 @@ public class PlayerPrefsEditorEditor:Editor {
 		if (times.Count==0)
 			Begin();
 		
+		// delete if necessary
 		if (GUILayout.Button("Reset all data")) {
-			for (int i=0; i<50; ++i) {
+			for (int i=0; i<numLevels; ++i) {
 				PlayerPrefs.DeleteKey("Level "+i);
 				PlayerPrefs.DeleteKey("Level "+i+" Bronze");
 				PlayerPrefs.DeleteKey("Level "+i+" Silver");
@@ -47,6 +51,7 @@ public class PlayerPrefsEditorEditor:Editor {
 			if (lsMenu!=null && Application.isPlaying) lsMenu.ResetLocks();
 			Begin();
 		}
+
 		EditorGUILayout.BeginHorizontal();
 		GUILayout.Label("Level");
 		GUILayout.Label("Time");
@@ -64,6 +69,14 @@ public class PlayerPrefsEditorEditor:Editor {
 			goldTimes[i] = HandleField(goldTimes[i], "Level "+(i+1)+" Gold");
 			EditorGUILayout.EndHorizontal();
 		}
+
+		Event e = Event.current;
+		if (changed && (e.clickCount!=0 ||
+			(e.rawType==EventType.keyUp && (e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter||e.keyCode==KeyCode.Tab)))) {
+			LevelSelectMenu lsMenu = GameObject.FindObjectOfType<LevelSelectMenu>();
+			if (lsMenu!=null && Application.isPlaying) lsMenu.ResetLocks();
+		}
+		//Debug.Log("clickCount="+Event.current.clickCount+", commandName: "+Event.current.commandName+", keyCode: "+Event.current.keyCode+", modifiers: "+Event.current.modifiers+", pressure: "+Event.current.pressure+", rawType: "+Event.current.rawType+", type: "+Event.current.type);
 	}
 
 	private float HandleField(float value, string name) {
@@ -72,8 +85,7 @@ public class PlayerPrefsEditorEditor:Editor {
 			if (f==0) PlayerPrefs.DeleteKey(name);
 			else PlayerPrefs.SetFloat(name, f);
 			PlayerPrefs.Save();
-			LevelSelectMenu lsMenu = GameObject.FindObjectOfType<LevelSelectMenu>();
-			if (lsMenu!=null && Application.isPlaying) lsMenu.ResetLocks();
+			changed = true;
 		}
 		return f;
 	}
