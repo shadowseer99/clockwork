@@ -18,6 +18,8 @@ public class Pause : MonoBehaviour {
 	public Sprite[] numbers;
 	public Sprite colon;
 	public RectTransform timeObject;
+	public RectTransform bestTimeObject;
+	private Vector3 bestTimePos;
 	public float bronzeTime=180;
 	public float silverTime=120;
 	public float goldTime=60;
@@ -40,6 +42,7 @@ public class Pause : MonoBehaviour {
 	{
 		levelend.SetActive (false);
 		timer -= fadeDelay;
+		bestTimePos = bestTimeObject.position;
 
 		// find all images, levelend.GetComponentsInChildren<Image>() wasn't working for some reason
 		Stack<Transform> todo = new Stack<Transform>();
@@ -189,12 +192,14 @@ public class Pause : MonoBehaviour {
         levelend.SetActive(true);
         faders = levelend.GetComponentsInChildren<Image>();
 		string level = "Level "+Application.loadedLevel;
+		float prevTime = PlayerPrefs.GetFloat(level);
 		PlayerPrefs.SetFloat(level, PlayerPrefs.HasKey(level)?Mathf.Min(PlayerPrefs.GetFloat(level), timeSpent):timeSpent);
 		PlayerPrefs.SetFloat(level+" Bronze", bronzeTime);
 		PlayerPrefs.SetFloat(level+" Silver", silverTime);
 		PlayerPrefs.SetFloat(level+" Gold", goldTime);
 		PlayerPrefs.Save();
 		AddNumber(timeObject, timeSpent, true);
+		AddNumber(bestTimeObject, prevTime, true);
 		if (timeSpent>bronzeTime) bronzeImage.gameObject.SetActive(false);
 		if (timeSpent>silverTime) silverImage.gameObject.SetActive(false);
 		if (timeSpent>goldTime) goldImage.gameObject.SetActive(false);

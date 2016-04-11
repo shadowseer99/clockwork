@@ -254,12 +254,15 @@ public class CollidingObject:PhysicsObject {
 
 	// helper functions
 	public float Accel() {
+		// find a multiplication constant
 		float mult = 0;
 		if (airControl!=0) mult = airControl;
 		if (inwaters.Count>0) mult = 0.5f + 0.5f*mult;
 		if (groundedTo.Count>0 || attachedTo!=null || !isMovable) mult = 1;
 		float result = Time.fixedDeltaTime*mult*accel*(accelMult-curSpeed/maxSpeed);
-		if (groundedTo.Count>0 && groundedTo[0].collider.sharedMaterial!=null && groundedTo[0].collider.sharedMaterial.name=="Ramp" && result*curSpeed<0 && accelMult==0) result *= 0.1f;
+		// don't slow down if accelMult==0 AND in the air OR on a Ramp
+		if (accelMult==0 && result*curSpeed<0 && (groundedTo.Count==0 || (groundedTo[0].collider.sharedMaterial!=null && groundedTo[0].collider.sharedMaterial.name=="Ramp"))) result = 0;
+		// don't slow down if moving fast...
 		if (result*curSpeed<0 && accelMult*curSpeed>0) result = 0;
 		return result;
 	}
