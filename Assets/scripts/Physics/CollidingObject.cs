@@ -201,9 +201,9 @@ public class CollidingObject:PhysicsObject {
 		if (collObj!=null && (attachedTo==null || coll!=attachedTo) && attaching) {
 			PhysicsUpdate();
 			attachedTo = collObj;
-			//Physics2D.IgnoreCollision(coll, attachedTo.coll, true);
+			if (this is PlayerGear && collObj is Gear)
+				(collObj as Gear).hasPlayerGear = true;
 			isMovable = false;
-			//print("attaching to: "+attachedTo.name);
 		}
 	}
 
@@ -225,8 +225,9 @@ public class CollidingObject:PhysicsObject {
 			Vector3 velocity = attachedTo.GetVelAtPoint(transform.position);
 			Vector3 velocity2 = -accelMult*curSpeed*GetVelAtPoint(attachedTo.transform.position).normalized;
 			this.velocity = velocity + velocity2;
-			//Physics2D.IgnoreCollision(coll, attachedTo.coll, false);
 			attachedTo = null;
+			if (this is PlayerGear && collObj is Gear)
+				(collObj as Gear).hasPlayerGear = false;
 		}
 	}
 

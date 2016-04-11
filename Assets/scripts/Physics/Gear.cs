@@ -9,6 +9,7 @@ public class Gear:CollidingObject {
 	public bool isGolden=false;
 	private float goldenRotation=0;
 	private float soundCounter=0;
+	[HideInInspector]public bool hasPlayerGear;
 	
 	public AudioCustom _insert;
 	public AudioCustom _goldenRotating;
@@ -41,16 +42,15 @@ public class Gear:CollidingObject {
 	public override void PhysicsUpdate() {
 		// handle goldenGear
 		if (isGolden) {
+			if (!hasPlayerGear)
+				curSpeed = 0;
+
 			if (Application.isPlaying) {
 				if (!goldenRotating.isPlaying) goldenRotating.Play();
-				//if (Mathf.Floor(Mathf.Abs(goldenRotation)/4) != Mathf.Floor(Mathf.Abs(goldenRotation+Time.fixedDeltaTime*curAngularVelocity)/4))
-					//goldenRotating.Play();
-					//goldenRotating.PlayDelayed(0.05f);
 				goldenRotating.volume = _goldenRotating.volume*SoundProfile.effects*Mathf.Abs(AngularVelocityToCurSpeed()/maxSpeed);
 				goldenRotating.pitch = SemitonesToPitch(Mathf.Abs(goldenRotation)*18/360-6);
-				//print("pitch: "+goldenRotating.pitch);
 			}
-			goldenRotation += Time.fixedDeltaTime*curAngularVelocity;
+			goldenRotation += Time.fixedDeltaTime*CurSpeedToAngularVelocity();;
 			if (Mathf.Abs(goldenRotation) > 360) {
 				goldenRotated.volume = _goldenRotated.volume*SoundProfile.effects;
 				goldenRotated.Play();
