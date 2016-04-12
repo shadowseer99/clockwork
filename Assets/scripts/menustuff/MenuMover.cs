@@ -72,7 +72,7 @@ public class MenuMover : MonoBehaviour {
                 fader += Time.deltaTime;
                 foreach(Image i in transform.GetComponentsInChildren<Image>())
                 {
-                    i.color = new Color(1, 1, 1, fader);
+                    i.color = new Color(i.color.r, i.color.g, i.color.b, fader);
                 }
 
 

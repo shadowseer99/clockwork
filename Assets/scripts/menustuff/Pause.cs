@@ -30,10 +30,14 @@ public class Pause : MonoBehaviour {
 	public Image bronzeImage;
 	public Image silverImage;
 	public Image goldImage;
+	private Vector3 bronzePos;
+	private Vector3 silverPos;
+	private Vector3 goldPos;
 	public float rotationSpeed=360;
 	public float coinDelayTime;
 	public float coinFadeTime;
 	public float coinStaggerTime;
+	public float coinFallHeight=300;
     
     // Use this for initialization
 
@@ -43,6 +47,9 @@ public class Pause : MonoBehaviour {
 		levelend.SetActive (false);
 		timer -= fadeDelay;
 		bestTimePos = bestTimeObject.position;
+		bronzePos = bronzeImage.transform.position;
+		silverPos = silverImage.transform.position;
+		goldPos = goldImage.transform.position;
 
 		// find all images, levelend.GetComponentsInChildren<Image>() wasn't working for some reason
 		Stack<Transform> todo = new Stack<Transform>();
@@ -87,6 +94,12 @@ public class Pause : MonoBehaviour {
 			bronzeImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
 			silverImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
 			goldImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
+			bronzeImage.transform.position =
+				bronzePos + (1-Mathf.Min((timer-fadeTime-coinDelayTime-0*coinStaggerTime)/coinFadeTime, 1))*coinFallHeight*Vector3.up;
+			silverImage.transform.position =
+				silverPos + (1-Mathf.Min((timer-fadeTime-coinDelayTime-1*coinStaggerTime)/coinFadeTime, 1))*coinFallHeight*Vector3.up;
+			goldImage.transform.position   =
+				goldPos +   (1-Mathf.Min((timer-fadeTime-coinDelayTime-2*coinStaggerTime)/coinFadeTime, 1))*coinFallHeight*Vector3.up;
 			bronzeImage.color = new Color(bronzeImage.color.r, bronzeImage.color.g, bronzeImage.color.b,
 				Mathf.Min((timer-fadeTime-coinDelayTime-0*coinStaggerTime)/coinFadeTime, 1));
 			silverImage.color = new Color(silverImage.color.r, silverImage.color.g, silverImage.color.b,
@@ -191,6 +204,8 @@ public class Pause : MonoBehaviour {
         timedelay = Time.realtimeSinceStartup;
         levelend.SetActive(true);
         faders = levelend.GetComponentsInChildren<Image>();
+
+		// save and print results
 		string level = "Level "+Application.loadedLevel;
 		float prevTime = PlayerPrefs.GetFloat(level);
 		PlayerPrefs.SetFloat(level, PlayerPrefs.HasKey(level)?Mathf.Min(PlayerPrefs.GetFloat(level), timeSpent):timeSpent);
@@ -200,12 +215,16 @@ public class Pause : MonoBehaviour {
 		PlayerPrefs.Save();
 		AddNumber(timeObject, timeSpent, true);
 		AddNumber(bestTimeObject, prevTime, true);
+
+		// handle bronze/silver/gold
 		if (timeSpent>bronzeTime) bronzeImage.gameObject.SetActive(false);
 		if (timeSpent>silverTime) silverImage.gameObject.SetActive(false);
 		if (timeSpent>goldTime) goldImage.gameObject.SetActive(false);
-		//bronzeImage.Rotate(0*Vector3.up, Space.World);
-		//silverImage.Rotate(120*Vector3.up, Space.World);
-		//goldImage.Rotate(240*Vector3.up, Space.World);
+		if (rotationSpeed!=0) {
+			bronzeImage.transform.Rotate(0*Vector3.up, Space.World);
+			silverImage.transform.Rotate(120*Vector3.up, Space.World);
+			goldImage.transform.Rotate(240*Vector3.up, Space.World);
+		}
     }
 
 	public void AddNumber(RectTransform neighbor, float number, bool isTime) {
