@@ -20,6 +20,7 @@ public class PlayerGear:CollidingObject {
 	public Animator attachingSystem;
 	public Animator attachedSystem;
 	private Renderer attachingSystemRenderer;
+    public bool deathgrab = false;
 
 	public override void Start() {
 		base.Start();
@@ -69,7 +70,10 @@ public class PlayerGear:CollidingObject {
         accelMult = CrossPlatformInputManager.GetAxisRaw("Horizontal");
 #endif
 
-
+        if(deathgrab)
+        {
+            attaching = true;
+        }
 
         trig.enabled = attaching;
 		if (attaching==false && attachedTo!=null) {
