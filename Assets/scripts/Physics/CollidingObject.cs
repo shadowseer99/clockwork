@@ -193,8 +193,10 @@ public class CollidingObject:PhysicsObject {
 		// handle entering water
 		Water water = coll.gameObject.GetComponent<Water>();
 		if (water!=null) {
-			water.splash.Play();
-			inwaters.Add(water);
+			if (!inwaters.Contains(water)) {
+				water.splash.Play();
+				inwaters.Add(water);
+			}
 		}
 
 		// handle attaching
