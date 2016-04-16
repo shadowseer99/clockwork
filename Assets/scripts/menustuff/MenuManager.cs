@@ -68,7 +68,7 @@ public class MenuManager : MonoBehaviour {
             else
             {
                 corOut = false;
-                titleCorners.transform.localScale = new Vector3(1.5f, 1.5f, 1);
+                titleCorners.transform.localScale = titleResize;
             }
         }
     }
