@@ -14,6 +14,7 @@ public class MenuManager : MonoBehaviour {
 	public Texture2D cursor;
     private int loader = 0;
     public GameObject titleCorners;
+	public Vector3 titleResize=new Vector3(2, 2, 1);
     private bool corIn = false;
     private bool corOut = false;
     private float strechTime = 0;
@@ -48,7 +49,7 @@ public class MenuManager : MonoBehaviour {
         {
             if(strechTime<=1)
             {
-                titleCorners.transform.localScale= Vector3.Lerp(new Vector3(1.5f, 1.5f, 1), Vector3.one, strechTime);
+                titleCorners.transform.localScale= Vector3.Lerp(titleResize, Vector3.one, strechTime);
                 strechTime += Time.deltaTime;
             }
             else
@@ -61,7 +62,7 @@ public class MenuManager : MonoBehaviour {
         {
             if (strechTime <= 1)
             {
-                titleCorners.transform.localScale = Vector3.Lerp(Vector3.one,new Vector3(1.5f, 1.5f, 1),  strechTime);
+                titleCorners.transform.localScale = Vector3.Lerp(Vector3.one, titleResize,  strechTime);
                 strechTime += Time.deltaTime;
             }
             else
