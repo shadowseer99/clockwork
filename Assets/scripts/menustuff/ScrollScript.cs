@@ -4,15 +4,21 @@ using UnityEngine.UI;
 
 public class ScrollScript : MonoBehaviour {
 	public RectTransform neighbors;
-	public float offset=10;
+	public float offset=120;
 	private float minPos;
 	private float maxPos;
 	private Vector3 initPos;
 	private float origY;
+	private bool init=false;
+	private Canvas canvas;
 
 	public void Start() {
 		GetComponent<Scrollbar>().onValueChanged.AddListener(ScrollBarUpdate);
-		
+		canvas = transform.root.GetComponent<Canvas>();
+	}
+
+	public void Init() {
+		init = true;
 		minPos = float.PositiveInfinity;
 		maxPos = float.NegativeInfinity;
 		initPos = neighbors.parent.position;
@@ -30,9 +36,10 @@ public class ScrollScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	public void ScrollBarUpdate(float val) {
+		if (!init)
+			Init();
 		float diff = maxPos - minPos;
-		neighbors.localPosition = new Vector3(neighbors.localPosition.x, origY - val*Screen.height, neighbors.localPosition.z);
-		neighbors.position = new Vector3(neighbors.position.x, neighbors.position.y + val*(diff+offset), neighbors.position.z);
-		// f(0) = origY f(1) = 
+		neighbors.localPosition = new Vector3(neighbors.localPosition.x, origY, neighbors.localPosition.z);
+		neighbors.position += Vector3.up*(val*(diff-offset));
 	}
 }
