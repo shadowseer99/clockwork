@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class ScrollScript : MonoBehaviour {
 	public RectTransform neighbors;
-	public float padding=10;
+	public float offset=10;
 	private float minPos;
 	private float maxPos;
 	private Vector3 initPos;
@@ -31,10 +31,8 @@ public class ScrollScript : MonoBehaviour {
 	// Update is called once per frame
 	public void ScrollBarUpdate(float val) {
 		float diff = maxPos - minPos;
-		float screenDiff = diff - Screen.height;
-		float y = val*screenDiff;
 		neighbors.localPosition = new Vector3(neighbors.localPosition.x, origY - val*Screen.height, neighbors.localPosition.z);
-		neighbors.position = new Vector3(neighbors.position.x, neighbors.position.y + val*diff, neighbors.position.z);
+		neighbors.position = new Vector3(neighbors.position.x, neighbors.position.y + val*(diff+offset), neighbors.position.z);
 		// f(0) = origY f(1) = 
 	}
 }
