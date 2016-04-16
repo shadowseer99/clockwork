@@ -73,16 +73,17 @@ public class LevelSelectMenu : MonoBehaviour {
 
 		// unlock special levels
 		bool l46=true, l48=true, l49=true;
-		for (int i=0; i<15; ++i) {
+		for (int i=0; i<14; ++i)
 			l46 = l46 && PlayerPrefs.HasKey("Level "+(i+1));
+		for (int i=0; i<15; ++i)
 			l48 = l48 && PlayerPrefs.HasKey("Level "+(i+16));
+		for (int i=0; i<10; ++i)
 			l49 = l49 && PlayerPrefs.HasKey("Level "+(i+31));
-		}
 		UnlockLevel(45, l46);
 		UnlockLevel(46, PlayerPrefs.HasKey("Level 46"));
-		UnlockLevel(47, l48);
+		UnlockLevel(47, false);//l48);
 		UnlockLevel(48, l49);
-		UnlockLevel(49, PlayerPrefs.HasKey("Level 47") && PlayerPrefs.HasKey("Level 48") && PlayerPrefs.HasKey("Level 49"));
+		UnlockLevel(49, PlayerPrefs.HasKey("Level 47") /*&& PlayerPrefs.HasKey("Level 48")*/ && PlayerPrefs.HasKey("Level 49"));
 
 		// add medals
 		for (int i=0; i<levels.Count; ++i) {
