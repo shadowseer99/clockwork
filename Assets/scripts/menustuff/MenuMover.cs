@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class MenuMover : MonoBehaviour {
-	public float duration=0.5f;
+	public float duration=0.75f;
 	public float upDelayRatio=0;
 	public float downDelayRatio=0;
 	public float additionalMoveUp=0;
@@ -74,7 +74,10 @@ public class MenuMover : MonoBehaviour {
                 {
                     i.color = new Color(i.color.r, i.color.g, i.color.b, fader);
                 }
-
+				foreach(SpriteRenderer i in transform.GetComponentsInChildren<SpriteRenderer>())
+				{
+					i.color = new Color(i.color.r, i.color.g, i.color.b, fader);
+				}
 
                 transform.GetChild(1).GetComponent<Image>().color = Color.white;
                 

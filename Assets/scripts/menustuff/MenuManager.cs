@@ -34,7 +34,7 @@ public class MenuManager : MonoBehaviour {
 		// display first menu
 		DisplayMenu(initMenu);
         //menus[0].MoveDown();
-        for (int i = 1; i < menus[0].transform.childCount; ++i)
+        for (int i = 0; i < menus[0].transform.childCount; ++i)
         {
             menus[0].transform.GetChild(i).gameObject.SetActive(true);
         }
@@ -47,8 +47,14 @@ public class MenuManager : MonoBehaviour {
         
         if(corIn)
         {
-            if(strechTime<=1)
+			if (strechTime <= 0) 
+			{
+				titleCorners.SetActive (false);
+				strechTime += Time.deltaTime;
+			}
+            else if(strechTime<=1)
             {
+				titleCorners.SetActive (true);
                 titleCorners.transform.localScale= Vector3.Lerp(titleResize, Vector3.one, strechTime);
                 strechTime += Time.deltaTime;
             }
@@ -78,11 +84,11 @@ public class MenuManager : MonoBehaviour {
         corOut = true;
         strechTime = 0;
         //menus[0].gameObject.SetActive(false);
-        for (int i = 1; i < menus[0].transform.childCount; ++i)
+        for (int i = 0; i < menus[0].transform.childCount; ++i)
         {
             menus[0].transform.GetChild(i).gameObject.SetActive(false);
         }
-
+		menus[0].transform.GetChild(2).gameObject.SetActive(true);
         for (int i = 1; i < menus.Length; ++i)
         {
             menus[i].gameObject.transform.position = new Vector3(menus[i].gameObject.transform.position.x, 1000, menus[i].gameObject.transform.position.z);
@@ -116,7 +122,7 @@ public class MenuManager : MonoBehaviour {
             }
             menus[menu].MoveDown();
         }
-        else if(menu==1||menu==4)
+		else if(menu==1||menu==4||menu==2)
         {
             menus[menu].bannerDrop();
         }
@@ -130,14 +136,17 @@ public class MenuManager : MonoBehaviour {
         }
         else
         {
+			menus[menu].bannerDrop();
             //menus[menu].gameObject.SetActive(true);
+			/*
             for (int i = 0; i < menus[menu].transform.childCount; ++i)
             {
                 menus[menu].transform.GetChild(i).gameObject.SetActive(true);
             }
+            */
             corOut = false;
             corIn = true;
-            strechTime = 0;
+            strechTime = -.75f;
         }
         
         this.enabled = true;
