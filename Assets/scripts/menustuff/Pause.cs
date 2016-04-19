@@ -38,6 +38,7 @@ public class Pause : MonoBehaviour {
 	public float coinFadeTime;
 	public float coinStaggerTime;
 	public float coinFallHeight=300;
+	bool hasEnded=false;
     
     // Use this for initialization
 
@@ -195,6 +196,10 @@ public class Pause : MonoBehaviour {
     }
 	public void EndLevel()
 	{
+		if (hasEnded)
+			return;
+		hasEnded = true;
+
 #if UNITY_IPHONE || UNITY_ANDROID
         Mobile.menu = false;
         Mobile.active = false;
@@ -207,14 +212,13 @@ public class Pause : MonoBehaviour {
 
 		// save and print results
 		string level = "Level "+Application.loadedLevel;
-		float prevTime = PlayerPrefs.GetFloat(level);
 		PlayerPrefs.SetFloat(level, PlayerPrefs.HasKey(level)?Mathf.Min(PlayerPrefs.GetFloat(level), timeSpent):timeSpent);
 		PlayerPrefs.SetFloat(level+" Bronze", bronzeTime);
 		PlayerPrefs.SetFloat(level+" Silver", silverTime);
 		PlayerPrefs.SetFloat(level+" Gold", goldTime);
 		PlayerPrefs.Save();
 		AddNumber(timeObject, timeSpent, true);
-		AddNumber(bestTimeObject, prevTime, true);
+		AddNumber(bestTimeObject, PlayerPrefs.GetFloat(level), true);
 
 		// handle bronze/silver/gold
 		if (timeSpent>bronzeTime) bronzeImage.gameObject.SetActive(false);
