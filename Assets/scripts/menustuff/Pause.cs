@@ -39,6 +39,7 @@ public class Pause : MonoBehaviour {
 	public float coinStaggerTime;
 	public float coinFallHeight=300;
 	bool hasEnded=false;
+	public Vector3 timeOffset=230*Vector3.right;
     
     // Use this for initialization
 
@@ -242,7 +243,7 @@ public class Pause : MonoBehaviour {
 			RectTransform newObj = temp.AddComponent<RectTransform>();
 			newObj.SetParent(neighbor.parent);
 			newObj.sizeDelta = new Vector2(150, 150);
-			newObj.localPosition = neighbor.transform.localPosition + new Vector3(50*(i-(timeStr.Length-1)/2f), -100);
+			newObj.localPosition = neighbor.transform.localPosition + Vector3.right*50*(i-(timeStr.Length-1)/2f) + timeOffset;
 			newObj.localScale = neighbor.localScale*1.727862f;
 			Image img = newObj.gameObject.AddComponent<Image>();
 			images.Add(img);
