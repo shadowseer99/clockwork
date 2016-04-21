@@ -37,6 +37,8 @@ public class CollidingObject:PhysicsObject {
 	[HideInInspector]public float waterDensity=0;
 	[HideInInspector]public Vector3 waterVelocity=Vector3.zero;
 
+
+	public GameObject dust;
 	// sounds
 	public AudioCustom _move;
 	public AudioCustom _collHit;
@@ -253,6 +255,16 @@ public class CollidingObject:PhysicsObject {
 			hitSurface.volume = vol*_hitSurface.volume;
 			hitSurface.Play();
 		}
+		if (lastVelocity.magnitude > 8) {
+			Vector2 hit = coll.contacts [0].point;
+			GameObject temp = (GameObject)Instantiate (dust, new Vector3(hit.x,hit.y,0), Quaternion.identity);
+			temp.GetComponent<ParticleSystem> ().startSize = lastVelocity.magnitude/10-.25f;
+		}
+
+
+
+
+
 	}
 
 	// helper functions

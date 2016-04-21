@@ -1,9 +1,13 @@
 fileFormatVersion: 2
 guid: 98b7ee68da3dfb14fb85aa7ba2880524
-timeCreated: 1460423358
+timeCreated: 1461273976
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: sparkle_0
+    21300002: sparkle_1
+    21300004: sparkle_2
+    21300006: sparkle_3
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -49,7 +53,67 @@ TextureImporter:
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: sparkle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -256, y: 256}
+        - {x: -256, y: -256}
+        - {x: 256, y: -256}
+        - {x: 256, y: 256}
+    - name: sparkle_1
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -256, y: 256}
+        - {x: -256, y: -256}
+        - {x: 256, y: -256}
+        - {x: 256, y: 256}
+    - name: sparkle_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -256, y: 256}
+        - {x: -256, y: -256}
+        - {x: 256, y: -256}
+        - {x: 256, y: 256}
+    - name: sparkle_3
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -256, y: 256}
+        - {x: -256, y: -256}
+        - {x: 256, y: -256}
+        - {x: 256, y: 256}
     outline: []
   spritePackingTag: 
   userData: 

@@ -46,6 +46,11 @@ public class Pause : MonoBehaviour {
     // Update is called once per frame
 	void Start()
 	{
+		// handle bronze/silver/gold
+		bronzeImage.gameObject.SetActive(false);
+		silverImage.gameObject.SetActive(false);
+		goldImage.gameObject.SetActive(false);
+
 		levelend.SetActive (false);
 		timer -= fadeDelay;
 		bestTimePos = bestTimeObject.position;
@@ -93,21 +98,15 @@ public class Pause : MonoBehaviour {
                 }
             }
 
-			bronzeImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
-			silverImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
-			goldImage.transform.Rotate(rotationSpeed*Time.unscaledDeltaTime*Vector3.up, Space.World);
-			bronzeImage.transform.position =
-				bronzePos + (1-Mathf.Min((timer-fadeTime-coinDelayTime-0*coinStaggerTime)/coinFadeTime, 1))*coinFallHeight*Vector3.up;
-			silverImage.transform.position =
-				silverPos + (1-Mathf.Min((timer-fadeTime-coinDelayTime-1*coinStaggerTime)/coinFadeTime, 1))*coinFallHeight*Vector3.up;
-			goldImage.transform.position   =
-				goldPos +   (1-Mathf.Min((timer-fadeTime-coinDelayTime-2*coinStaggerTime)/coinFadeTime, 1))*coinFallHeight*Vector3.up;
-			bronzeImage.color = new Color(bronzeImage.color.r, bronzeImage.color.g, bronzeImage.color.b,
-				Mathf.Min((timer-fadeTime-coinDelayTime-0*coinStaggerTime)/coinFadeTime, 1));
-			silverImage.color = new Color(silverImage.color.r, silverImage.color.g, silverImage.color.b,
-				Mathf.Min((timer-fadeTime-coinDelayTime-1*coinStaggerTime)/coinFadeTime, 1));
-			goldImage.color = new Color(goldImage.color.r, goldImage.color.g, goldImage.color.b,
-				Mathf.Min((timer-fadeTime-coinDelayTime-2*coinStaggerTime)/coinFadeTime, 1));
+			// handle bronze/silver/gold
+			if (timeSpent<=bronzeTime&&timer>.5) bronzeImage.gameObject.SetActive(true);
+			if (timeSpent<=silverTime&&timer>1) silverImage.gameObject.SetActive(true);
+			if (timeSpent<=goldTime&&timer>1.5) goldImage.gameObject.SetActive(true);
+
+
+
+			//goldImage.color = new Color(goldImage.color.r, goldImage.color.g, goldImage.color.b,
+				//Mathf.Min((timer-fadeTime-coinDelayTime-2*coinStaggerTime)/coinFadeTime, 1));
             
         }
         else if(!dropping)
@@ -221,15 +220,7 @@ public class Pause : MonoBehaviour {
 		AddNumber(timeObject, timeSpent, true);
 		AddNumber(bestTimeObject, PlayerPrefs.GetFloat(level), true);
 
-		// handle bronze/silver/gold
-		if (timeSpent>bronzeTime) bronzeImage.gameObject.SetActive(false);
-		if (timeSpent>silverTime) silverImage.gameObject.SetActive(false);
-		if (timeSpent>goldTime) goldImage.gameObject.SetActive(false);
-		if (rotationSpeed!=0) {
-			bronzeImage.transform.Rotate(0*Vector3.up, Space.World);
-			silverImage.transform.Rotate(120*Vector3.up, Space.World);
-			goldImage.transform.Rotate(240*Vector3.up, Space.World);
-		}
+
     }
 
 	public void AddNumber(RectTransform neighbor, float number, bool isTime) {

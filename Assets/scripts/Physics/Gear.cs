@@ -17,11 +17,18 @@ public class Gear:CollidingObject {
 	private AudioSource insert;
 	private AudioSource goldenRotating;
 	private AudioSource goldenRotated;
-
+	public ParticleSystem particlesS;
+	public ParticleSystem particlesF;
 	public override void Start() {
 		base.Start();
 		if (!Application.isPlaying) return;
-
+		if (!isGolden) {
+			particlesS.Pause ();
+			particlesF.Pause ();
+		} else {
+			particlesS.Play ();
+			particlesF.Pause ();
+		}
 		// initialize sounds
 		insert = gameObject.AddComponent<AudioSource>();
 		insert.clip = _insert.clip;
@@ -49,8 +56,13 @@ public class Gear:CollidingObject {
 				if (!goldenRotating.isPlaying) goldenRotating.Play();
 				goldenRotating.volume = _goldenRotating.volume*SoundProfile.effects*Mathf.Abs(AngularVelocityToCurSpeed()/maxSpeed);
 				goldenRotating.pitch = SemitonesToPitch(Mathf.Abs(goldenRotation)*18/360-6);
+				//particles.emission.rate = 15  *Mathf.Abs (AngularVelocityToCurSpeed () / maxSpeed) * .2;
+				if (CurSpeedToAngularVelocity()>0) {
+					particlesS.Pause ();
+					particlesF.Play ();
+				}
 			}
-			goldenRotation += Time.fixedDeltaTime*CurSpeedToAngularVelocity();;
+			goldenRotation += Time.fixedDeltaTime*CurSpeedToAngularVelocity();
 			if (Mathf.Abs(goldenRotation) > 360) {
 				goldenRotated.volume = _goldenRotated.volume*SoundProfile.effects;
 				goldenRotated.Play();
