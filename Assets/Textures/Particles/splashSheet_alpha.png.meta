@@ -1,9 +1,13 @@
 fileFormatVersion: 2
 guid: 39f6b57c7bc37b047a6a3131c9fc9989
-timeCreated: 1461611573
+timeCreated: 1461626305
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: splashSheet_alpha_0
+    21300002: splashSheet_alpha_1
+    21300004: splashSheet_alpha_2
+    21300006: splashSheet_alpha_3
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -49,7 +53,159 @@ TextureImporter:
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: splashSheet_alpha_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -52, y: -62}
+        - {x: -65, y: -87}
+        - {x: -65, y: -128}
+        - {x: 49, y: -128}
+        - {x: 55, y: -126}
+        - {x: 55, y: -84}
+        - {x: 17, y: -62}
+    - name: splashSheet_alpha_1
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -98, y: -100}
+        - {x: -80, y: -112}
+        - {x: -48, y: -112}
+        - {x: -48, y: -93}
+        - {x: -57, y: -74}
+        - {x: -88, y: -74}
+        - {x: -98, y: -77}
+      - - {x: 71, y: -83}
+        - {x: 66, y: -84}
+        - {x: 54, y: -96}
+        - {x: 54, y: -104}
+        - {x: 56, y: -109}
+        - {x: 67, y: -110}
+        - {x: 91, y: -110}
+        - {x: 100, y: -102}
+        - {x: 100, y: -91}
+        - {x: 88, y: -83}
+      - - {x: -32, y: -39}
+        - {x: -49, y: -39}
+        - {x: -57, y: -41}
+        - {x: -57, y: -67}
+        - {x: -48, y: -91}
+        - {x: -31, y: -96}
+        - {x: -18, y: -96}
+        - {x: -13, y: -94}
+        - {x: -13, y: -75}
+        - {x: -19, y: -55}
+      - - {x: 45, y: -44}
+        - {x: 22, y: -76}
+        - {x: 22, y: -91}
+        - {x: 23, y: -94}
+        - {x: 38, y: -94}
+        - {x: 76, y: -73}
+        - {x: 76, y: -49}
+        - {x: 69, y: -44}
+    - name: splashSheet_alpha_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -98, y: -88}
+        - {x: -101, y: -96}
+        - {x: -101, y: -112}
+        - {x: -98, y: -114}
+        - {x: -95, y: -115}
+        - {x: -79, y: -115}
+        - {x: -60, y: -103}
+        - {x: -60, y: -95}
+        - {x: -72, y: -88}
+      - - {x: 60, y: -77}
+        - {x: 49, y: -84}
+        - {x: 49, y: -99}
+        - {x: 59, y: -104}
+        - {x: 86, y: -104}
+        - {x: 89, y: -99}
+        - {x: 89, y: -81}
+        - {x: 84, y: -77}
+      - - {x: 62, y: -32}
+        - {x: 42, y: -32}
+        - {x: 30, y: -42}
+        - {x: 30, y: -55}
+        - {x: 31, y: -57}
+        - {x: 61, y: -57}
+        - {x: 68, y: -49}
+        - {x: 68, y: -38}
+        - {x: 67, y: -33}
+      - - {x: -50, y: -20}
+        - {x: -76, y: -20}
+        - {x: -84, y: -22}
+        - {x: -84, y: -41}
+        - {x: -77, y: -47}
+        - {x: -53, y: -55}
+        - {x: -41, y: -55}
+        - {x: -41, y: -34}
+        - {x: -42, y: -27}
+    - name: splashSheet_alpha_3
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 101, y: -105}
+        - {x: 102, y: -108}
+        - {x: 118, y: -108}
+        - {x: 118, y: -91}
+        - {x: 106, y: -91}
+        - {x: 101, y: -94}
+      - - {x: -110, y: -78}
+        - {x: -113, y: -86}
+        - {x: -113, y: -102}
+        - {x: -106, y: -107}
+        - {x: -91, y: -107}
+        - {x: -84, y: -104}
+        - {x: -84, y: -79}
+        - {x: -88, y: -78}
+      - - {x: 68, y: -41}
+        - {x: 59, y: -48}
+        - {x: 59, y: -71}
+        - {x: 66, y: -73}
+        - {x: 90, y: -73}
+        - {x: 92, y: -63}
+        - {x: 92, y: -45}
+        - {x: 88, y: -41}
+      - - {x: -78, y: -24}
+        - {x: -83, y: -30}
+        - {x: -83, y: -41}
+        - {x: -74, y: -47}
+        - {x: -70, y: -47}
+        - {x: -63, y: -44}
+        - {x: -60, y: -40}
+        - {x: -60, y: -30}
+        - {x: -64, y: -24}
     outline: []
   spritePackingTag: 
   userData: 
