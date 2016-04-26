@@ -71,7 +71,7 @@ public class MenuManager : MonoBehaviour {
         {
             if (strechTime <= 1)
             {
-                titleCorners.transform.localScale = Vector3.Lerp(new Vector3(1.02f,1,1), titleResize,  strechTime);
+                titleCorners.transform.localScale = Vector3.Lerp(new Vector3(1.1f,1,1), titleResize,  strechTime);
                 strechTime += Time.deltaTime;
             }
             else
