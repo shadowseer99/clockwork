@@ -142,6 +142,7 @@ public class Pause : MonoBehaviour {
                     }
 
                     activated = true;
+                    Cursor.visible = true;
                 }
                 else
                 {
@@ -151,6 +152,7 @@ public class Pause : MonoBehaviour {
 #endif
                     Time.timeScale = 1;
                     activated = false;
+                    Cursor.visible = false;
                 }
             }
             screen.SetActive(activated);
