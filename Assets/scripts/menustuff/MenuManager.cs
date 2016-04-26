@@ -18,6 +18,8 @@ public class MenuManager : MonoBehaviour {
     private bool corIn = false;
     private bool corOut = false;
     private float strechTime = 0;
+    private int activemenu = 0;
+    public OptionsMenu option;
 
     // Use this for initialization
     void Start ()
@@ -40,6 +42,7 @@ public class MenuManager : MonoBehaviour {
         }
         corOut = false;
         corIn = true;
+        activemenu = 0;
 	}
 
 	void Update()
@@ -77,6 +80,49 @@ public class MenuManager : MonoBehaviour {
                 titleCorners.transform.localScale = titleResize;
             }
         }
+        if(activemenu==0)
+        {
+            if(Input.GetKeyDown(KeyCode.P))
+            {
+                LoadLevel(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.L))
+            {
+                DisplayMenu(1);
+            }
+            else if(Input.GetKeyDown(KeyCode.C))
+            {
+                DisplayMenu(2);
+            }
+            else if (Input.GetKeyDown(KeyCode.O))
+            {
+                option.setSliders();
+                DisplayMenu(4);
+            }
+            else if(Input.GetKeyDown(KeyCode.Q))
+            {
+                exit();
+            }
+        }
+        else if(activemenu==1||activemenu==2)
+        {
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                DisplayMenu(0);
+            }
+        }
+        else if(activemenu==4)
+        {
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                option.setSounds();
+                DisplayMenu(0);
+            }
+            else if (Input.GetKeyDown(KeyCode.O))
+            {
+                DisplayMenu(0);
+            }
+        }
     }
 
 	public void HideMenus()
@@ -112,6 +158,7 @@ public class MenuManager : MonoBehaviour {
 
 	public void DisplayMenu(int menu)
 	{
+        activemenu = menu;
 		// set only the appropriate menu active
 		HideMenus();
         if(menu==7)

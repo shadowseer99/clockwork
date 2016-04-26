@@ -109,4 +109,13 @@ public class LevelSelectMenu : MonoBehaviour {
 		levels[level].GetComponent<UnityEngine.UI.Button>().enabled = unlock;
 		locks[level].gameObject.SetActive(!unlock);
 	}
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.U))
+        {
+            // unlock all levels
+            for (int i = 0; i < levels.Count; ++i)
+                UnlockLevel(i, true);
+        }
+    }
 }
