@@ -20,7 +20,7 @@ public class MenuManager : MonoBehaviour {
     private float strechTime = 0;
     private int activemenu = 0;
     public OptionsMenu option;
-    public float cornerXscalar = 1.02;
+    public float cornerXscalar = 1.02f;
 
     // Use this for initialization
     void Start ()
