@@ -20,6 +20,7 @@ public class MenuManager : MonoBehaviour {
     private float strechTime = 0;
     private int activemenu = 0;
     public OptionsMenu option;
+    public float cornerXscalar = 1.02;
 
     // Use this for initialization
     void Start ()
@@ -58,20 +59,20 @@ public class MenuManager : MonoBehaviour {
             else if(strechTime<=1)
             {
 				titleCorners.SetActive (true);
-                titleCorners.transform.localScale= Vector3.Lerp(titleResize, Vector3.one, strechTime);
+                titleCorners.transform.localScale = Vector3.Lerp(titleResize, new Vector3(cornerXscalar, 1, 1), strechTime);
                 strechTime += Time.deltaTime;
             }
             else
             {
                 corIn = false;
-                titleCorners.transform.localScale = Vector3.one;
+                titleCorners.transform.localScale = new Vector3(cornerXscalar, 1, 1);
             }
         }
         else if(corOut)
         {
             if (strechTime <= 1)
             {
-                titleCorners.transform.localScale = Vector3.Lerp(new Vector3(1.1f,1,1), titleResize,  strechTime);
+                titleCorners.transform.localScale = Vector3.Lerp(new Vector3(cornerXscalar,1,1), titleResize,  strechTime);
                 strechTime += Time.deltaTime;
             }
             else
