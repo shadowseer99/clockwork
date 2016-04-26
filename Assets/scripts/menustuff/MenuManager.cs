@@ -106,14 +106,14 @@ public class MenuManager : MonoBehaviour {
         }
         else if(activemenu==1||activemenu==2)
         {
-            if (Input.GetKeyDown(KeyCode.B))
+            if (Input.GetKeyDown(KeyCode.B)||Input.GetKeyDown(KeyCode.Escape))
             {
                 DisplayMenu(0);
             }
         }
         else if(activemenu==4)
         {
-            if (Input.GetKeyDown(KeyCode.B))
+            if (Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.Escape))
             {
                 option.setSounds();
                 DisplayMenu(0);
