@@ -74,6 +74,7 @@ public class Pause : MonoBehaviour {
     {
         if(dropping)
         {
+            Cursor.visible = true;
 			if (endBanner.transform.position.y>0)
 				endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
             timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime+coinDelayTime+2*coinStaggerTime+coinFadeTime);
