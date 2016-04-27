@@ -70,6 +70,7 @@ public class Pause : MonoBehaviour {
 			if (img!=null && img.gameObject!=levelend)
 				images.Add(img);
 		}
+		Cursor.visible = false;
 	}
     void Update()
     {
