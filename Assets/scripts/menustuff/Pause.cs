@@ -40,6 +40,7 @@ public class Pause : MonoBehaviour {
 	public float coinFallHeight=300;
 	bool hasEnded=false;
 	public Vector3 timeOffset=230*Vector3.right;
+    private bool speedup = false;
     
     // Use this for initialization
 
@@ -75,9 +76,24 @@ public class Pause : MonoBehaviour {
         if(dropping)
         {
             Cursor.visible = true;
-			if (endBanner.transform.position.y>0)
-				endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
-            timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime+coinDelayTime+2*coinStaggerTime+coinFadeTime);
+            if(speedup)
+            {
+                if (endBanner.transform.position.y > 0)
+                    endBanner.transform.Translate(0, -1000 * Time.unscaledDeltaTime, 0);
+                timer = Mathf.Min(timer + Time.unscaledDeltaTime*2, fadeTime + coinDelayTime + 2 * coinStaggerTime + coinFadeTime);
+            }
+            else
+            {
+                if (endBanner.transform.position.y > 0)
+                    endBanner.transform.Translate(0, -500 * Time.unscaledDeltaTime, 0);
+                timer = Mathf.Min(timer + Time.unscaledDeltaTime, fadeTime + coinDelayTime + 2 * coinStaggerTime + coinFadeTime);
+                if(Input.GetMouseButtonDown(0))
+                {
+                    speedup = true;
+                }
+            }
+
+			
             if(timer < fadeTime)
             {
                 // handle fade
@@ -162,6 +178,7 @@ public class Pause : MonoBehaviour {
 		
     }
 	public void PrintText() { print("Text"); }
+    
 	public void NextLevel()
 	{
 		print("next level...");
